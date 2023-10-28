@@ -14,7 +14,7 @@ This isn't just a website revamp; it's a mission to supercharge community engage
 
 We don't expect you to arrive with all these skills under your belt - this program is as much about gaining practical experience as it is about applying what you already know! That said, any experience you do have in these areas will definitely work in your favor:
 
-- Web Development****: Familiarity with front-end and back-end technologies (think JavaScript, TypeScript, React, Angular, Vue, CSS, HTML, Node.js, Express, etc.) could be beneficial.
+- **Web Development**: Familiarity with front-end and back-end technologies (think JavaScript, TypeScript, React, Angular, Vue, CSS, HTML, Node.js, Express, etc.) could be beneficial.
 - **API Integrations**: Experience with integrating APIs (Showpass, social media, Discord, and others) will come in handy.
 - **WordPress**: If you've got experience with WordPress, that's a bonus, but it's not a requirement.
 - **Interest in Sports**: We're looking for someone who understands the club's mission, end users, and the importance of what we're building.
