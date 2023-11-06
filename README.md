@@ -1,5 +1,25 @@
 # UBC-Tennis-Circle-Website
 
+## Getting Started
+
+[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
+
+### Make sure you have commitizen installed
+
+```bash
+npm install -g commitizen cz-conventional-changelog
+```
+
+### Running the development server
+
+```bash
+npm run dev
+# or
+yarn dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
 ### What will you be building, and how will it be used?
 
 Get ready to revolutionize the digital face of the UBC Tennis Circle! We're building an engaging, user-centric website that goes far beyond their existing WordPress site, one that will transform how the UBC tennis community interacts. With features like interactive calendars, Showpass integration, and review posting, imagine creating a space where members can organize their own events, share photo memories, and easily connect with each other. All of this, while maintaining robust security and a connection with the club's Discord server. This project will enhance the club's online presence significantly, giving you practical coding experience and the satisfaction of influencing a thriving community. Join us in this project to broaden your skills and help shape the UBC Tennis Circle's future!
@@ -27,23 +47,3 @@ In contrast to Developers, we expect the Tech Leads to already have a good grasp
 - **Team Leadership**: The ability to guide and coordinate a team of developers is a must.
 - **UI/UX Design**: Familiarity with design principles to help guide the team in creating a user-friendly interface.
 - **Scalability and Maintainability**: Understanding how to build scalable solutions and plan for future maintenance is important, especially considering the site needs to be easily managed by non-coders in the future.
-
-## Getting Started
-
-[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
-
-### Make sure you have commitizen installed
-
-```bash
-npm install -g commitizen cz-conventional-changelog
-```
-
-### Running the development server
-
-```bash
-npm run dev
-# or
-yarn dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
