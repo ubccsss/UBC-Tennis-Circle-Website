@@ -27,3 +27,23 @@ In contrast to Developers, we expect the Tech Leads to already have a good grasp
 - **Team Leadership**: The ability to guide and coordinate a team of developers is a must.
 - **UI/UX Design**: Familiarity with design principles to help guide the team in creating a user-friendly interface.
 - **Scalability and Maintainability**: Understanding how to build scalable solutions and plan for future maintenance is important, especially considering the site needs to be easily managed by non-coders in the future.
+
+## Getting Started
+
+[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
+
+### Make sure you have commitizen installed
+
+```bash
+npm install -g commitizencz-conventional-changelog
+```
+
+### Running the development server
+
+```bash
+npm run dev
+# or
+yarn dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
