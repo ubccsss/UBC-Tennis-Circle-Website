@@ -35,7 +35,7 @@ In contrast to Developers, we expect the Tech Leads to already have a good grasp
 ### Make sure you have commitizen installed
 
 ```bash
-npm install -g commitizencz-conventional-changelog
+npm install -g commitizen cz-conventional-changelog
 ```
 
 ### Running the development server
