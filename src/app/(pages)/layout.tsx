@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Chakra } from "@providers/chakra";
 
 export const metadata: Metadata = {
   title: "UBC Tennis Circle",
@@ -8,7 +9,11 @@ export const metadata: Metadata = {
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Chakra>
+          {children}
+        </Chakra>
+      </body>
     </html>
   );
 };
