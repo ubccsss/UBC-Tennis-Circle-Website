@@ -1,4 +1,4 @@
-import mongoose , { Schema , Types } from "mongoose"
+import mongoose, { Schema , Types } from "mongoose"
 
 export interface Comment{
     _id: string,
