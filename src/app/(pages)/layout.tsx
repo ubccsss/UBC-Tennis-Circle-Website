@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-import { Chakra } from "@providers/index";
-import { ReactQueryProvider } from "@providers/index";
+import { Chakra } from "@providers";
+import { ReactQueryProvider } from "@providers";
 
 export const metadata: Metadata = {
   title: "UBC Tennis Circle",
