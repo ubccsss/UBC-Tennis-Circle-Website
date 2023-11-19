@@ -1,6 +1,10 @@
 import z from "zod"
 import { connectToDatabase } from "@lib/mongoose"
 import { validDate } from "@helpers"
+import { NextRequest } from "next/server"
+import { ServerResponse } from "@helpers"
+import { getSession } from "@helpers"
+import Filter from "bad-words"
 
 const EventSchema = z.object({
     open: z
@@ -15,10 +19,6 @@ const EventSchema = z.object({
         .string()
         .array()
         .nonempty("At least 1 attendee is required for your events"),
-    hosted_by: z
-        .string({
-            required_error: "Name of person hosting is required"
-        }),
     location: z
         .string({
             required_error: "Location of event is required"
@@ -38,3 +38,32 @@ const EventSchema = z.object({
 })
 
 type Event = z.infer<typeof EventSchema>
+
+export const POST = async (request: NextRequest) => {
+    await connectToDatabase()
+
+    const body: Event = await request.json()
+
+    const session = getSession(request);
+
+    if (!session) {
+        ServerResponse.unauthorizedError();
+    }
+
+
+    // type validation
+    const zodValidation = EventSchema.safeParse(body)
+
+    if(zodValidation.success){
+        const filter = new Filter()
+        if (filter.isProfane(body.name)){
+            return ServerResponse.userError("Please do not use profanity in the event name")
+        } else {
+            return ServerResponse.success("Event created successfully")
+        }
+    }
+    else{
+        return ServerResponse.validationError(zodValidation)
+    }
+
+}
