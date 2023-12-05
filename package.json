@@ -18,7 +18,7 @@
     "axios": "^1.6.2",
     "bad-words": "^3.0.4",
     "date-fns": "^2.30.0",
-    "framer-motion": "^10.16.4",
+    "framer-motion": "^10.16.14",
     "lucia": "^2.7.4",
     "mongodb": "^6.2.0",
     "mongoose": "^8.0.0",
