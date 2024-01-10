@@ -1,19 +1,21 @@
 {
+  "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
     "target": "es5",
+    "rootDir": ".",
     "lib": ["dom", "dom.iterable", "esnext"],
+    "outDir": "build",
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
+    "incremental": true,
     "esModuleInterop": true,
-    "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "downlevelIteration": true,
     "jsx": "preserve",
-    "incremental": true,
+    "baseUrl": "./",
     "plugins": [
       {
         "name": "next"
@@ -24,13 +26,14 @@
       "@models/*": ["./src/models/*"],
       "@components/*": ["./src/components/*"],
       "@contexts/*": ["./src/contexts/*"],
-      "@broadcasts/*": ["./src/broadcasts/*"],
       "@utils/*": ["./src/utils/*"],
+      "@broadcasts/*": ["./src/broadcasts/*"],
       "@hooks/*": ["./src/hooks/*"],
       "@providers/*": ["./src/providers/*"],
+      "@constants/*": ["./src/constants/*"],
+      "@types/*": ["./src/types/*"],
       "@helpers/*": ["./src/app/api/helpers/*"],
       "@emails/*": ["./src/app/api/emails/*"],
-      "@constants/*": ["./src/app/api/constants/*"],
 
       "@lib": ["./src/lib"],
       "@models": ["./src/models"],
@@ -40,20 +43,23 @@
       "@broadcasts": ["./src/broadcasts"],
       "@hooks": ["./src/hooks"],
       "@providers": ["./src/providers"],
+      "@constants": ["./src/constants"],
+      "@types": ["./src/types"],
       "@helpers": ["./src/app/api/helpers"],
       "@emails": ["./src/app/api/emails"],
-      "@constants": ["./src/app/api/constants"],
 
       "@/*": ["./src/*"]
     }
   },
   "include": [
+    "src/**/*.ts",
+    "test/**/*.ts",
+    ".next/types/**/*.ts",
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     "**/**/*.tsx",
     ".next/types/**/*.ts",
     "./src/types/*.d.ts"
-  ],
-  "exclude": ["node_modules"]
+  ]
 }
