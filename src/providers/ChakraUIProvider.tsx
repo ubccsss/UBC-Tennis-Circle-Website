@@ -1,7 +1,16 @@
 'use client';
 import {CacheProvider} from '@chakra-ui/next-js';
-import {ChakraProvider, extendTheme} from '@chakra-ui/react';
+import {ChakraProvider, extendTheme, defineStyleConfig} from '@chakra-ui/react';
 
+// Components
+const Button = defineStyleConfig({
+  defaultProps: {
+    colorScheme: 'green',
+    size: 'md',
+  },
+});
+
+// Custom theme
 const theme = extendTheme({
   colors: {
     black: {
@@ -68,6 +77,9 @@ const theme = extendTheme({
   fonts: {
     heading: 'Work Sans',
     body: 'Work Sans',
+  },
+  components: {
+    Button,
   },
 });
 
