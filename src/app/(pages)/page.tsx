@@ -1,8 +1,12 @@
 'use client';
-import {Text} from '@chakra-ui/react';
+import {Text, Button} from '@chakra-ui/react';
 
 const Home = () => {
-  return <Text>Font Test</Text>;
+  return (
+    <>
+      <Button>hello</Button>
+    </>
+  );
 };
 
 export default Home;
