@@ -4,26 +4,23 @@ import {OAuthRequestError} from '@lucia-auth/oauth';
 import {cookies, headers} from 'next/headers';
 import {NextResponse} from 'next/server';
 
-import type {NextRequest} from 'next/server';
-import {getDomain} from 'tldts';
-
 export const GET = async (request: NextRequest) => {
   const state = request.nextUrl.searchParams.get('state');
   const code = request.nextUrl.searchParams.get('code');
 
-  try {
-    const googleObj = await googleAuth.validateCallback(code!);
-    console.log(googleObj.googleUser);
+  if (!state || !code) {
+    return ServerResponse.serverError('Could not process request');
+  }
 
-    return ServerResponse.success('Success');
-    /*
+  try {
+    const {getExistingUser, createUser, googleUser} =
+      await googleAuth.validateCallback(code!);
+
     const userAttributes = {
       first_name: googleUser.given_name,
       last_name: googleUser.family_name,
-      email_address: 'no-email@gmail.com',
-      email_verified: true,
-      role: 'Google Test User',
-      domain: 'gmail.com',
+      email_address: googleUser.email,
+      email_verified: googleUser.email_verified,
     };
 
     const getUser = async () => {
@@ -50,9 +47,5 @@ export const GET = async (request: NextRequest) => {
       return ServerResponse.userError('Bad OAUTH REQUEST');
     }
     return ServerResponse.serverError();
-  }
-  */
-  } catch (e) {
-    console.log(e);
   }
 };
