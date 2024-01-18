@@ -21,6 +21,9 @@ import {
   ModalContent,
   ModalCloseButton,
   ModalBody,
+  Link,
+  Text,
+  HStack,
 } from '@chakra-ui/react';
 import {FiArrowRight, FiMail} from 'react-icons/fi';
 import {Subheader} from '@components';
@@ -29,6 +32,7 @@ import z from 'zod';
 import axios from 'axios';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {DEFAULT_SERVER_ERR, ZOD_ERR} from '@constants';
+import {ExternalLinkIcon} from '@chakra-ui/icons';
 
 const schema = z
   .object({
@@ -49,6 +53,8 @@ const schema = z
 type Form = z.infer<typeof schema>;
 
 const Signup = () => {
+  const GOOGLE_AUTH_LINK = `${process.env.NEXT_PUBLIC_HOSTNAME}/api/auth/signup/google`;
+
   const statusToast = useToast();
 
   const {isOpen, onOpen, onClose} = useDisclosure();
@@ -220,6 +226,12 @@ const Signup = () => {
             >
               Continue
             </Button>
+            <HStack>
+              <Text>or </Text>
+              <Link href={GOOGLE_AUTH_LINK}>
+                Sign up with Google <ExternalLinkIcon mx="2px" />
+              </Link>
+            </HStack>
           </VStack>
         </form>
       </SimpleGrid>
