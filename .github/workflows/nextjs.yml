@@ -15,6 +15,20 @@ jobs:
         node-version: [18.x]
 
     steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install Dependencies
+        run: npm ci
       - name: Create env file
         run: |
           touch .env
@@ -28,24 +42,6 @@ jobs:
           echo "NEXT_UPLOADTHING_APP_ID=${{ secrets.NEXT_UPLOADTHING_APP_ID }}" >> .env
           echo "NEXT_TENNIS_CIRCLE_LOGO_URI=${{ secrets.NEXT_TENNIS_CIRCLE_LOGO_URI }}" >> .env
           cat .env
-
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Cache node modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install Dependencies
-        run: npm ci
-
       - name: Build
         run: npm run build
 
