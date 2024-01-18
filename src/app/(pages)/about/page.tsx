@@ -3,17 +3,17 @@ import {Container} from '@chakra-ui/react';
 import axios from 'axios';
 import {useQuery} from '@tanstack/react-query';
 
-// get featured team members
+// get all team members
 const getFeatured = async () => {
   const featured = await axios.get(
-    `${process.env.NEXT_PUBLIC_HOSTNAME}/api/team/get-featured`
+    `${process.env.NEXT_PUBLIC_HOSTNAME}/api/team/get-all`
   );
   return featured.data;
 };
 
 const Home = () => {
   const {isPending, error, data} = useQuery({
-    queryKey: ['featured-team'],
+    queryKey: ['team'],
     queryFn: getFeatured,
   });
 

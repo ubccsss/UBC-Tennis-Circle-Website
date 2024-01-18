@@ -44,7 +44,6 @@
     "react-email": "^1.10.0",
     "react-hook-form": "^7.49.3",
     "react-icons": "^5.0.1",
-    "react-query": "^3.39.3",
     "resend": "^2.0.0",
     "winston": "^3.11.0",
     "zod": "^3.22.4"
