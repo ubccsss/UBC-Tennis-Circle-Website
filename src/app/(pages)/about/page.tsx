@@ -11,7 +11,7 @@ const getFeatured = async () => {
   return featured.data;
 };
 
-const Home = () => {
+const About = () => {
   const {isPending, error, data} = useQuery({
     queryKey: ['team'],
     queryFn: getFeatured,
@@ -20,4 +20,4 @@ const Home = () => {
   return <Container maxW="container.xl"></Container>;
 };
 
-export default Home;
+export default About;
