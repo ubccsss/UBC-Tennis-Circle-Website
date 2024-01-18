@@ -4,7 +4,6 @@ import type {
   EntryFieldTypes,
   EntrySkeletonType,
   LocaleCode,
-  Asset,
 } from 'contentful';
 
 export interface TypeEventFields {

@@ -41,6 +41,9 @@ jobs:
           echo "NEXT_UPLOADTHING_SECRET=${{ secrets.NEXT_UPLOADTHING_SECRET }}" >> .env
           echo "NEXT_UPLOADTHING_APP_ID=${{ secrets.NEXT_UPLOADTHING_APP_ID }}" >> .env
           echo "NEXT_TENNIS_CIRCLE_LOGO_URI=${{ secrets.NEXT_TENNIS_CIRCLE_LOGO_URI }}" >> .env
+          echo "NEXT_CONTENTFUL_API_KEY=${{ secrets.NEXT_CONTENTFUL_API_KEY }}" >> .env
+          echo "NEXT_CONTENTFUL_SPACE_ID=${{ secrets.NEXT_CONTENTFUL_SPACE_ID }}" >> .env
+          echo "NEXT_CONTENTFUL_CMA_TOKEN=${{ secrets.NEXT_CONTENTFUL_CMA_TOKEN }}" >> .env
           cat .env
       - name: Build
         run: npm run build
