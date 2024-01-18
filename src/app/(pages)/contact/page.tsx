@@ -6,9 +6,8 @@ import {
   Button,
   Heading,
   Input,
-  SimpleGrid,
   Img,
-  Box,
+  Flex,
   FormControl,
   FormErrorMessage,
   Stack,
@@ -75,28 +74,20 @@ const Contact = () => {
 
   return (
     <Container maxW="container.xl" py={{base: '32', lg: '20'}}>
-      <SimpleGrid
-        columns={{base: 1, lg: 2}}
-        px="4"
-        alignItems="center"
-        spacing="16"
-      >
-        <Box w="100%" h="100%" display={{base: 'none', lg: 'block'}}>
-          <Img
-            sizes="lg"
-            src="/static/images/illustrations/question-mark.svg"
-            alt="Solar Panel"
-            borderRadius="lg"
-            objectFit="cover"
-            marginLeft={60}
-          />
-        </Box>
+      <Flex flexDirection="row" w="100%" justifyContent="center" gap="36">
+        <Img
+          sizes="lg"
+          src="/static/images/illustrations/question-mark.svg"
+          alt="Solar Panel"
+          borderRadius="lg"
+          display={{base: 'none', lg: 'block'}}
+          ml="24"
+        />
         <form onSubmit={handleSubmit(onSubmit)}>
           <VStack
             align="flex-start"
             w={{base: '100%', sm: 'max-content'}}
             spacing="19"
-            mx="auto"
           >
             <Heading as="h1" size="2xl">
               Have any Questions?
@@ -176,7 +167,7 @@ const Contact = () => {
             </Button>
           </VStack>
         </form>
-      </SimpleGrid>
+      </Flex>
     </Container>
   );
 };
