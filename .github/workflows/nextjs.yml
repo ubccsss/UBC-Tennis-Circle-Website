@@ -15,11 +15,19 @@ jobs:
         node-version: [18.x]
 
     steps:
-      - name: Create .env file
-        uses: SpicyPizza/create-envfile@v2.0
-        with:
-          envkey_DEBUG: false
-          envkey_SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      - name: Create env file
+        run: |
+          touch .env
+          echo "NEXT_ATLAS_URI=${{ secrets.NEXT_ATLAS_URI }}" >> .env
+          echo "NEXT_PUBLIC_HOSTNAME=${{ secrets.NEXT_PUBLIC_HOSTNAME }}" >> .env
+          echo "NEXT_OAUTH_ID=${{ secrets.NEXT_OAUTH_ID }}" >> .env
+          echo "NEXT_OAUTH_SECRET=${{ secrets.NEXT_OAUTH_SECRET }}" >> .env
+          echo "NEXT_SEND_EMAIL=${{ secrets.NEXT_SEND_EMAIL }}" >> .env
+          echo "NEXT_RESEND_API=${{ secrets.NEXT_RESEND_API }}" >> .env
+          echo "NEXT_UPLOADTHING_SECRET=${{ secrets.NEXT_UPLOADTHING_SECRET }}" >> .env
+          echo "NEXT_UPLOADTHING_APP_ID=${{ secrets.NEXT_UPLOADTHING_APP_ID }}" >> .env
+          echo "NEXT_TENNIS_CIRCLE_LOGO_URI=${{ secrets.NEXT_TENNIS_CIRCLE_LOGO_URI }}" >> .env
+          cat .env
 
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
