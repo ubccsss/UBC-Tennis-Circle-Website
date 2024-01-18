@@ -1,3 +1,4 @@
+'use server';
 import React from 'react';
 import {Resend} from 'resend';
 import {renderAsync} from '@react-email/render';
