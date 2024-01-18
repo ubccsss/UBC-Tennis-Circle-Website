@@ -1,42 +1,10 @@
 'use client';
 import {CacheProvider} from '@chakra-ui/next-js';
-import {ChakraProvider, extendTheme, defineStyleConfig} from '@chakra-ui/react';
-
-// Components
-const Button = defineStyleConfig({
-  defaultProps: {
-    colorScheme: 'green',
-    size: 'md',
-  },
-});
+import {ChakraProvider, extendTheme} from '@chakra-ui/react';
 
 // Custom theme
 const theme = extendTheme({
   colors: {
-    black: {
-      50: '#999897',
-      100: '#868583',
-      200: '#747270',
-      300: '#61605e',
-      400: '#504e4c',
-      500: '#3f3d3b',
-      600: '#353432',
-      700: '#2c2b29',
-      800: '#232221',
-      900: '#1b1a19',
-    },
-    white: {
-      50: '#fefefe',
-      100: '#fafbfb',
-      200: '#f8f9f8',
-      300: '#f7f8f7',
-      400: '#f5f7f6',
-      500: '#f3f5f4',
-      600: '#d3d5d4',
-      700: '#b4b6b5',
-      800: '#979897',
-      900: '#7a7b7a',
-    },
     navy: {
       50: '#8392b0',
       100: '#6c7ea1',
@@ -49,7 +17,7 @@ const theme = extendTheme({
       800: '#0a193a',
       900: '#06122e',
     },
-    green: {
+    brand: {
       50: '#9accbc',
       100: '#85c2b0',
       200: '#70b8a3',
@@ -61,7 +29,7 @@ const theme = extendTheme({
       800: '#085d4c',
       900: '#054a3c',
     },
-    yellow: {
+    accent: {
       50: '#ffdea7',
       100: '#ffd795',
       200: '#ffd081',
@@ -77,9 +45,6 @@ const theme = extendTheme({
   fonts: {
     heading: 'Work Sans',
     body: 'Work Sans',
-  },
-  components: {
-    Button,
   },
 });
 

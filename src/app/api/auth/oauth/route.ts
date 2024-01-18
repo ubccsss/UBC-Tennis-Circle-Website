@@ -1,10 +1,7 @@
-// app/login/github/route.ts
 import {googleAuth} from '@lib/lucia';
 import * as context from 'next/headers';
 
-import type {NextRequest} from 'next/server';
-
-export const GET = async (request: NextRequest) => {
+export const GET = async () => {
   const [url, state] = await googleAuth.getAuthorizationUrl();
   // store state
   context.cookies().set('google_oauth_state', state, {

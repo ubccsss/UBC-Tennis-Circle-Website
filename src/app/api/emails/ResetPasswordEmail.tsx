@@ -36,7 +36,7 @@ export const ResetPasswordEmail = ({
             <Img
               src={`${process.env.NEXT_TENNIS_CIRCLE_LOGO_URI}`}
               alt="Tennis Circle"
-              height="40"
+              height="80"
               className="mx-auto mt-4 object-fill"
             />
             <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
@@ -49,7 +49,7 @@ export const ResetPasswordEmail = ({
             </Text>
             <Section className="text-center mt-[32px] mb-[32px]">
               <Button
-                className="bg-[#232F6F] rounded text-white text-[12px] font-semibold no-underline text-center px-6 py-4"
+                className="bg-[#15997e] rounded text-white text-[12px] font-semibold no-underline text-center px-6 py-4"
                 href={url}
               >
                 Reset Password

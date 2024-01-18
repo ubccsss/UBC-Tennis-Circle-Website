@@ -5,7 +5,11 @@
   },
   "settings": {
     "node": {
-      "allowModules": ["@chakra-ui/theme", "@chakra-ui/theme-tools"]
+      "allowModules": [
+        "@chakra-ui/theme",
+        "@chakra-ui/theme-tools",
+        "broadcast-channel"
+      ]
     }
   }
 }

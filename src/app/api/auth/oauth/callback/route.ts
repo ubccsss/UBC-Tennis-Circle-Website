@@ -2,7 +2,7 @@ import {ServerResponse} from '@helpers/serverResponse';
 import {auth, googleAuth} from '@lib/lucia';
 import {OAuthRequestError} from '@lucia-auth/oauth';
 import {cookies, headers} from 'next/headers';
-import {NextResponse} from 'next/server';
+import {NextResponse, NextRequest} from 'next/server';
 
 export const GET = async (request: NextRequest) => {
   const state = request.nextUrl.searchParams.get('state');
@@ -41,10 +41,10 @@ export const GET = async (request: NextRequest) => {
       headers,
     });
     authRequest.setSession(session);
-    return NextResponse.redirect(new URL('/my-company', request.url));
+    return NextResponse.redirect(new URL('/', request.url));
   } catch (e) {
     if (e instanceof OAuthRequestError) {
-      return ServerResponse.userError('Bad OAUTH REQUEST');
+      return ServerResponse.userError('Bad oauth request');
     }
     return ServerResponse.serverError();
   }

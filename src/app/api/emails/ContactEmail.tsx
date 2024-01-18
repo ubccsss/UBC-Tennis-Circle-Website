@@ -34,7 +34,7 @@ export const ContactEmail = ({
             <Img
               src={`${process.env.NEXT_TENNIS_CIRCLE_LOGO_URI}`}
               alt="Tennis Circle"
-              height="40"
+              height="80"
               className="mx-auto mt-4 object-fill"
             />
             <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
