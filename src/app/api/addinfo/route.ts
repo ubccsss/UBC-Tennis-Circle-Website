@@ -4,6 +4,7 @@ import {logger} from '@lib/winston';
 import {User} from '@models/User';
 import {NextRequest} from 'next/server';
 import z from 'zod';
+import {getSession} from '@helpers/getSession';
 
 const UpdateSchema = z.object({
   id: z.string({required_error: 'User ID is required'}),
@@ -27,6 +28,11 @@ export const PUT = async (request: NextRequest) => {
 
   if (validation.success) {
     try {
+      const {session} = await getSession(request);
+
+      if (!session) {
+        return ServerResponse.unauthorizedError();
+      }
       const {id, skill, instagram} = structuredClone(body);
 
       const user = await User.findById(id);
@@ -35,12 +41,12 @@ export const PUT = async (request: NextRequest) => {
         return ServerResponse.userError('Invalid user ID');
       }
 
-      const updatedUser = await User.findByIdAndUpdate(id, {
+      await User.findByIdAndUpdate(id, {
         skill: skill,
         instagram: instagram,
       });
 
-      return ServerResponse.success(updatedUser);
+      return ServerResponse.success('Successfully updated user attributes');
     } catch (e) {
       logger.error(e);
       console.log(e);

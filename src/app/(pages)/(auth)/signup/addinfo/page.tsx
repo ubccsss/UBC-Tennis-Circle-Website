@@ -15,13 +15,15 @@ import {
   Spacer,
   FormControl,
   FormErrorMessage,
+  useToast,
 } from '@chakra-ui/react';
 import {useSearchParams} from 'next/navigation';
 import {FiArrowRight, FiInstagram} from 'react-icons/fi';
 import z from 'zod';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {ZOD_ERR} from '@constants/error-messages';
+import {ZOD_ERR, DEFAULT_SERVER_ERR} from '@constants/error-messages';
+import axios from 'axios';
 
 const schema = z.object({
   skill: z.string().min(1, ZOD_ERR.REQ_FIELD),
@@ -31,6 +33,7 @@ const schema = z.object({
 type Form = z.infer<typeof schema>;
 
 const AddInfo = () => {
+  const statusToast = useToast();
   const params = useSearchParams();
   const id = params.get('id');
   const picture = params.get('picture');
@@ -41,8 +44,31 @@ const AddInfo = () => {
     formState: {errors, isSubmitting},
   } = useForm<Form>({resolver: zodResolver(schema)});
 
-  const onSubmit = ({skill, instagram}: Form) => {
-    console.log(skill, instagram);
+  const onSubmit = async ({skill, instagram}: Form) => {
+    try {
+      const res = await axios.put(
+        `${process.env.NEXT_PUBLIC_HOSTNAME}/api/addinfo`,
+        {
+          id,
+          skill: parseInt(skill),
+          instagram,
+        }
+      );
+
+      if (res.data) {
+        statusToast({
+          title: res.data.message,
+          status: 'success',
+        });
+      }
+    } catch (e) {
+      if (axios.isAxiosError(e)) {
+        statusToast({
+          title: e?.response?.data?.message || DEFAULT_SERVER_ERR,
+          status: 'error',
+        });
+      }
+    }
   };
 
   const skip = () => {
