@@ -12,7 +12,9 @@
     "compile": "tsc",
     "fix": "gts fix",
     "pretest": "npm run compile",
-    "posttest": "npm run lint"
+    "posttest": "npm run lint",
+    "cf-type-gen": "dotenv -- bash -c 'cf-content-types-generator -s $NEXT_CONTENTFUL_SPACE_ID -t $NEXT_CONTENTFUL_CMA_TOKEN -X -o ./src/types/contentful' && npm run fix",
+    "gen-example-env": "sed 's/=.*/=/' .env > .env.example"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
@@ -28,6 +30,9 @@
     "@tanstack/react-query": "^5.8.3",
     "axios": "^1.6.2",
     "broadcast-channel": "^5.3.0",
+    "cf-content-types-generator": "^2.13.1",
+    "contentful": "^10.6.16",
+    "dotenv-cli": "^7.3.0",
     "framer-motion": "^10.16.4",
     "lucia": "^2.7.4",
     "mongodb": "^6.2.0",
