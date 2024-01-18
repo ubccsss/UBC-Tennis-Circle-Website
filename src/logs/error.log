@@ -2,3 +2,5 @@
 {"level":"error","service":"user-service"}
 {"level":"error","service":"user-service"}
 {"level":"error","service":"user-service"}
+{"digest":"DYNAMIC_SERVER_USAGE","level":"error","service":"user-service"}
+{"detail":"","level":"error","service":"user-service"}
