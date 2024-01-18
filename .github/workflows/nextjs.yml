@@ -16,8 +16,10 @@ jobs:
 
     steps:
       - name: Create .env file
-        run: |
-          echo "${{ secrets.ENV_FILE }}" > .env
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          envkey_DEBUG: false
+          envkey_SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
