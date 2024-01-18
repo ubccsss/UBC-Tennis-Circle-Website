@@ -22,7 +22,7 @@ export const sendMail = async ({
     const emailHTML = await renderAsync(emailComponent);
 
     return await resend.emails.send({
-      from: process.env.NEXT_SEND_EMAIL!,
+      from: `UBC Tennis Circle <${process.env.NEXT_SEND_EMAIL!}>`,
       to,
       subject,
       html: emailHTML,
