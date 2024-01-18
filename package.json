@@ -13,7 +13,8 @@
     "fix": "gts fix",
     "pretest": "npm run compile",
     "posttest": "npm run lint",
-    "cf-type-gen": "dotenv -- bash -c 'cf-content-types-generator -s $NEXT_CONTENTFUL_SPACE_ID -t $NEXT_CONTENTFUL_CMA_TOKEN -X -o ./src/types/contentful' && npm run fix"
+    "cf-type-gen": "dotenv -- bash -c 'cf-content-types-generator -s $NEXT_CONTENTFUL_SPACE_ID -t $NEXT_CONTENTFUL_CMA_TOKEN -X -o ./src/types/contentful' && npm run fix",
+    "gen-example-env": "sed 's/=.*/=/' .env > .env.example"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",

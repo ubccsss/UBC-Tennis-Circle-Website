@@ -28,6 +28,8 @@ yarn-error.log*
 
 # local env files
 .env*.local
+.env.me
+.env.previous
 .env
 
 # vercel
@@ -39,3 +41,8 @@ next-env.d.ts
 
 # react email
 /.react-email
+
+.env*
+.flaskenv*
+!.env.project
+!.env.vault
