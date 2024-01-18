@@ -1,5 +1,5 @@
 import type {Metadata} from 'next';
-import {Providers} from '@components';
+import {Providers, Navbar, Footer, PageWrapper} from '@components';
 import {Work_Sans} from 'next/font/google';
 
 export const metadata: Metadata = {
@@ -17,7 +17,11 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en" className={workSans.className}>
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <Navbar />
+          <PageWrapper>{children}</PageWrapper>
+          <Footer />
+        </Providers>
       </body>
     </html>
   );

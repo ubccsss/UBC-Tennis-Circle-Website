@@ -1,12 +1,8 @@
 'use client';
-import {Text, Button} from '@chakra-ui/react';
+import {Container} from '@chakra-ui/react';
 
 const Home = () => {
-  return (
-    <>
-      <Button>hello</Button>
-    </>
-  );
+  return <Container maxW="container.xl"></Container>;
 };
 
 export default Home;

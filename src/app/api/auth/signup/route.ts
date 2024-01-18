@@ -49,6 +49,8 @@ export const POST = async (request: NextRequest) => {
           last_name,
           email_address,
           email_verified: false,
+          skill: 1,
+          instagram: null,
         },
       });
 

@@ -1,6 +1,5 @@
 import {connectToDatabase} from '@lib/mongoose';
 import {logger} from '@lib/winston';
-import {ServerResponse} from '@helpers/serverResponse';
 import {auth} from '@lib/lucia';
 import {isWithinExpiration} from 'lucia/utils';
 import {EmailToken} from '@models/EmailToken';

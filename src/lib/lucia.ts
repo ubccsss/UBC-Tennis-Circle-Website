@@ -2,6 +2,7 @@ import {lucia} from 'lucia';
 import {nextjs_future} from 'lucia/middleware';
 import {mongoose} from '@lucia-auth/adapter-mongoose';
 import {User, Key, Session} from '@models';
+import {google} from '@lucia-auth/oauth/providers';
 
 export const auth = lucia({
   adapter: mongoose({
@@ -25,6 +26,13 @@ export const auth = lucia({
       instagram: data.instagram,
     };
   },
+});
+
+export const googleAuth = google(auth, {
+  clientId: process.env.NEXT_OAUTH_ID!,
+  clientSecret: process.env.NEXT_OAUTH_SECRET!,
+  redirectUri: `${process.env.NEXT_PUBLIC_HOSTNAME}/api/auth/signup/google/callback`,
+  scope: ['https://www.googleapis.com/auth/userinfo.email'],
 });
 
 export type Auth = typeof auth;
