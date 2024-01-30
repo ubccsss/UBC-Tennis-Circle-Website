@@ -25,12 +25,9 @@ const faq = () => {
           <Heading as="h1" size="xl" mb={4}>
             What can we help you find?
           </Heading>
-          <Box width={{base: '100%', sm: '50%'}} mb={7}>
-            <Text>
+          <Box width={{base: '100%', sm: '80%'}} mb={7}>
+            <Text textAlign={{base: 'left', sm: 'center'}}>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat.
             </Text>
           </Box>
           <Box width={{base: '100%', sm: '75%'}}>
