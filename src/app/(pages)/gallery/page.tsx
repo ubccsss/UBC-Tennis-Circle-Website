@@ -2,6 +2,7 @@
 
 import {useEffect, useState, useRef} from 'react';
 import {
+  Skeleton,
   Container,
   Text,
   Box,
@@ -24,6 +25,10 @@ const Gallery = () => {
   const [after, setAfter] = useState(null);
   const [loading, setLoading] = useState(false);
   const loader = useRef(null);
+
+  const skeletons = new Array(9).fill(null).map((_, index) => (
+    <Skeleton key={index} rounded="lg" height="300px" width="300px" />
+  ));
 
   const fetchPosts = async (afterParam = null) => {
     if (loading) return;
@@ -89,57 +94,27 @@ const Gallery = () => {
       </Box>
       <Container maxW="container.lg" py="28">
         <SimpleGrid columns={3} spacing={6}>
-          {posts.map((post, index) =>
-            posts.length === index + 1 ? (
-              <Box
-                key={`post-${index}`}
+          {posts.length === 0 ? skeletons : posts.map((post, index) => (
+          <Box 
+              key={`post-${index}`}
                 ref={loader}
                 w="300px"
                 h="300px"
                 rounded="lg"
-                overflow="hidden"
-              >
-                <a
-                  href={post.permalink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Image
-                    src={post.media_url}
-                    alt={post.caption}
-                    objectFit="cover"
-                    width="100%"
-                    height="100%"
-                  />
-                </a>
-              </Box>
-            ) : (
-              <Box
-                key={`post-${index}`}
-                w="300px"
-                h="300px"
-                rounded="lg"
-                overflow="hidden"
-              >
-                <a
-                  href={post.permalink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Image
-                    src={post.media_url}
-                    alt={post.caption}
-                    objectFit="cover"
-                    width="100%"
-                    height="100%"
-                  />
-                </a>
-              </Box>
-            )
-          )}
+                overflow="hidden">
+            <a href={post.permalink} target="_blank" rel="noopener noreferrer">
+              <Image src={post.media_url}
+                alt={post.caption}
+                objectFit="cover"
+                width="100%"
+                height="100%" />
+            </a>
+          </Box>
+        ))}
         </SimpleGrid>
       </Container>
-      {loading && <Center>Loading more posts...</Center>}
+      {loading && <Center>
+        <Text color="gray">Loading...</Text></Center>}
     </Container>
   );
 };
