@@ -25,7 +25,6 @@ const Events = () => {
         </Center>
         <Center>
           <Text
-            font="Work Sans"
             fontWeight="500"
             fontSize="4xl"
             color="#15997E"
