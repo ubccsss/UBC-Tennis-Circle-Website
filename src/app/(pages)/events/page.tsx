@@ -24,11 +24,7 @@ const Events = () => {
           </Text>
         </Center>
         <Center>
-          <Text
-            fontWeight="500"
-            fontSize="4xl"
-            color="#15997E"
-          >
+          <Text fontWeight="500" fontSize="4xl" color="#15997E">
             More events coming soon!
           </Text>
         </Center>
