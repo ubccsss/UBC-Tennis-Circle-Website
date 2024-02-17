@@ -16,6 +16,9 @@
 /build
 combined.log
 error.log
+/src/logs
+/src/logs/combined.log
+/src/logs/error.log
 
 # misc
 .DS_Store
