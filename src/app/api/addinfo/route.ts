@@ -5,6 +5,8 @@ import {User} from '@models/User';
 import {NextRequest} from 'next/server';
 import z from 'zod';
 import {getSession} from '@helpers/getSession';
+import {UTApi} from 'uploadthing/server';
+import {dataURLtoFile} from '@helpers/dataURLtoFile';
 
 const UpdateSchema = z.object({
   id: z.string({required_error: 'User ID is required'}),
@@ -17,7 +19,12 @@ const UpdateSchema = z.object({
     {message: 'Skill level must be between 1 and 5'}
   ),
   instagram: z.string({required_error: 'Instagram is required'}),
+  profile: z.string({required_error: 'Profile is required'}),
 });
+
+const testIfBase64 = (input: string): boolean => {
+  return input.startsWith('https://');
+};
 
 export const PUT = async (request: NextRequest) => {
   await connectToDatabase();
@@ -28,12 +35,41 @@ export const PUT = async (request: NextRequest) => {
 
   if (validation.success) {
     try {
-      const {session} = await getSession(request);
+      const {id, skill, instagram, profile} = structuredClone(body);
 
-      if (!session) {
-        return ServerResponse.unauthorizedError();
+      const base64ImageType = profile.match(/^data:(.+);base64/)?.[1];
+
+      let profileURL = profile;
+
+      if (!testIfBase64(profileURL)) {
+        if (base64ImageType?.split('/')[0] !== 'image' && !profileURL) {
+          return ServerResponse.userError('Invalid company image');
+        }
+
+        if (base64ImageType?.split('/')[0] === 'image') {
+          // uploading image to uploadthing if base64
+          const utapi = new UTApi({
+            apiKey: process.env.NEXT_UPLOADTHING_SECRET,
+          });
+
+          const file = await dataURLtoFile(profile, instagram, base64ImageType);
+
+          // bytes -> kb -> mb is greater than 2mb
+          if (file.size > 1024 ** 2 * 2) {
+            return ServerResponse.serverError('Company logo image is too big');
+          }
+
+          const uploadRes = await utapi.uploadFiles([file]);
+
+          if (uploadRes[0].error) {
+            return ServerResponse.serverError(
+              'Could not process company logo image'
+            );
+          }
+
+          profileURL = uploadRes[0].data.url;
+        }
       }
-      const {id, skill, instagram} = structuredClone(body);
 
       const user = await User.findById(id);
 
@@ -44,6 +80,7 @@ export const PUT = async (request: NextRequest) => {
       await User.findByIdAndUpdate(id, {
         skill: skill,
         instagram: instagram,
+        profile: profileURL,
       });
 
       return ServerResponse.success('Successfully updated user attributes');

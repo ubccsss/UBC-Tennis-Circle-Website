@@ -1,6 +1,7 @@
 import {ServerResponse} from '@helpers/serverResponse';
 import {auth, googleAuth} from '@lib/lucia';
 import {OAuthRequestError} from '@lucia-auth/oauth';
+import {User} from '@models/User';
 import {cookies, headers} from 'next/headers';
 import {NextResponse, NextRequest} from 'next/server';
 

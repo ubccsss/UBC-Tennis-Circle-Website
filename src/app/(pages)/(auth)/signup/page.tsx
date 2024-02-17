@@ -26,6 +26,7 @@ import {
   HStack,
 } from '@chakra-ui/react';
 import {FiArrowRight, FiMail} from 'react-icons/fi';
+import {FaGoogle} from 'react-icons/fa';
 import {Subheader} from '@components';
 import {useForm} from 'react-hook-form';
 import z from 'zod';
@@ -147,6 +148,21 @@ const Signup = () => {
             <Subheader mt="-2" mb="1">
               Register With The Tennis Circle
             </Subheader>
+            <Button
+              flexGrow={1}
+              onClick={() => {
+                window.location.href = GOOGLE_AUTH_LINK;
+              }}
+              colorScheme="brand"
+              variant="outline"
+              size="lg"
+              _hover={{
+                bg: 'gray.100',
+              }}
+            >
+              <Icon as={FaGoogle} mr={4} color="brand.500" /> Sign up with
+              Google
+            </Button>
             <SimpleGrid w={{base: '100%', sm: 'sm'}} columns={2} spacing="4">
               <FormControl isInvalid={Boolean(errors.first_name)}>
                 <Input
@@ -226,12 +242,6 @@ const Signup = () => {
             >
               Continue
             </Button>
-            <HStack>
-              <Text>or </Text>
-              <Link href={GOOGLE_AUTH_LINK}>
-                Sign up with Google <ExternalLinkIcon mx="2px" />
-              </Link>
-            </HStack>
           </VStack>
         </form>
       </SimpleGrid>
