@@ -160,6 +160,7 @@ const Home = () => {
                 position="absolute"
                 left="-20"
                 bottom="44"
+                display={{base: 'none', md: 'block'}}
               />
             </Box>
             {error && (
