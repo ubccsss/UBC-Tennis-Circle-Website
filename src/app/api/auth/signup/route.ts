@@ -1,4 +1,4 @@
-import {NextRequest} from 'next/server';
+import {NextRequest, NextResponse} from 'next/server';
 import z from 'zod';
 import {auth, connectToDatabase} from '@lib';
 import {LuciaError} from 'lucia';
@@ -51,6 +51,7 @@ export const POST = async (request: NextRequest) => {
           email_verified: false,
           skill: 1,
           instagram: null,
+          profile: 'https://source.boringavatars.com/beam',
         },
       });
 
@@ -61,6 +62,7 @@ export const POST = async (request: NextRequest) => {
         {
           $set: {
             'email_verification_token.id': emailConfirmationToken,
+            profile: `https://source.boringavatars.com/beam/120/${user.userId}`,
           },
         }
       );
