@@ -11,7 +11,7 @@ export const GET = async () => {
     });
 
     const team = res.items.map(i => ({
-      title: i.fields.name,
+      name: i.fields.name,
       role: i.fields.role,
       headshot: `https:${(i.fields.headshot as Asset)?.fields?.file?.url}`,
     }));
