@@ -21,9 +21,6 @@ import {
   ModalContent,
   ModalCloseButton,
   ModalBody,
-  Link,
-  Text,
-  HStack,
 } from '@chakra-ui/react';
 import {FiArrowRight, FiMail} from 'react-icons/fi';
 import {FaGoogle} from 'react-icons/fa';
@@ -33,7 +30,6 @@ import z from 'zod';
 import axios from 'axios';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {DEFAULT_SERVER_ERR, ZOD_ERR} from '@constants';
-import {ExternalLinkIcon} from '@chakra-ui/icons';
 
 const schema = z
   .object({

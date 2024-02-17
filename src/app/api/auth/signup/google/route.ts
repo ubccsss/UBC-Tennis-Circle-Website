@@ -1,8 +1,8 @@
-import {googleAuth} from '@lib/lucia';
+import {googleSignup} from '@lib/lucia';
 import * as context from 'next/headers';
 
 export const GET = async () => {
-  const [url, state] = await googleAuth.getAuthorizationUrl();
+  const [url, state] = await googleSignup.getAuthorizationUrl();
   // store state
   context.cookies().set('google_oauth_state', state, {
     httpOnly: true,
