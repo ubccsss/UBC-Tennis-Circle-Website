@@ -179,7 +179,7 @@ const Home = () => {
               <SimpleGrid
                 w="100%"
                 spacing="4"
-                columns={{base: 1, md: 2, lg: 4}}
+                columns={{base: 1, sm: 2, md: 4}}
               >
                 {Array(4)
                   .fill(0, 0, 4)
@@ -189,7 +189,7 @@ const Home = () => {
               </SimpleGrid>
             )}
             {data && (
-              <SimpleGrid spacing="4" columns={{base: 1, md: 2, lg: 4}}>
+              <SimpleGrid spacing="4" columns={{base: 1, sm: 2, md: 4}}>
                 {data.map(i => (
                   <Box position="relative">
                     <Image
