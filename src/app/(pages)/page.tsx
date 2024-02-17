@@ -14,7 +14,7 @@ import {
 import {TennisBallIcon, UserFriendsIcon, CommentsIcon} from '@icons';
 import axios from 'axios';
 import {useQuery} from '@tanstack/react-query';
-import {FiArrowRight} from 'react-icons/fi';
+import {FiArrowRight, FiAlertCircle} from 'react-icons/fi';
 import {TeamMember} from '@types';
 import {Skeleton} from '@chakra-ui/react';
 
@@ -32,7 +32,6 @@ const Home = () => {
     queryFn: getFeatured,
   });
 
-  console.log(data);
   const stats = [
     {
       icon: UserFriendsIcon,
@@ -54,11 +53,12 @@ const Home = () => {
   return (
     <>
       <Container maxW="container.xl">
-        <SimpleGrid columns={2} spacing="24" mt="12">
+        <SimpleGrid columns={{base: 1, lg: 2}} spacing="24" mt="12">
           <Image
             src="static/images/stock/hero.png"
             alt="tennis player"
             borderRadius="md"
+            display={{base: 'none', lg: 'block'}}
           />
           <Flex
             flexDirection="column"
@@ -78,9 +78,10 @@ const Home = () => {
               </Button>
             </Box>
             <Image
+              zIndex="-1"
               position="absolute"
-              bottom="24"
-              right="24"
+              bottom={{base: '-10', lg: '24'}}
+              right={{base: '0', lg: '24'}}
               src="static/images/illustrations/tennis-ball-yellow-lg.svg"
               w="16"
               alt="Tennis ball"
@@ -90,7 +91,7 @@ const Home = () => {
       </Container>
       <Box w="100%" py="12" bg="brand.500" my="24">
         <Container maxW="container.xl">
-          <SimpleGrid columns={3} spacing="12">
+          <SimpleGrid columns={{base: 1, md: 3}} gap="14">
             {stats.map(i => (
               <Flex
                 alignItems="center"
@@ -103,14 +104,16 @@ const Home = () => {
                 <Heading as="h6" fontSize="24" color="white">
                   {i.title}
                 </Heading>
-                <Text color="white">{i.body}</Text>
+                <Text color="white" maxW="64">
+                  {i.body}
+                </Text>
               </Flex>
             ))}
           </SimpleGrid>
         </Container>
       </Box>
       <Container maxW="container.xl" my="12">
-        <SimpleGrid columns={2} spacing={24}>
+        <SimpleGrid columns={{base: 1, md: 2}} spacing={{base: 12, md: 24}}>
           <Flex flexDirection="column" gap="4" justifyContent="center">
             <Heading as="h1">
               Find events and connect with other tennis players!
@@ -149,34 +152,67 @@ const Home = () => {
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a leo
             tempus, euismod purus vitae, blandit lectus.
           </Text>
-          <Flex mt="8" gap="4" position="relative">
-            {isPending &&
-              Array(3)
-                .fill(0, 0, 3)
-                .map(() => <Skeleton w="80" h="96" borderRadius="md" />)}
+          <Flex mt="8" flexDirection={{base: 'column', md: 'row'}} w="100%">
+            <Box>
+              <Image
+                src="static/images/illustrations/tennis-racket.svg"
+                alt="tennis racket"
+                position="absolute"
+                left="-20"
+                bottom="44"
+              />
+            </Box>
+            {error && (
+              <Flex
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+                textAlign="center"
+                gap="2"
+              >
+                <Icon as={FiAlertCircle} color="red.400" fontSize="28" />
+                <Text maxW="64">An unexpected error has occurred</Text>
+              </Flex>
+            )}
 
-            {data &&
-              data.map(i => (
-                <Box position="relative">
-                  <Image
-                    src={i.headshot}
-                    alt={i.name}
-                    objectFit="cover"
-                    w="80"
-                    h="96"
-                    borderRadius="md"
-                    filter="brightness(60%)"
-                  />
-                  <Box position="absolute" bottom="0" m="4">
-                    <Text color="white" fontSize="xl" fontWeight="semibold">
-                      {i.name}
-                    </Text>
-                    <Text color="white" fontSize="md" fontWeight={400}>
-                      {i.role}
-                    </Text>
+            {isPending && (
+              <SimpleGrid
+                w="100%"
+                spacing="4"
+                columns={{base: 1, md: 2, lg: 4}}
+              >
+                {Array(4)
+                  .fill(0, 0, 4)
+                  .map(() => (
+                    <Skeleton h="96" w="100%" />
+                  ))}
+              </SimpleGrid>
+            )}
+            {data && (
+              <SimpleGrid spacing="4" columns={{base: 1, md: 2, lg: 4}}>
+                {data.map(i => (
+                  <Box position="relative">
+                    <Image
+                      src={i.headshot}
+                      alt={i.name}
+                      objectFit="cover"
+                      w="3xl"
+                      h="96"
+                      borderRadius="md"
+                      filter="brightness(60%)"
+                    />
+                    <Box position="absolute" bottom="0" m="4">
+                      <Text color="white" fontSize="xl" fontWeight="semibold">
+                        {i.name}
+                      </Text>
+                      <Text color="white" fontSize="md" fontWeight={400}>
+                        {i.role}
+                      </Text>
+                    </Box>
                   </Box>
-                </Box>
-              ))}
+                ))}
+              </SimpleGrid>
+            )}
           </Flex>
           <Button mt="8" colorScheme="brand" rightIcon={<FiArrowRight />}>
             View full team
