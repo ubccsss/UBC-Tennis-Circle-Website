@@ -4,6 +4,19 @@ import {ChakraProvider, extendTheme} from '@chakra-ui/react';
 
 // Custom theme
 const theme = extendTheme({
+  components: {
+    Heading: {
+      baseStyle: {
+        fontWeight: 600,
+        color: '#3F3D3B',
+      },
+    },
+    Text: {
+      baseStyle: {
+        color: 'gray.500',
+      },
+    },
+  },
   colors: {
     navy: {
       50: '#8392b0',
