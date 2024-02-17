@@ -28,11 +28,25 @@ export const auth = lucia({
   },
 });
 
-export const googleAuth = google(auth, {
+const googleController = (redirectUri: string) => ({
   clientId: process.env.NEXT_OAUTH_ID!,
   clientSecret: process.env.NEXT_OAUTH_SECRET!,
-  redirectUri: `${process.env.NEXT_PUBLIC_HOSTNAME}/api/auth/signup/google/callback`,
   scope: ['https://www.googleapis.com/auth/userinfo.email'],
+  redirectUri,
 });
+
+export const googleSignup = google(
+  auth,
+  googleController(
+    `${process.env.NEXT_PUBLIC_HOSTNAME}/api/auth/signup/google/callback`
+  )
+);
+
+export const googleLogin = google(
+  auth,
+  googleController(
+    `${process.env.NEXT_PUBLIC_HOSTNAME}/api/auth/login/google/callback`
+  )
+);
 
 export type Auth = typeof auth;

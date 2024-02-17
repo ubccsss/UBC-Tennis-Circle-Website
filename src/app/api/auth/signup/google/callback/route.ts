@@ -1,5 +1,5 @@
-import {ServerResponse} from '@helpers/serverResponse';
-import {auth, googleAuth} from '@lib/lucia';
+import {ServerResponse} from '@helpers';
+import {auth, googleSignup} from '@lib/lucia';
 import {OAuthRequestError} from '@lucia-auth/oauth';
 import {cookies, headers} from 'next/headers';
 import {NextResponse, NextRequest} from 'next/server';
@@ -14,10 +14,7 @@ export const GET = async (request: NextRequest) => {
   }
 
   try {
-    const {getExistingUser, createUser, googleUser} =
-      await googleAuth.validateCallback(code!);
-
-    console.log(googleUser);
+    const {createUser, googleUser} = await googleSignup.validateCallback(code!);
 
     const userAttributes = {
       first_name: googleUser.given_name,
@@ -40,10 +37,6 @@ export const GET = async (request: NextRequest) => {
     }
 
     const getUser = async () => {
-      const existingUser = await getExistingUser();
-
-      if (existingUser) return existingUser;
-
       const user = await createUser({
         attributes: userAttributes,
       });
