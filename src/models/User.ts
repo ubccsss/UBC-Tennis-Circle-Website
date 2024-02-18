@@ -12,6 +12,7 @@ export interface User {
   skill?: number;
   instagram?: string;
   profile: string;
+  provider: string;
 }
 
 mongoose.Promise = global.Promise;
@@ -30,9 +31,13 @@ const schema = new Schema<User>(
     skill: {type: Number, required: false},
     instagram: {type: String, required: false},
     profile: {type: String, required: true},
+    provider: {type: String, required: true},
   },
   {_id: false}
 );
 
 export const User =
   mongoose.models.User || mongoose.model<User>('User', schema);
+
+export const DeletedUser =
+  mongoose.models.DeletedUser || mongoose.model<User>('DeletedUser', schema);

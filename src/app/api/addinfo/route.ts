@@ -4,7 +4,6 @@ import {logger} from '@lib/winston';
 import {User} from '@models/User';
 import {NextRequest} from 'next/server';
 import z from 'zod';
-import {getSession} from '@helpers/getSession';
 import {UTApi} from 'uploadthing/server';
 import {dataURLtoFile} from '@helpers/dataURLtoFile';
 

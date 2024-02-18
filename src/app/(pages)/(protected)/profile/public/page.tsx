@@ -1,8 +1,9 @@
 'use client';
 import {
-  InputLeftElement,
+  SimpleGrid,
   Input,
   InputGroup,
+  InputLeftElement,
   InputRightElement,
   Container,
   Flex,
@@ -10,6 +11,7 @@ import {
   Heading,
   Icon,
   Image,
+  Select,
   Button,
   Spacer,
   FormControl,
@@ -27,8 +29,6 @@ import {
   Box,
   Skeleton,
 } from '@chakra-ui/react';
-import {AtSignIcon} from '@chakra-ui/icons';
-import {FormatOptionLabelMeta, Select} from 'chakra-react-select';
 import {FiArrowRight, FiCamera, FiInstagram} from 'react-icons/fi';
 import z from 'zod';
 import {zodResolver} from '@hookform/resolvers/zod';
@@ -37,10 +37,12 @@ import axios from 'axios';
 import {useState, useCallback, useEffect} from 'react';
 import {useDropzone, FileRejection} from 'react-dropzone';
 import {getClientSession} from '@utils';
-import {Controller, UseFormSetValue, useForm} from 'react-hook-form';
+import {UseFormSetValue, useForm} from 'react-hook-form';
 
 const schema = z.object({
-  skill: z.object({value: z.number(), label: z.string()}),
+  first_name: z.string().min(1, ZOD_ERR.REQ_FIELD),
+  last_name: z.string().min(1, ZOD_ERR.REQ_FIELD),
+  skill: z.string().min(1, ZOD_ERR.REQ_FIELD),
   instagram: z.string().min(1, ZOD_ERR.REQ_FIELD),
   profile: z.string().min(1),
 });
@@ -49,11 +51,10 @@ type Form = z.infer<typeof schema>;
 
 const initialFormUpdate = async (setValue: UseFormSetValue<Form>) => {
   const session = await getClientSession();
-  console.log(session);
   setValue('profile', session.user.profile);
 };
 
-const ProfileSetup = () => {
+const AddInfo = () => {
   const statusToast = useToast();
 
   const {
@@ -61,7 +62,6 @@ const ProfileSetup = () => {
     register,
     setValue,
     watch,
-    control,
     formState: {errors, isSubmitting},
   } = useForm<Form>({resolver: zodResolver(schema)});
 
@@ -69,12 +69,20 @@ const ProfileSetup = () => {
     initialFormUpdate(setValue);
   }, []);
 
-  const onSubmit = async ({skill, instagram, profile}: Form) => {
+  const onSubmit = async ({
+    first_name,
+    last_name,
+    skill,
+    instagram,
+    profile,
+  }: Form) => {
     try {
       const res = await axios.put(
-        `${process.env.NEXT_PUBLIC_HOSTNAME}/api/addinfo`,
+        `${process.env.NEXT_PUBLIC_HOSTNAME}/api/auth/profile`,
         {
-          skill: skill.value,
+          first_name,
+          last_name,
+          skill: parseInt(skill),
           instagram,
           profile,
         }
@@ -85,6 +93,7 @@ const ProfileSetup = () => {
           title: res.data.message,
           status: 'success',
         });
+        window.location.href = '/profile/public';
       }
     } catch (e) {
       if (axios.isAxiosError(e)) {
@@ -94,10 +103,6 @@ const ProfileSetup = () => {
         });
       }
     }
-  };
-
-  const skip = () => {
-    window.location.href = '/';
   };
 
   const MAX_IMG_SIZE: number = 1024 ** 2 * 2;
@@ -147,41 +152,24 @@ const ProfileSetup = () => {
 
     const fetchSession = async () => {
       const session = await getUserFromSession();
+      console.log(session.user);
+      setValue('first_name', session.user.first_name);
+      setValue('last_name', session.user.last_name);
+      setValue('skill', session.user.skill);
+      setValue('instagram', session.user.instagram);
       setValue('profile', session.user.profile);
     };
 
     fetchSession();
   }, []);
 
-  interface SkillOptionSelect {
-    value: number;
-    label: string;
-  }
-  const SkillOption = (
-    {value, label}: SkillOptionSelect,
-    meta: FormatOptionLabelMeta<SkillOptionSelect>
-  ) => {
-    console.log(meta);
-    const selected =
-      meta.context === 'menu' && meta.selectValue?.[0]?.value === value;
-    return (
-      <Box w="100%">
-        <Text color={selected ? 'white' : 'black'}>Skill {value}</Text>
-        <Text fontSize="sm" color={selected ? 'white' : 'gray.500'} mt="-1">
-          {label}
-        </Text>
-      </Box>
-    );
-  };
-
-  console.log(watched);
   return (
     <Container maxW="container.xl" py={{base: '32', lg: '20'}}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Flex flexDirection="row" w="100%" justifyContent="center" gap="36">
           <VStack width="450px">
             <Heading as="h1" textAlign="center">
-              Complete your profile
+              Update your profile
             </Heading>
             <Text textAlign="center">
               Lorem ipsum dolor sit amet, qui minim labore adipisicing minim
@@ -191,7 +179,7 @@ const ProfileSetup = () => {
               <Box
                 position="relative"
                 as="button"
-                mt="5"
+                mt="10"
                 onClick={onOpen}
                 type="button"
               >
@@ -211,7 +199,7 @@ const ProfileSetup = () => {
                 </Flex>
               </Box>
             ) : (
-              <Skeleton w="24" h="24" borderRadius="8" mt="5" />
+              <Skeleton w="24" h="24" borderRadius="8" />
             )}
             <Modal isOpen={isOpen} onClose={onClose}>
               <ModalOverlay />
@@ -265,12 +253,7 @@ const ProfileSetup = () => {
                 </ModalBody>
 
                 <ModalFooter>
-                  <Button
-                    colorScheme="red"
-                    mr={3}
-                    onClick={onClose}
-                    variant="solid"
-                  >
+                  <Button colorScheme="red" mr={3} onClick={onClose}>
                     Cancel
                   </Button>
                   <Button
@@ -279,77 +262,90 @@ const ProfileSetup = () => {
                       setValue('profile', watched.profile);
                       onClose();
                     }}
-                    colorScheme="brand"
+                    variant="ghost"
                   >
                     Update Profile
                   </Button>
                 </ModalFooter>
               </ModalContent>
             </Modal>
-            <Flex justifyContent="center" flexDir="column" gap="4" mt="-4">
-              <InputGroup size="lg" mt="10" w="80" zIndex={2}>
-                <Controller
-                  control={control}
-                  name="skill"
-                  render={({field: {onChange, onBlur, ref}}) => (
-                    <FormControl isInvalid={Boolean(errors.skill)}>
-                      <Select
-                        ref={ref}
-                        onChange={onChange}
-                        onBlur={onBlur}
-                        selectedOptionColorScheme="brand"
-                        options={[
-                          {value: 1, label: "I've never played before"},
-                          {value: 2, label: "I'm a beginner player"},
-                          {value: 3, label: "I'm an intermediate player"},
-                          {value: 4, label: "I'm an advanced player"},
-                        ]}
-                        formatOptionLabel={SkillOption}
-                        placeholder="Skill Level"
-                        size="lg"
-                        isSearchable={false}
-                      />
-                    </FormControl>
-                  )}
+            <SimpleGrid mt={6} columns={2} spacing="4">
+              <FormControl isInvalid={Boolean(errors.first_name)}>
+                <Input
+                  id="first_name"
+                  placeholder="First Name"
+                  disabled={isSubmitting}
+                  w="100%"
+                  size="lg"
+                  {...register('first_name')}
                 />
-              </InputGroup>
-              <FormErrorMessage>{errors?.skill?.message}</FormErrorMessage>
-              <FormControl isInvalid={Boolean(errors.instagram)}>
-                <InputGroup size="lg" w="80">
-                  <InputLeftElement pointerEvents="none">
-                    <AtSignIcon color="gray.300" />
-                  </InputLeftElement>
-                  <Input
-                    placeholder="Instagram Username"
-                    {...register('instagram')}
-                  />
-
-                  <InputRightElement pointerEvents="none">
-                    <Icon as={FiInstagram} color="gray.500" />
-                  </InputRightElement>
-                </InputGroup>
                 <FormErrorMessage>
-                  {errors?.instagram?.message}
+                  {errors?.first_name?.message}
                 </FormErrorMessage>
               </FormControl>
-
-              <Flex mt={4} w="full">
-                <Spacer />
-                <Button onClick={skip} size="md" variant="outline">
-                  Skip
-                </Button>
-                <Button
-                  colorScheme="brand"
-                  type="submit"
-                  isLoading={isSubmitting}
-                  loadingText="Updating ..."
-                  size="md"
-                  rightIcon={<Icon as={FiArrowRight} />}
-                  marginLeft={2}
+              <FormControl isInvalid={Boolean(errors.last_name)}>
+                <Input
+                  id="last_name"
+                  placeholder="Last Name"
+                  disabled={isSubmitting}
+                  w="100%"
+                  size="lg"
+                  {...register('last_name')}
+                />
+                <FormErrorMessage>
+                  {errors?.last_name?.message}
+                </FormErrorMessage>
+              </FormControl>
+            </SimpleGrid>
+            <FormControl isInvalid={Boolean(errors.skill)}>
+              <InputGroup size="lg">
+                <Select
+                  color="gray.500"
+                  placeholder="Skill level"
+                  {...register('skill')}
                 >
-                  Continue
-                </Button>
-              </Flex>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                </Select>
+              </InputGroup>
+              <FormErrorMessage>{errors?.skill?.message}</FormErrorMessage>
+            </FormControl>
+            <FormControl isInvalid={Boolean(errors.instagram)}>
+              <InputGroup size="lg">
+                <InputLeftElement
+                  pointerEvents="none"
+                  color="gray.300"
+                  fontSize="1.2em"
+                >
+                  @
+                </InputLeftElement>
+                <Input
+                  placeholder="Instagram Username"
+                  {...register('instagram')}
+                />
+
+                <InputRightElement pointerEvents="none">
+                  <Icon as={FiInstagram} color="gray.500" />
+                </InputRightElement>
+              </InputGroup>
+              <FormErrorMessage>{errors?.instagram?.message}</FormErrorMessage>
+            </FormControl>
+            <Flex mt={5} w="full">
+              <Spacer />
+              <Button
+                colorScheme="brand"
+                type="submit"
+                isLoading={isSubmitting}
+                loadingText="Updating ..."
+                size="md"
+                rightIcon={<Icon as={FiArrowRight} />}
+                marginLeft={2}
+              >
+                Update Profile
+              </Button>
             </Flex>
           </VStack>
         </Flex>
@@ -358,4 +354,4 @@ const ProfileSetup = () => {
   );
 };
 
-export default ProfileSetup;
+export default AddInfo;

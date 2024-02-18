@@ -24,6 +24,7 @@ export const GET = async (request: NextRequest) => {
       skill: 1,
       instagram: null,
       profile: googleUser.picture,
+      provider: 'google',
     };
 
     const sameEmailUser = await User.findOne({
