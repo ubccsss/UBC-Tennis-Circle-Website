@@ -38,3 +38,6 @@ const schema = new Schema<User>(
 
 export const User =
   mongoose.models.User || mongoose.model<User>('User', schema);
+
+export const DeletedUser =
+  mongoose.models.DeletedUser || mongoose.model<User>('DeletedUser', schema);

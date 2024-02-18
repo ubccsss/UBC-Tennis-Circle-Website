@@ -187,11 +187,6 @@ const AddInfo = () => {
             ) : (
               <Skeleton w="24" h="24" borderRadius="8" />
             )}
-            <Image src={watched.profile} mt="10" boxSize="80px" />
-            <Button onClick={onOpen} size="md" mt={2}>
-              Update your profile
-            </Button>
-
             <Modal isOpen={isOpen} onClose={onClose}>
               <ModalOverlay />
               <ModalContent>
