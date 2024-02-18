@@ -32,6 +32,7 @@
     "axios": "^1.6.2",
     "broadcast-channel": "^5.3.0",
     "cf-content-types-generator": "^2.13.1",
+    "chakra-react-select": "^4.7.6",
     "contentful": "^10.6.16",
     "dotenv-cli": "^7.3.0",
     "framer-motion": "^10.16.4",
