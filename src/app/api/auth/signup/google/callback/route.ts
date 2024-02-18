@@ -53,10 +53,7 @@ export const GET = async (request: NextRequest) => {
     });
     authRequest.setSession(session);
     return NextResponse.redirect(
-      new URL(
-        `/signup/addinfo?id=${user.userId}&picture=${googleUser.picture}`,
-        request.url
-      )
+      new URL(`/signup/addinfo?id=${user.userId}`, request.url)
     );
   } catch (e) {
     if (e instanceof OAuthRequestError) {

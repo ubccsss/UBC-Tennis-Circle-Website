@@ -36,7 +36,7 @@ import {ZOD_ERR, DEFAULT_SERVER_ERR} from '@constants/error-messages';
 import axios from 'axios';
 import {useState, useCallback, useEffect} from 'react';
 import {useDropzone, FileRejection} from 'react-dropzone';
-import {setRevalidateHeaders} from 'next/dist/server/send-payload';
+import {getClientSession} from '@utils/getClientSession';
 
 const schema = z.object({
   skill: z.string().min(1, ZOD_ERR.REQ_FIELD),
@@ -50,7 +50,6 @@ const AddInfo = () => {
   const statusToast = useToast();
   const params = useSearchParams();
   const id = params.get('id');
-  const picture = params.get('picture');
 
   const {
     handleSubmit,
@@ -132,7 +131,17 @@ const AddInfo = () => {
   const watched = watch();
 
   useEffect(() => {
-    setValue('profile', picture!);
+    const getUserFromSession = async () => {
+      const session = await getClientSession();
+      return session;
+    };
+
+    const fetchSession = async () => {
+      const session = await getUserFromSession();
+      setValue('profile', session.user.profile);
+    };
+
+    fetchSession();
   }, []);
 
   return (
@@ -143,11 +152,7 @@ const AddInfo = () => {
             <Heading as="h1" size="2xl">
               Create your profile
             </Heading>
-            {watched.profile ? (
-              <Image src={watched.profile} mt="10" boxSize="80px" />
-            ) : (
-              <Image src={picture!} mt="10" boxSize="80px" />
-            )}
+            <Image src={watched.profile} mt="10" boxSize="80px" />
             <Button onClick={onOpen} size="md" mt={2}>
               Update your profile
             </Button>
