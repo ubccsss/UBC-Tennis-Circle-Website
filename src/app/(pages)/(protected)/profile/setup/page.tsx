@@ -9,7 +9,6 @@ import {
   Heading,
   Icon,
   Image,
-  Select,
   Button,
   Spacer,
   FormControl,
@@ -27,6 +26,7 @@ import {
   Box,
   Skeleton,
 } from '@chakra-ui/react';
+import {FormatOptionLabelMeta, Select} from 'chakra-react-select';
 import {FiArrowRight, FiCamera, FiInstagram} from 'react-icons/fi';
 import z from 'zod';
 import {zodResolver} from '@hookform/resolvers/zod';
@@ -35,10 +35,10 @@ import axios from 'axios';
 import {useState, useCallback, useEffect} from 'react';
 import {useDropzone, FileRejection} from 'react-dropzone';
 import {getClientSession} from '@utils';
-import {UseFormSetValue, useForm} from 'react-hook-form';
+import {Controller, UseFormSetValue, useForm} from 'react-hook-form';
 
 const schema = z.object({
-  skill: z.string().min(1, ZOD_ERR.REQ_FIELD),
+  skill: z.object({value: z.number(), label: z.string()}),
   instagram: z.string().min(1, ZOD_ERR.REQ_FIELD),
   profile: z.string().min(1),
 });
@@ -47,10 +47,11 @@ type Form = z.infer<typeof schema>;
 
 const initialFormUpdate = async (setValue: UseFormSetValue<Form>) => {
   const session = await getClientSession();
+  console.log(session);
   setValue('profile', session.user.profile);
 };
 
-const AddInfo = () => {
+const ProfileSetup = () => {
   const statusToast = useToast();
 
   const {
@@ -58,6 +59,7 @@ const AddInfo = () => {
     register,
     setValue,
     watch,
+    control,
     formState: {errors, isSubmitting},
   } = useForm<Form>({resolver: zodResolver(schema)});
 
@@ -149,6 +151,28 @@ const AddInfo = () => {
     fetchSession();
   }, []);
 
+  interface SkillOptionSelect {
+    value: number;
+    label: string;
+  }
+  const SkillOption = (
+    {value, label}: SkillOptionSelect,
+    meta: FormatOptionLabelMeta<SkillOptionSelect>
+  ) => {
+    console.log(meta);
+    const selected =
+      meta.context === 'menu' && meta.selectValue?.[0]?.value === value;
+    return (
+      <Box w="100%">
+        <Text color={selected ? 'white' : 'black'}>Skill {value}</Text>
+        <Text fontSize="sm" color={selected ? 'white' : 'gray.500'} mt="-1">
+          {label}
+        </Text>
+      </Box>
+    );
+  };
+
+  console.log(watched);
   return (
     <Container maxW="container.xl" py={{base: '32', lg: '20'}}>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -165,7 +189,7 @@ const AddInfo = () => {
               <Box
                 position="relative"
                 as="button"
-                mt="10"
+                mt="5"
                 onClick={onOpen}
                 type="button"
               >
@@ -185,12 +209,8 @@ const AddInfo = () => {
                 </Flex>
               </Box>
             ) : (
-              <Skeleton w="24" h="24" borderRadius="8" />
+              <Skeleton w="24" h="24" borderRadius="8" mt="5" />
             )}
-            <Image src={watched.profile} mt="10" boxSize="80px" />
-            <Button onClick={onOpen} size="md" mt={2}>
-              Update your profile
-            </Button>
 
             <Modal isOpen={isOpen} onClose={onClose}>
               <ModalOverlay />
@@ -244,7 +264,12 @@ const AddInfo = () => {
                 </ModalBody>
 
                 <ModalFooter>
-                  <Button colorScheme="red" mr={3} onClick={onClose}>
+                  <Button
+                    colorScheme="red"
+                    mr={3}
+                    onClick={onClose}
+                    variant="solid"
+                  >
                     Cancel
                   </Button>
                   <Button
@@ -253,58 +278,74 @@ const AddInfo = () => {
                       setValue('profile', watched.profile);
                       onClose();
                     }}
-                    variant="ghost"
+                    colorScheme="brand"
                   >
                     Update Profile
                   </Button>
                 </ModalFooter>
               </ModalContent>
             </Modal>
-            <FormControl isInvalid={Boolean(errors.skill)}>
-              <InputGroup size="lg" mt="10">
-                <Select
-                  color="gray.500"
-                  placeholder="Skill level"
-                  {...register('skill')}
-                >
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                </Select>
+            <Flex justifyContent="center" flexDir="column" gap="4" mt="-4">
+              <InputGroup size="lg" mt="10" w="80" zIndex={2}>
+                <Controller
+                  control={control}
+                  name="skill"
+                  render={({field: {onChange, onBlur, ref}}) => (
+                    <FormControl isInvalid={Boolean(errors.skill)}>
+                      <Select
+                        ref={ref}
+                        onChange={onChange}
+                        onBlur={onBlur}
+                        selectedOptionColorScheme="brand"
+                        options={[
+                          {value: 1, label: "I've never played before"},
+                          {value: 2, label: "I'm a beginner player"},
+                          {value: 3, label: "I'm an intermediate player"},
+                          {value: 4, label: "I'm an advanced player"},
+                        ]}
+                        formatOptionLabel={SkillOption}
+                        placeholder="Skill Level"
+                        size="lg"
+                        isSearchable={false}
+                      />
+                    </FormControl>
+                  )}
+                />
               </InputGroup>
               <FormErrorMessage>{errors?.skill?.message}</FormErrorMessage>
-            </FormControl>
-            <FormControl isInvalid={Boolean(errors.instagram)}>
-              <InputGroup size="lg">
-                <Input
-                  placeholder="Instagram Username"
-                  {...register('instagram')}
-                />
+              <FormControl isInvalid={Boolean(errors.instagram)}>
+                <InputGroup size="lg" w="80">
+                  <Input
+                    placeholder="Instagram Username"
+                    {...register('instagram')}
+                  />
 
-                <InputRightElement pointerEvents="none">
-                  <Icon as={FiInstagram} color="gray.500" />
-                </InputRightElement>
-              </InputGroup>
-              <FormErrorMessage>{errors?.instagram?.message}</FormErrorMessage>
-            </FormControl>
-            <Flex mt={5} w="full">
-              <Spacer />
-              <Button onClick={skip} colorScheme="brand" size="md">
-                Skip
-              </Button>
-              <Button
-                colorScheme="brand"
-                type="submit"
-                isLoading={isSubmitting}
-                loadingText="Updating ..."
-                size="md"
-                rightIcon={<Icon as={FiArrowRight} />}
-                marginLeft={2}
-              >
-                Continue
-              </Button>
+                  <InputRightElement pointerEvents="none">
+                    <Icon as={FiInstagram} color="gray.500" />
+                  </InputRightElement>
+                </InputGroup>
+                <FormErrorMessage>
+                  {errors?.instagram?.message}
+                </FormErrorMessage>
+              </FormControl>
+
+              <Flex mt={4} w="full">
+                <Spacer />
+                <Button onClick={skip} size="md" variant="outline">
+                  Skip
+                </Button>
+                <Button
+                  colorScheme="brand"
+                  type="submit"
+                  isLoading={isSubmitting}
+                  loadingText="Updating ..."
+                  size="md"
+                  rightIcon={<Icon as={FiArrowRight} />}
+                  marginLeft={2}
+                >
+                  Continue
+                </Button>
+              </Flex>
             </Flex>
           </VStack>
         </Flex>
@@ -313,4 +354,4 @@ const AddInfo = () => {
   );
 };
 
-export default AddInfo;
+export default ProfileSetup;
