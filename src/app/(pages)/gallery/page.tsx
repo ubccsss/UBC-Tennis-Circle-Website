@@ -10,6 +10,9 @@ import {
   VStack,
   SimpleGrid,
   Image,
+  Flex,
+  Spinner,
+  Heading,
 } from '@chakra-ui/react';
 import axios from 'axios';
 
@@ -22,8 +25,9 @@ const Gallery = () => {
       caption: string;
     }>
   >([]);
-  const [after, setAfter] = useState(null);
+  const [after, setAfter] = useState('unset');
   const [loading, setLoading] = useState(false);
+  const [allLoaded, setAllLoaded] = useState(false);
   const loader = useRef(null);
 
   const skeletons = new Array(9)
@@ -32,8 +36,9 @@ const Gallery = () => {
       <Skeleton key={index} rounded="lg" height="300px" width="300px" />
     ));
 
-  const fetchPosts = async (afterParam = null) => {
+  const fetchPosts = async (afterParam: string) => {
     if (loading) return;
+    if (after === undefined) return;
     setLoading(true);
     try {
       const res = await axios.post(
@@ -45,9 +50,11 @@ const Gallery = () => {
           },
         }
       );
-      console.log(res);
-      setPosts(prevPosts => [...prevPosts, ...res.data.data]);
-      setAfter(res.data.paging?.cursors?.after);
+
+      if (!allLoaded) {
+        setPosts(prevPosts => [...prevPosts, ...res.data.data]);
+        setAfter(res.data.paging?.cursors?.after);
+      }
     } catch (error) {
       console.error('Error fetching Instagram posts:', error);
     } finally {
@@ -56,10 +63,14 @@ const Gallery = () => {
   };
 
   useEffect(() => {
-    fetchPosts();
+    fetchPosts(after);
   }, []);
 
   useEffect(() => {
+    if (after === undefined) {
+      setAllLoaded(true);
+    }
+
     const options = {
       root: null,
       rootMargin: '0px',
@@ -68,7 +79,7 @@ const Gallery = () => {
 
     const observer = new IntersectionObserver(entries => {
       const [entry] = entries;
-      if (entry.isIntersecting && after) {
+      if (entry.isIntersecting && !allLoaded && !loading) {
         fetchPosts(after);
       }
     }, options);
@@ -82,30 +93,32 @@ const Gallery = () => {
         observer.unobserve(loader.current);
       }
     };
-  }, [after, loading]);
+  }, [after, allLoaded, loading]);
 
   return (
     <Container maxW="container.xl">
       <Box>
         <Center>
           <VStack>
-            <Text fontSize="2xl">View our recent posts</Text>
-            <Text fontSize="sm">Come join us for a fun round of tennis!</Text>
+            <Heading as="h1">View our recent posts</Heading>
+            <Text maxW="xl" textAlign="center">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a
+              leo tempus, euismod purus vitae, blandit lectus.
+            </Text>
           </VStack>
         </Center>
       </Box>
-      <Container maxW="container.lg" py="28">
-        <SimpleGrid columns={3} spacing={6}>
+      <Flex w="100%" justifyContent="center" my="12">
+        <SimpleGrid columns={3} gap="6" ref={loader}>
           {posts.length === 0
             ? skeletons
             : posts.map((post, index) => (
                 <Box
                   key={`post-${index}`}
-                  ref={loader}
-                  w="300px"
-                  h="300px"
-                  rounded="lg"
+                  w="72"
+                  h="72"
                   overflow="hidden"
+                  borderRadius="8"
                 >
                   <a
                     href={post.permalink}
@@ -123,10 +136,10 @@ const Gallery = () => {
                 </Box>
               ))}
         </SimpleGrid>
-      </Container>
+      </Flex>
       {loading && (
         <Center>
-          <Text color="gray">Loading...</Text>
+          <Spinner color=":rand.500" />
         </Center>
       )}
     </Container>
