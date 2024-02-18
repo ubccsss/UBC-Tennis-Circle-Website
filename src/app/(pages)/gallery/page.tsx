@@ -36,7 +36,9 @@ const Gallery = () => {
       <Box>
         <Center>
           <VStack>
-            <Heading as="h1">View our recent posts</Heading>
+            <Heading as="h1" textAlign="center">
+              View our recent posts
+            </Heading>
             <Text maxW="xl" textAlign="center">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a
               leo tempus, euismod purus vitae, blandit lectus.
@@ -45,7 +47,7 @@ const Gallery = () => {
         </Center>
       </Box>
       <Flex w="100%" justifyContent="center" my="12">
-        <SimpleGrid columns={3} gap="6">
+        <SimpleGrid columns={{base: 1, sm: 2, lg: 3}} gap="6">
           {error && (
             <Flex
               flexDirection="column"
@@ -62,15 +64,20 @@ const Gallery = () => {
             new Array(9)
               .fill(null)
               .map((_, index) => (
-                <Skeleton key={index} borderRadius="8" h="72" w="72" />
+                <Skeleton
+                  key={index}
+                  borderRadius="8"
+                  w={{base: '100%', md: '72'}}
+                  h={{base: '100%', md: '72'}}
+                />
               ))}
 
           {data &&
             data.map((post, index) => (
               <Box
                 key={`post-${index}`}
-                w="72"
-                h="72"
+                w={{base: '100%', md: '72'}}
+                h={{base: '100%', md: '72'}}
                 overflow="hidden"
                 borderRadius="8"
               >

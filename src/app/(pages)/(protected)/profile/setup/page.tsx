@@ -1,5 +1,6 @@
 'use client';
 import {
+  InputLeftElement,
   Input,
   InputGroup,
   InputRightElement,
@@ -26,6 +27,7 @@ import {
   Box,
   Skeleton,
 } from '@chakra-ui/react';
+import {AtSignIcon} from '@chakra-ui/icons';
 import {FormatOptionLabelMeta, Select} from 'chakra-react-select';
 import {FiArrowRight, FiCamera, FiInstagram} from 'react-icons/fi';
 import z from 'zod';
@@ -72,7 +74,7 @@ const ProfileSetup = () => {
       const res = await axios.put(
         `${process.env.NEXT_PUBLIC_HOSTNAME}/api/addinfo`,
         {
-          skill: parseInt(skill),
+          skill: skill.value,
           instagram,
           profile,
         }
@@ -315,6 +317,9 @@ const ProfileSetup = () => {
               <FormErrorMessage>{errors?.skill?.message}</FormErrorMessage>
               <FormControl isInvalid={Boolean(errors.instagram)}>
                 <InputGroup size="lg" w="80">
+                  <InputLeftElement pointerEvents="none">
+                    <AtSignIcon color="gray.300" />
+                  </InputLeftElement>
                   <Input
                     placeholder="Instagram Username"
                     {...register('instagram')}
