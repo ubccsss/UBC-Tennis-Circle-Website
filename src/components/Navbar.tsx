@@ -117,7 +117,7 @@ export const Navbar = () => {
                 spacing="8"
                 direction="row"
                 align="center"
-                pl="10"
+                pl="24"
                 display={{base: 'none', lg: 'flex'}}
               >
                 {links.map(i => (
