@@ -32,7 +32,7 @@ export const GET = async (request: NextRequest) => {
 
     if (sameEmailUser) {
       return NextResponse.redirect(
-        new URL('/login?same-google-email=true', request.url)
+        new URL('/signup?same-google-email=true', request.url)
       );
     }
 
@@ -52,9 +52,7 @@ export const GET = async (request: NextRequest) => {
       headers,
     });
     authRequest.setSession(session);
-    return NextResponse.redirect(
-      new URL(`/signup/addinfo?id=${user.userId}`, request.url)
-    );
+    return NextResponse.redirect(new URL('/profile/setup', request.url));
   } catch (e) {
     if (e instanceof OAuthRequestError) {
       return ServerResponse.userError('Bad oauth request');

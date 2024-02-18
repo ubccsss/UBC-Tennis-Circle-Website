@@ -13,7 +13,6 @@ export const GET = async (
 
   let success = false;
   let id;
-  let profile;
 
   try {
     const user = await User.findOne({
@@ -21,7 +20,6 @@ export const GET = async (
     }).lean<User>();
     if (user) {
       id = user._id;
-      profile = user.profile;
       await User.updateOne(
         {'email_verification_token.id': token},
         {
@@ -58,7 +56,7 @@ export const GET = async (
   }
 
   if (success) {
-    redirect(`/signup/addinfo?id=${id}`);
+    redirect('/profile/setup');
   } else {
     redirect('/login?confirmation-status=failed');
   }

@@ -1,5 +1,4 @@
 'use client';
-
 import {
   Input,
   InputGroup,
@@ -26,17 +25,17 @@ import {
   ModalFooter,
   Text,
   Box,
+  Skeleton,
 } from '@chakra-ui/react';
-import {useSearchParams} from 'next/navigation';
-import {FiArrowRight, FiInstagram} from 'react-icons/fi';
+import {FiArrowRight, FiCamera, FiInstagram} from 'react-icons/fi';
 import z from 'zod';
-import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {ZOD_ERR, DEFAULT_SERVER_ERR} from '@constants/error-messages';
 import axios from 'axios';
 import {useState, useCallback, useEffect} from 'react';
 import {useDropzone, FileRejection} from 'react-dropzone';
-import {getClientSession} from '@utils/getClientSession';
+import {getClientSession} from '@utils';
+import {UseFormSetValue, useForm} from 'react-hook-form';
 
 const schema = z.object({
   skill: z.string().min(1, ZOD_ERR.REQ_FIELD),
@@ -46,10 +45,13 @@ const schema = z.object({
 
 type Form = z.infer<typeof schema>;
 
+const initialFormUpdate = async (setValue: UseFormSetValue<Form>) => {
+  const session = await getClientSession();
+  setValue('profile', session.user.profile);
+};
+
 const AddInfo = () => {
   const statusToast = useToast();
-  const params = useSearchParams();
-  const id = params.get('id');
 
   const {
     handleSubmit,
@@ -59,12 +61,15 @@ const AddInfo = () => {
     formState: {errors, isSubmitting},
   } = useForm<Form>({resolver: zodResolver(schema)});
 
+  useEffect(() => {
+    initialFormUpdate(setValue);
+  }, []);
+
   const onSubmit = async ({skill, instagram, profile}: Form) => {
     try {
       const res = await axios.put(
         `${process.env.NEXT_PUBLIC_HOSTNAME}/api/addinfo`,
         {
-          id,
           skill: parseInt(skill),
           instagram,
           profile,
@@ -149,9 +154,39 @@ const AddInfo = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Flex flexDirection="row" w="100%" justifyContent="center" gap="36">
           <VStack width="450px">
-            <Heading as="h1" size="2xl">
-              Create your profile
+            <Heading as="h1" textAlign="center">
+              Complete your profile
             </Heading>
+            <Text textAlign="center">
+              Lorem ipsum dolor sit amet, qui minim labore adipisicing minim
+              sint cillum sint consectetur cupidatat.
+            </Text>
+            {watched.profile ? (
+              <Box
+                position="relative"
+                as="button"
+                mt="10"
+                onClick={onOpen}
+                type="button"
+              >
+                <Image src={watched.profile} boxSize="24" borderRadius="8" />
+                <Flex
+                  position="absolute"
+                  bg="black"
+                  w="100%"
+                  justifyContent="center"
+                  alignItems="center"
+                  bottom="0"
+                  borderBottomRadius="8"
+                  py="2"
+                  bgColor="rgb(0, 0, 0, 0.5)"
+                >
+                  <Icon as={FiCamera} color="white" />
+                </Flex>
+              </Box>
+            ) : (
+              <Skeleton w="24" h="24" borderRadius="8" />
+            )}
             <Image src={watched.profile} mt="10" boxSize="80px" />
             <Button onClick={onOpen} size="md" mt={2}>
               Update your profile

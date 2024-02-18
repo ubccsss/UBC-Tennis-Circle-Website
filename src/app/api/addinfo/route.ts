@@ -56,15 +56,13 @@ export const PUT = async (request: NextRequest) => {
 
           // bytes -> kb -> mb is greater than 2mb
           if (file.size > 1024 ** 2 * 2) {
-            return ServerResponse.serverError('Company logo image is too big');
+            return ServerResponse.serverError('User image is too big');
           }
 
           const uploadRes = await utapi.uploadFiles([file]);
 
           if (uploadRes[0].error) {
-            return ServerResponse.serverError(
-              'Could not process company logo image'
-            );
+            return ServerResponse.serverError('Could not process User image');
           }
 
           profileURL = uploadRes[0].data.url;
