@@ -1,27 +1,37 @@
 import axios from 'axios';
-import {logger} from '@lib';
+import {logger, Cache} from '@lib';
 import {ServerResponse} from '@helpers';
 import {NextRequest} from 'next/server';
 
 export const POST = async (request: NextRequest) => {
   const {after} = await request.json();
 
-  try {
+  const fetchPosts = async () => {
     const url = 'https://graph.instagram.com/v18.0/17841417789493733/media';
     const params = {
       fields: 'id,caption,media_type,media_url,permalink',
       access_token: process.env.NEXT_INSTAGRAM_TOKEN,
       limit: 9,
-      after: after,
+      after: after === 'unset' ? null : after,
     };
 
     const response = await axios.get(url, {params});
 
-    if (response.data.paging?.next) {
-      delete response.data.paging.next;
+    return response.data;
+  };
+
+  try {
+    if (!after) {
+      return ServerResponse.success({});
     }
 
-    return ServerResponse.success(response.data);
+    const cachedPosts = await Cache.fetch(
+      `instagram-posts;after=${after}`,
+      fetchPosts,
+      60 * 60
+    );
+
+    return ServerResponse.success(cachedPosts);
   } catch (error) {
     logger.error('Error fetching data from Instagram:', error);
     return ServerResponse.serverError('Failed to fetch data from Instagram');
