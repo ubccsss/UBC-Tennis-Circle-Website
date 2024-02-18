@@ -1,6 +1,6 @@
 import Redis from 'ioredis';
 
-export const redis = new Redis(`${process.env.REDIS_URL}`);
+export const redis = new Redis(`${process.env.NEXT_REDIS_URL}`);
 
 export class Cache {
   static async fetch<T>(key: string, fetcher: () => T, expires: number) {
