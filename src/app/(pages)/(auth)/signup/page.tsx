@@ -1,5 +1,5 @@
 'use client';
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {
   Container,
   VStack,
@@ -21,9 +21,6 @@ import {
   ModalContent,
   ModalCloseButton,
   ModalBody,
-  Link,
-  Text,
-  HStack,
 } from '@chakra-ui/react';
 import {FiArrowRight, FiMail} from 'react-icons/fi';
 import {FaGoogle} from 'react-icons/fa';
@@ -33,7 +30,7 @@ import z from 'zod';
 import axios from 'axios';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {DEFAULT_SERVER_ERR, ZOD_ERR} from '@constants';
-import {ExternalLinkIcon} from '@chakra-ui/icons';
+import {useSearchParams} from 'next/navigation';
 
 const schema = z
   .object({
@@ -60,6 +57,21 @@ const Signup = () => {
 
   const {isOpen, onOpen, onClose} = useDisclosure();
   const [sentTo, setSentTo] = useState('');
+
+  const params = useSearchParams();
+  const sameGoogleEmail = params.get('same-google-email');
+
+  useEffect(() => {
+    if (sameGoogleEmail) {
+      if (sameGoogleEmail === 'true') {
+        statusToast({
+          id: 'google_email',
+          title: 'A non-google account with the same email exists',
+          status: 'error',
+        });
+      }
+    }
+  }, []);
 
   const {
     handleSubmit,

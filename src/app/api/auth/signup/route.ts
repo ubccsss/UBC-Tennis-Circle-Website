@@ -1,4 +1,4 @@
-import {NextRequest, NextResponse} from 'next/server';
+import {NextRequest} from 'next/server';
 import z from 'zod';
 import {auth, connectToDatabase} from '@lib';
 import {LuciaError} from 'lucia';
@@ -29,6 +29,16 @@ export const POST = async (request: NextRequest) => {
 
   email_address = email_address.toLowerCase();
 
+  const sameEmailUser = await User.findOne({
+    email_address,
+  });
+
+  if (sameEmailUser) {
+    return ServerResponse.userError(
+      'A user with this email address already exists'
+    );
+  }
+
   const validation = signupSchema.safeParse({
     first_name,
     last_name,
@@ -38,6 +48,8 @@ export const POST = async (request: NextRequest) => {
 
   if (validation.success) {
     try {
+      const profilePictureGenerationURL = generateRandomString(64);
+
       const user = await auth.createUser({
         key: {
           providerId: 'email_address',
@@ -51,7 +63,7 @@ export const POST = async (request: NextRequest) => {
           email_verified: false,
           skill: 1,
           instagram: null,
-          profile: 'https://source.boringavatars.com/beam',
+          profile: `https://source.boringavatars.com/beam/120/${profilePictureGenerationURL}`,
         },
       });
 
@@ -62,7 +74,6 @@ export const POST = async (request: NextRequest) => {
         {
           $set: {
             'email_verification_token.id': emailConfirmationToken,
-            profile: `https://source.boringavatars.com/beam/120/${user.userId}`,
           },
         }
       );

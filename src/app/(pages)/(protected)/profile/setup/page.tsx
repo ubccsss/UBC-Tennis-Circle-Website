@@ -1,5 +1,4 @@
 'use client';
-
 import {
   Input,
   InputGroup,
@@ -26,17 +25,17 @@ import {
   ModalFooter,
   Text,
   Box,
+  Skeleton,
 } from '@chakra-ui/react';
-import {useSearchParams} from 'next/navigation';
-import {FiArrowRight, FiInstagram} from 'react-icons/fi';
+import {FiArrowRight, FiCamera, FiInstagram} from 'react-icons/fi';
 import z from 'zod';
-import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {ZOD_ERR, DEFAULT_SERVER_ERR} from '@constants/error-messages';
 import axios from 'axios';
 import {useState, useCallback, useEffect} from 'react';
 import {useDropzone, FileRejection} from 'react-dropzone';
-import {setRevalidateHeaders} from 'next/dist/server/send-payload';
+import {getClientSession} from '@utils';
+import {UseFormSetValue, FieldValues, useForm} from 'react-hook-form';
 
 const schema = z.object({
   skill: z.string().min(1, ZOD_ERR.REQ_FIELD),
@@ -46,11 +45,13 @@ const schema = z.object({
 
 type Form = z.infer<typeof schema>;
 
+const initialFormUpdate = async (setValue: UseFormSetValue<Form>) => {
+  const session = await getClientSession();
+  setValue('profile', session.user.profile);
+};
+
 const AddInfo = () => {
   const statusToast = useToast();
-  const params = useSearchParams();
-  const id = params.get('id');
-  const picture = params.get('picture');
 
   const {
     handleSubmit,
@@ -60,12 +61,15 @@ const AddInfo = () => {
     formState: {errors, isSubmitting},
   } = useForm<Form>({resolver: zodResolver(schema)});
 
+  useEffect(() => {
+    initialFormUpdate(setValue);
+  }, []);
+
   const onSubmit = async ({skill, instagram, profile}: Form) => {
     try {
       const res = await axios.put(
         `${process.env.NEXT_PUBLIC_HOSTNAME}/api/addinfo`,
         {
-          id,
           skill: parseInt(skill),
           instagram,
           profile,
@@ -131,26 +135,44 @@ const AddInfo = () => {
 
   const watched = watch();
 
-  useEffect(() => {
-    setValue('profile', picture!);
-  }, []);
-
   return (
     <Container maxW="container.xl" py={{base: '32', lg: '20'}}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Flex flexDirection="row" w="100%" justifyContent="center" gap="36">
           <VStack width="450px">
-            <Heading as="h1" size="2xl">
-              Create your profile
+            <Heading as="h1" textAlign="center">
+              Complete your profile
             </Heading>
+            <Text textAlign="center">
+              Lorem ipsum dolor sit amet, qui minim labore adipisicing minim
+              sint cillum sint consectetur cupidatat.
+            </Text>
             {watched.profile ? (
-              <Image src={watched.profile} mt="10" boxSize="80px" />
+              <Box
+                position="relative"
+                as="button"
+                mt="10"
+                onClick={onOpen}
+                type="button"
+              >
+                <Image src={watched.profile} boxSize="24" borderRadius="8" />
+                <Flex
+                  position="absolute"
+                  bg="black"
+                  w="100%"
+                  justifyContent="center"
+                  alignItems="center"
+                  bottom="0"
+                  borderBottomRadius="8"
+                  py="2"
+                  bgColor="rgb(0, 0, 0, 0.5)"
+                >
+                  <Icon as={FiCamera} color="white" />
+                </Flex>
+              </Box>
             ) : (
-              <Image src={picture!} mt="10" boxSize="80px" />
+              <Skeleton w="24" h="24" borderRadius="8" />
             )}
-            <Button onClick={onOpen} size="md" mt={2}>
-              Update your profile
-            </Button>
 
             <Modal isOpen={isOpen} onClose={onClose}>
               <ModalOverlay />

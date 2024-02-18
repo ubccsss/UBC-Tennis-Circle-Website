@@ -2,8 +2,6 @@ import {NextRequest} from 'next/server';
 import {redirect} from 'next/navigation';
 import {connectToDatabase, logger} from '@lib';
 import {User} from '@models';
-import {auth} from '@lib';
-import {cookies, headers} from 'next/headers';
 
 export const GET = async (
   _: NextRequest,
@@ -12,16 +10,12 @@ export const GET = async (
   await connectToDatabase();
 
   let success = false;
-  let id;
-  let profile;
 
   try {
     const user = await User.findOne({
       'email_verification_token.id': token,
     }).lean<User>();
     if (user) {
-      id = user._id;
-      profile = user.profile;
       await User.updateOne(
         {'email_verification_token.id': token},
         {
@@ -37,7 +31,7 @@ export const GET = async (
   }
 
   if (success) {
-    redirect(`/signup/addinfo?id=${id}&picture=${profile}`);
+    redirect('/profile/setup');
   } else {
     redirect('/login?confirmation-status=failed');
   }

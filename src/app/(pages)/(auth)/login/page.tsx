@@ -39,19 +39,6 @@ const Login = () => {
   const confirmationStatus = params.get('confirmation-status');
   const recoveryStatus = params.get('recovery-status');
   const invalidate = params.get('invalidate');
-  const sameGoogleEmail = params.get('same-google-email');
-
-  useEffect(() => {
-    if (sameGoogleEmail) {
-      if (sameGoogleEmail === 'true') {
-        statusToast({
-          id: 'google_email',
-          title: 'A non-google account with the same email exists',
-          status: 'error',
-        });
-      }
-    }
-  });
 
   useEffect(() => {
     if (invalidate === 'true') {
