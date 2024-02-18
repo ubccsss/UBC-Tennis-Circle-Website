@@ -25,6 +25,7 @@ export const auth = lucia({
       skill: data.skill,
       instagram: data.instagram,
       profile: data.profile,
+      provider: data.provider,
     };
   },
 });

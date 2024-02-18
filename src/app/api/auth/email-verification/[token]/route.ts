@@ -36,6 +36,7 @@ export const GET = async (
         skill: user.skill,
         instagram: user.instagram,
         profile: user.profile,
+        provider: 'password',
       };
 
       const session = await auth.createSession({
