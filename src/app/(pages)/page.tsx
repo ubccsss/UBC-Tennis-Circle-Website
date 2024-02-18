@@ -113,7 +113,10 @@ const Home = () => {
         </Container>
       </Box>
       <Container maxW="container.xl" my="12">
-        <SimpleGrid columns={{base: 1, md: 2}} spacing={{base: 12, md: 24}}>
+        <SimpleGrid
+          columns={{base: 1, md: 2}}
+          spacing={{base: 12, md: 14, lg: 24}}
+        >
           <Flex flexDirection="column" gap="4" justifyContent="center">
             <Heading as="h1">
               Find events and connect with other tennis players!
@@ -131,11 +134,15 @@ const Home = () => {
               </Button>
             </Box>
           </Flex>
-          <Image
-            src="static/images/stock/find-events-connect.png"
-            alt="find events & connect"
-            borderRadius="md"
-          />
+          <Flex alignItems="center">
+            <Image
+              src="static/images/stock/find-events-connect.png"
+              alt="find events & connect"
+              borderRadius="md"
+              height="100%"
+              objectFit="cover"
+            />
+          </Flex>
         </SimpleGrid>
 
         <Flex
@@ -160,6 +167,7 @@ const Home = () => {
                 position="absolute"
                 left="-20"
                 bottom="44"
+                display={{base: 'none', md: 'block'}}
               />
             </Box>
             {error && (

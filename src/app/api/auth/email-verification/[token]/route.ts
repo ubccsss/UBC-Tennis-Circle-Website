@@ -2,20 +2,24 @@ import {NextRequest} from 'next/server';
 import {redirect} from 'next/navigation';
 import {connectToDatabase, logger} from '@lib';
 import {User} from '@models';
+import {auth} from '@lib';
+import {cookies, headers} from 'next/headers';
 
 export const GET = async (
-  _: NextRequest,
+  request: NextRequest,
   {params: {token}}: {params: {token: string}}
 ) => {
   await connectToDatabase();
 
   let success = false;
+  let id;
 
   try {
     const user = await User.findOne({
       'email_verification_token.id': token,
     }).lean<User>();
     if (user) {
+      id = user._id;
       await User.updateOne(
         {'email_verification_token.id': token},
         {
@@ -24,6 +28,27 @@ export const GET = async (
         }
       );
 
+      const userAttributes = {
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email_address: user.email_address,
+        email_verified: user.email_verified,
+        skill: user.skill,
+        instagram: user.instagram,
+        profile: user.profile,
+      };
+
+      const session = await auth.createSession({
+        userId: id,
+        attributes: userAttributes,
+      });
+
+      const authRequest = auth.handleRequest(request.method, {
+        cookies,
+        headers,
+      });
+
+      authRequest.setSession(session);
       success = true;
     }
   } catch (e) {

@@ -35,7 +35,7 @@ import axios from 'axios';
 import {useState, useCallback, useEffect} from 'react';
 import {useDropzone, FileRejection} from 'react-dropzone';
 import {getClientSession} from '@utils';
-import {UseFormSetValue, FieldValues, useForm} from 'react-hook-form';
+import {UseFormSetValue, useForm} from 'react-hook-form';
 
 const schema = z.object({
   skill: z.string().min(1, ZOD_ERR.REQ_FIELD),
@@ -135,6 +135,20 @@ const AddInfo = () => {
 
   const watched = watch();
 
+  useEffect(() => {
+    const getUserFromSession = async () => {
+      const session = await getClientSession();
+      return session;
+    };
+
+    const fetchSession = async () => {
+      const session = await getUserFromSession();
+      setValue('profile', session.user.profile);
+    };
+
+    fetchSession();
+  }, []);
+
   return (
     <Container maxW="container.xl" py={{base: '32', lg: '20'}}>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -173,6 +187,10 @@ const AddInfo = () => {
             ) : (
               <Skeleton w="24" h="24" borderRadius="8" />
             )}
+            <Image src={watched.profile} mt="10" boxSize="80px" />
+            <Button onClick={onOpen} size="md" mt={2}>
+              Update your profile
+            </Button>
 
             <Modal isOpen={isOpen} onClose={onClose}>
               <ModalOverlay />

@@ -17,6 +17,7 @@ import {
 } from '@chakra-ui/react';
 import {useForm} from 'react-hook-form';
 import {FiArrowRight} from 'react-icons/fi';
+import {FaGoogle} from 'react-icons/fa';
 import {Subheader} from '@components';
 import {useSearchParams} from 'next/navigation';
 import {authBroadcast} from '@broadcasts';
@@ -35,10 +36,33 @@ type Form = z.infer<typeof schema>;
 const Login = () => {
   const statusToast = useToast();
   const params = useSearchParams();
+
   const redirectURL = params.get('redirect');
   const confirmationStatus = params.get('confirmation-status');
   const recoveryStatus = params.get('recovery-status');
   const invalidate = params.get('invalidate');
+  const sameGoogleEmail = params.get('same-google-email');
+  const badOauth = params.get('bad-oauth');
+
+  const GOOGLE_AUTH_LINK = `${process.env.NEXT_PUBLIC_HOSTNAME}/api/auth/login/google`;
+
+  useEffect(() => {
+    if (sameGoogleEmail === 'true') {
+      statusToast({
+        id: 'same_google_email',
+        title: 'A non-google account with the same email exists',
+        status: 'error',
+      });
+    }
+
+    if (badOauth === 'true') {
+      statusToast({
+        id: 'bad_oauth',
+        title: 'You need to sign up before logging in',
+        status: 'error',
+      });
+    }
+  }, [sameGoogleEmail, badOauth]);
 
   useEffect(() => {
     if (invalidate === 'true') {
@@ -178,6 +202,21 @@ const Login = () => {
             <Subheader mt="-2" mb="1">
               Welcome Back
             </Subheader>
+
+            <Button
+              flexGrow={1}
+              onClick={() => {
+                window.location.href = GOOGLE_AUTH_LINK;
+              }}
+              colorScheme="brand"
+              variant="outline"
+              size="lg"
+              _hover={{
+                bg: 'gray.100',
+              }}
+            >
+              <Icon as={FaGoogle} mr={4} color="brand.500" /> Login with Google
+            </Button>
             <FormControl isInvalid={Boolean(errors.email_address)}>
               <Input
                 id="email_address"
