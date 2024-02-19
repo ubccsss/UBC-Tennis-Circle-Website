@@ -32,17 +32,18 @@ import {FormatOptionLabelMeta, Select} from 'chakra-react-select';
 import {FiArrowRight, FiCamera, FiInstagram} from 'react-icons/fi';
 import z from 'zod';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {ZOD_ERR, DEFAULT_SERVER_ERR} from '@constants/error-messages';
+import {DEFAULT_SERVER_ERR} from '@constants/error-messages';
 import axios from 'axios';
 import {useState, useCallback, useEffect} from 'react';
 import {useDropzone, FileRejection} from 'react-dropzone';
 import {getClientSession} from '@utils';
 import {Controller, UseFormSetValue, useForm} from 'react-hook-form';
+import {useRouter} from 'next/navigation';
 
 const schema = z.object({
-  skill: z.object({value: z.number(), label: z.string()}),
-  instagram: z.string().min(1, ZOD_ERR.REQ_FIELD),
-  profile: z.string().min(1),
+  skill: z.object({value: z.number(), label: z.string()}).optional(),
+  instagram: z.string().optional(),
+  profile: z.string().min(1), // should always have this
 });
 
 type Form = z.infer<typeof schema>;
@@ -69,23 +70,20 @@ const ProfileSetup = () => {
     initialFormUpdate(setValue);
   }, []);
 
+  const router = useRouter();
+
   const onSubmit = async ({skill, instagram, profile}: Form) => {
     try {
-      const res = await axios.put(
-        `${process.env.NEXT_PUBLIC_HOSTNAME}/api/addinfo`,
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_HOSTNAME}/api/auth/profile/setup`,
         {
-          skill: skill.value,
+          skill: skill?.value || 1,
           instagram,
           profile,
         }
       );
 
-      if (res.data) {
-        statusToast({
-          title: res.data.message,
-          status: 'success',
-        });
-      }
+      router.push('/profile/public');
     } catch (e) {
       if (axios.isAxiosError(e)) {
         statusToast({
@@ -179,7 +177,7 @@ const ProfileSetup = () => {
     <Container maxW="container.xl" py={{base: '32', lg: '20'}}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Flex flexDirection="row" w="100%" justifyContent="center" gap="36">
-          <VStack width="450px">
+          <VStack maxW="lg">
             <Heading as="h1" textAlign="center">
               Complete your profile
             </Heading>
@@ -237,7 +235,7 @@ const ProfileSetup = () => {
                       w="100"
                       borderWidth={errors.profile ? 2 : 'thin'}
                       borderColor={errors.profile ? 'red.500' : 'gray.200'}
-                      p={20}
+                      p={{base: '16', lg: '20'}}
                       borderRadius="10"
                     >
                       <input
@@ -248,13 +246,24 @@ const ProfileSetup = () => {
                         <Image
                           src={watched.profile}
                           w="auto"
-                          maxW="48"
+                          maxW="72"
                           h="12"
                           objectFit="fill"
                           borderRadius="md"
                         />
-                        <Text color="gray.500" textAlign="center">
+                        <Text
+                          color="gray.500"
+                          textAlign="center"
+                          display={{base: 'none', md: 'block'}}
+                        >
                           Upload your new profile here
+                        </Text>
+                        <Text
+                          color="gray.500"
+                          textAlign="center"
+                          display={{base: 'block', md: 'none'}}
+                        >
+                          Click here to upload new picture
                         </Text>
                       </VStack>
                     </Box>
@@ -286,8 +295,14 @@ const ProfileSetup = () => {
                 </ModalFooter>
               </ModalContent>
             </Modal>
-            <Flex justifyContent="center" flexDir="column" gap="4" mt="-4">
-              <InputGroup size="lg" mt="10" w="80" zIndex={2}>
+            <Flex
+              justifyContent="center"
+              flexDir="column"
+              gap="4"
+              mt="-4"
+              w={{base: '100%', xs: '80'}}
+            >
+              <InputGroup size="lg" mt="10" zIndex={2} w="100%">
                 <Controller
                   control={control}
                   name="skill"
@@ -306,7 +321,7 @@ const ProfileSetup = () => {
                         ]}
                         formatOptionLabel={SkillOption}
                         placeholder="Skill Level"
-                        size="lg"
+                        size={{base: 'md', sm: 'lg'}}
                         isSearchable={false}
                       />
                     </FormControl>
@@ -315,7 +330,7 @@ const ProfileSetup = () => {
               </InputGroup>
               <FormErrorMessage>{errors?.skill?.message}</FormErrorMessage>
               <FormControl isInvalid={Boolean(errors.instagram)}>
-                <InputGroup size="lg" w="80">
+                <InputGroup size={{base: 'md', sm: 'lg'}} w="100%">
                   <InputLeftElement pointerEvents="none">
                     <AtSignIcon color="gray.300" />
                   </InputLeftElement>
