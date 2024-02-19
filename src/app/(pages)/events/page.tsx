@@ -1,59 +1,57 @@
 'use client';
 
-import {Container, Img, Text, Flex, Center} from '@chakra-ui/react';
+import {Container, Img, Text, Heading, Flex, Center} from '@chakra-ui/react';
 
 const Events = () => {
   return (
     <Container maxW="container.xl">
-      <Container py={[0, 20]}>
+      <Container py={{base: '12', sm: '20'}}>
         <Center>
-          <Text
-            as="b"
-            fontSize="36px"
+          <Heading
+            as="h1"
             fontWeight="500"
             lineHeight="43.2px"
             color="#3F3D3B"
-            align="center"
+            textAlign="center"
           >
-            Browse currently available tennis events
-          </Text>
+            Browse Tennis Events
+          </Heading>
         </Center>
         <Center>
-          <Text pt={{base: '5'}} pb={{base: '200'}}>
+          <Text pb={{base: '200'}} textAlign="center">
             Come join us for a fun round of tennis!
           </Text>
         </Center>
         <Center>
-          <Text fontWeight="500" fontSize="4xl" color="#15997E">
-            More events coming soon!
-          </Text>
+          <Heading
+            as="h4"
+            color="#15997E"
+            textAlign="center"
+            fontSize="24"
+            maxW="96"
+          >
+            Currently no events available, check back later!
+          </Heading>
         </Center>
 
         <Img
-          sizes="sm"
           src="/static/images/illustrations/tennis-ball-yellow-events.svg"
           alt="Yellow Tennis Ball"
           borderRadius="lg"
-          display={{base: 'none', lg: 'block'}}
-          ml="37em"
-          mt="-2em"
+          ml="auto"
+          display={{base: 'none', md: 'block'}}
         />
         <Img
-          sizes="sm"
           src="/static/images/illustrations/tennis-ball-green-events.svg"
           alt="Blue Tennis Ball"
           borderRadius="lg"
-          display={{base: 'none', lg: 'block'}}
-          mt="2em"
+          mt={{base: '12', md: '-4'}}
         />
         <Img
-          sizes="sm"
           src="/static/images/illustrations/tennis-ball-blue-events.svg"
           alt="Green Tennis Ball"
+          ml="24"
           borderRadius="lg"
-          display={{base: 'none', lg: 'block'}}
-          ml="-6em"
-          mt="-6em"
         />
       </Container>
     </Container>
