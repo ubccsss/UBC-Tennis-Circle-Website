@@ -8,10 +8,9 @@ import {
   Box,
   Image,
   SimpleGrid,
-  Icon,
 } from '@chakra-ui/react';
 import axios from 'axios';
-import {FiAlertCircle} from 'react-icons/fi';
+import {Error} from '@components';
 import {useQuery} from '@tanstack/react-query';
 import {TeamMember} from '@types';
 
@@ -131,18 +130,8 @@ const About = () => {
               display={{base: 'none', md: 'block'}}
             />
           </Box>
-          {error && (
-            <Flex
-              flexDirection="column"
-              alignItems="center"
-              justifyContent="center"
-              textAlign="center"
-              gap="2"
-            >
-              <Icon as={FiAlertCircle} color="red.400" fontSize="28" />
-              <Text maxW="64">An unexpected error has occurred</Text>
-            </Flex>
-          )}
+
+          {error && <Error />}
 
           {isPending && (
             <SimpleGrid w="100%" spacing="4" columns={{base: 1, sm: 2, md: 4}}>

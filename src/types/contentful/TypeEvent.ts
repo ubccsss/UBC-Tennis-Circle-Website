@@ -8,11 +8,11 @@ import type {
 
 export interface TypeEventFields {
   name: EntryFieldTypes.Symbol;
-  location: EntryFieldTypes.Location;
   ticketPrice: EntryFieldTypes.Number;
   date: EntryFieldTypes.Date;
   coverImage: EntryFieldTypes.AssetLink;
-  description: EntryFieldTypes.RichText;
+  location: EntryFieldTypes.Symbol;
+  description: EntryFieldTypes.Text;
 }
 
 export type TypeEventSkeleton = EntrySkeletonType<TypeEventFields, 'event'>;

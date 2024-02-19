@@ -34,6 +34,7 @@
     "cf-content-types-generator": "^2.13.1",
     "chakra-react-select": "^4.7.6",
     "contentful": "^10.6.16",
+    "date-fns": "^3.3.1",
     "dotenv-cli": "^7.3.0",
     "framer-motion": "^10.16.4",
     "ioredis": "^5.3.2",
