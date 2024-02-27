@@ -1,18 +1,29 @@
 'use client';
 import {
-  Container,
   Box,
+  Container,
+  Button,
+  Text,
   Image,
   Flex,
   Skeleton,
   SkeletonText,
   HStack,
   Heading,
+  AvatarGroup,
+  Avatar,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import {TennisEvent} from '@types';
 import {useQuery} from '@tanstack/react-query';
 import {useRouter} from 'next/navigation';
+import {format, parseISO} from 'date-fns';
+import {
+  LocationPinIcon,
+  ClockIcon,
+  SingleUserIcon,
+  UserFriendsIcon,
+} from '@icons';
 
 const EventDetail = ({params}: {params: {id: string}}) => {
   const router = useRouter();
@@ -39,7 +50,7 @@ const EventDetail = ({params}: {params: {id: string}}) => {
   }
 
   return (
-    <Container maxW="container.xl" py={{base: '32', lg: '20'}}>
+    <Container maxW="container.xl" py={{base: '12'}}>
       <Container maxW="container.lg">
         {isPending && (
           <Flex flexDirection="column" gap="4">
@@ -79,9 +90,104 @@ const EventDetail = ({params}: {params: {id: string}}) => {
                 bgColor="rgb(0, 0, 0, 0.5)"
                 borderRadius="8"
               />
-              <Heading as="h1" position="absolute">
-                {data.name}
-              </Heading>
+            </Flex>
+            <Flex gap="16" mt="8">
+              <Flex flexDir="column" gap="2">
+                <Text mb="-2">
+                  {format(parseISO(data.date), 'EEEE, MMM d yyyy')}
+                </Text>
+                <Heading as="h1" size="xl">
+                  {data.name}
+                </Heading>
+                <Text>{data.description}</Text>
+                <Box h="0.4" bg="gray.300" my="4" />
+                <Flex>
+                  <Flex alignItems="center" gap="2" color="gray.500">
+                    <ClockIcon />
+                    <Text>
+                      <b>Time: </b>
+                      {format(
+                        parseISO(data.date),
+                        'EEEE, MMM d yyyy, h:mm aaa'
+                      )}
+                    </Text>
+                  </Flex>
+                </Flex>
+
+                <Flex>
+                  <Flex alignItems="center" gap="2" color="gray.500">
+                    <LocationPinIcon />
+                    <Text>
+                      <b>Location: </b>
+                      {data.location}
+                    </Text>
+                  </Flex>
+                </Flex>
+
+                <Flex>
+                  <Flex alignItems="center" gap="2" color="gray.500">
+                    <SingleUserIcon />
+                    <Text>
+                      <b>Hosted by: </b>
+                      UBC Tennis Circle
+                    </Text>
+                  </Flex>
+                </Flex>
+
+                <Flex>
+                  <Flex alignItems="center" gap="2" color="gray.500">
+                    <UserFriendsIcon />
+                    <Text>
+                      <b>Attendees: </b>
+                    </Text>
+                    <AvatarGroup size="sm" max={3}>
+                      <Avatar
+                        name="Segun Adebayo"
+                        src="https://bit.ly/sage-adebayo"
+                      />
+                      <Avatar
+                        name="Kent Dodds"
+                        src="https://bit.ly/kent-c-dodds"
+                      />
+                      <Avatar
+                        name="Prosper Otemuyiwa"
+                        src="https://bit.ly/prosper-baba"
+                      />
+                      <Avatar
+                        name="Christian Nwamba"
+                        src="https://bit.ly/code-beast"
+                      />
+                    </AvatarGroup>
+                    <Button
+                      size="sm"
+                      colorScheme="brand"
+                      variant="ghost"
+                      _hover={{
+                        bg: 'gray.100',
+                      }}
+                    >
+                      View attendee list
+                    </Button>
+                  </Flex>
+                </Flex>
+              </Flex>
+              <Flex
+                borderRadius="8"
+                p="4"
+                border="1px"
+                borderColor="brand.500"
+                w="xl"
+                flexDir="column"
+                gap="4"
+                h="100%"
+              >
+                <Heading as="h4" fontSize="xl" textAlign="center">
+                  Admission ${data.ticket_price}
+                </Heading>
+                <Button w="100%" colorScheme="brand">
+                  Buy Ticket
+                </Button>
+              </Flex>
             </Flex>
           </Flex>
         )}

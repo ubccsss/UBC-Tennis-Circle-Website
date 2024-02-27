@@ -14,6 +14,8 @@ import {
   HStack,
   Icon,
   Button,
+  Avatar,
+  AvatarGroup,
 } from '@chakra-ui/react';
 import {useQuery} from '@tanstack/react-query';
 import axios from 'axios';
@@ -97,39 +99,60 @@ const Events = () => {
 
               <Stack>
                 <CardBody>
-                  <Heading size="md" mb="2">
+                  <Heading size="md" mb="2" fontSize="24">
                     {i.name}
                   </Heading>
-                  <HStack alignItems="flex-start">
-                    <HStack>
-                      <Icon as={LocationPinIcon} color="gray.500" />
-                      <Text fontWeight="bold">Location:</Text>
-                    </HStack>
-                    <Text>{i.location}</Text>
-                  </HStack>
 
-                  <HStack alignItems="flex-start">
-                    <HStack>
-                      <Icon as={ClockIcon} color="gray.500" />
-                      <Text fontWeight="bold">Time:</Text>
+                  <Flex flexDirection="column" mt="2">
+                    <HStack alignItems="flex-start">
+                      <HStack>
+                        <Icon as={ClockIcon} color="gray.500" />
+                        <Text fontWeight="semibold">Date:</Text>
+                      </HStack>
+                      <Text>{format(parseISO(i.date), 'E, MMM d yyyy')}</Text>
                     </HStack>
-                    <Text>{format(parseISO(i.date), 'E, MMM d yyyy')}</Text>
-                  </HStack>
 
-                  <HStack alignItems="flex-start">
-                    <HStack>
-                      <Icon as={SingleUserIcon} color="gray.500" />
-                      <Text fontWeight="bold">Host:</Text>
+                    <HStack alignItems="flex-start">
+                      <HStack>
+                        <Icon as={LocationPinIcon} color="gray.500" />
+                        <Text fontWeight="semibold">Location:</Text>
+                      </HStack>
+                      <Text>{i.location}</Text>
                     </HStack>
-                    <Text>UBC Tennis Circle</Text>
-                  </HStack>
 
-                  <HStack alignItems="flex-start">
-                    <HStack>
-                      <Icon as={UserFriendsIcon} color="gray.500" />
-                      <Text fontWeight="bold">Attendees:</Text>
+                    <HStack alignItems="flex-start">
+                      <HStack>
+                        <Icon as={SingleUserIcon} color="gray.500" />
+                        <Text fontWeight="semibold">Host:</Text>
+                      </HStack>
+                      <Text>UBC Tennis Circle</Text>
                     </HStack>
-                  </HStack>
+
+                    <HStack alignItems="flex-start">
+                      <HStack>
+                        <Icon as={UserFriendsIcon} color="gray.500" />
+                        <Text fontWeight="semibold">Attendees:</Text>
+                        <AvatarGroup size="sm" max={3}>
+                          <Avatar
+                            name="Segun Adebayo"
+                            src="https://bit.ly/sage-adebayo"
+                          />
+                          <Avatar
+                            name="Kent Dodds"
+                            src="https://bit.ly/kent-c-dodds"
+                          />
+                          <Avatar
+                            name="Prosper Otemuyiwa"
+                            src="https://bit.ly/prosper-baba"
+                          />
+                          <Avatar
+                            name="Christian Nwamba"
+                            src="https://bit.ly/code-beast"
+                          />
+                        </AvatarGroup>
+                      </HStack>
+                    </HStack>
+                  </Flex>
                 </CardBody>
               </Stack>
               <Button
