@@ -176,10 +176,10 @@ const EventDetail = ({params}: {params: {id: string}}) => {
                 p="4"
                 border="1px"
                 borderColor="brand.500"
-                w="xl"
                 flexDir="column"
                 gap="4"
                 h="100%"
+                minW="64"
               >
                 <Heading as="h4" fontSize="xl" textAlign="center">
                   Admission ${data.ticket_price}

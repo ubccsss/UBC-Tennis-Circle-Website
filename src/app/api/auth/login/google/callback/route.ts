@@ -18,26 +18,30 @@ export const GET = async (request: NextRequest) => {
     );
 
     const userAttributes = {
-      first_name: googleUser.given_name,
-      last_name: googleUser.family_name,
-      email_address: googleUser.email,
-      email_verified: googleUser.email_verified,
+      first_name: googleUser?.given_name,
+      last_name: googleUser?.family_name,
+      email_address: googleUser?.email,
+      email_verified: googleUser?.email_verified,
       skill: 1,
       instagram: null,
-      profile: googleUser.picture,
+      profile: googleUser?.picture,
       provider: 'google',
     };
 
     const getUser = async () => {
       const existingUser = await getExistingUser();
       if (existingUser) return existingUser;
-
-      return NextResponse.redirect(
-        new URL('/login?bad-oauth=true', request.url)
-      );
+      return null;
     };
 
     const user = await getUser();
+
+    if (!user) {
+      return NextResponse.redirect(
+        new URL('/login?bad-oauth=true', request.url)
+      );
+    }
+
     const session = await auth.createSession({
       userId: user.userId,
       attributes: userAttributes,

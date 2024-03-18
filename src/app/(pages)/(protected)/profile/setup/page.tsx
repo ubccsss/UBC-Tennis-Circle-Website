@@ -83,7 +83,7 @@ const ProfileSetup = () => {
         }
       );
 
-      router.push('/profile/public');
+      router.push('/');
     } catch (e) {
       if (axios.isAxiosError(e)) {
         statusToast({
