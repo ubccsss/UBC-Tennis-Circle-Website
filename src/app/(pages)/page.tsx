@@ -14,9 +14,10 @@ import {
 import {TennisBallIcon, UserFriendsIcon, CommentsIcon} from '@icons';
 import axios from 'axios';
 import {useQuery} from '@tanstack/react-query';
-import {FiArrowRight, FiAlertCircle} from 'react-icons/fi';
+import {FiArrowRight} from 'react-icons/fi';
 import {TeamMember} from '@types';
 import {Skeleton} from '@chakra-ui/react';
+import {Error} from '@components';
 
 // get featured team members
 const getFeatured = async () => {
@@ -170,18 +171,8 @@ const Home = () => {
                 display={{base: 'none', md: 'block'}}
               />
             </Box>
-            {error && (
-              <Flex
-                flexDirection="column"
-                alignItems="center"
-                justifyContent="center"
-                textAlign="center"
-                gap="2"
-              >
-                <Icon as={FiAlertCircle} color="red.400" fontSize="28" />
-                <Text maxW="64">An unexpected error has occurred</Text>
-              </Flex>
-            )}
+
+            {error && <Error />}
 
             {isPending && (
               <SimpleGrid

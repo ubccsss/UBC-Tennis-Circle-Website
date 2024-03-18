@@ -38,7 +38,7 @@ const links: Array<Link> = [
 const authButtonHrefs = {
   login: '/login',
   signup: '/signup',
-  myAccount: '/my-account',
+  myAccount: '/profile/public',
 };
 
 interface NavbarContext {
