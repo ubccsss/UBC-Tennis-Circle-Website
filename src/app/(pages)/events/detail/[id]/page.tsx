@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import {
   Box,
   Container,
@@ -49,26 +50,49 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
     router.push("/not-found");
   }
 
-  const BuyTicketBox = ({ ...props }) => (
-    <Flex
-      borderRadius="8"
-      p="4"
-      border="1px"
-      borderColor="brand.500"
-      flexDir="column"
-      gap="4"
-      h="100%"
-      minW={{ base: "unset", sm: "64" }}
-      {...props}
-    >
-      <Heading as="h4" fontSize="xl" textAlign="center">
-        Admission ${data.ticket_price}
-      </Heading>
-      <Button w="100%" colorScheme="brand">
-        Buy Ticket
-      </Button>
-    </Flex>
-  );
+  const [purchaseLoading, setPurchaseLoading] = useState(false);
+
+  const purchaseTicket = async () => {
+    try {
+      setPurchaseLoading(true);
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_HOSTNAME}/api/events/ticket/purchase`,
+        { event_id: params.id },
+      );
+      router.push(res.data.url);
+    } catch (e) {
+      console.error(e);
+    }
+    setPurchaseLoading(false);
+  };
+
+  const BuyTicketBox = ({ ...props }) => {
+    return (
+      <Flex
+        borderRadius="8"
+        p="4"
+        border="1px"
+        borderColor="brand.500"
+        flexDir="column"
+        gap="4"
+        h="100%"
+        minW={{ base: "unset", sm: "64" }}
+        {...props}
+      >
+        <Heading as="h4" fontSize="xl" textAlign="center">
+          Admission ${data.ticket_price}
+        </Heading>
+        <Button
+          w="100%"
+          colorScheme="brand"
+          onClick={purchaseTicket}
+          isLoading={purchaseLoading}
+        >
+          Buy Ticket
+        </Button>
+      </Flex>
+    );
+  };
 
   return (
     <Container maxW="container.xl" py={{ base: "12" }}>
