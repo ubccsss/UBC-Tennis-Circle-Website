@@ -1,4 +1,4 @@
-import mongoose, {Schema} from 'mongoose';
+import mongoose, { Schema } from "mongoose";
 
 export interface User {
   _id: string;
@@ -19,25 +19,26 @@ mongoose.Promise = global.Promise;
 
 const schema = new Schema<User>(
   {
-    _id: {type: String, required: true},
-    first_name: {type: String, required: true},
-    last_name: {type: String, required: true},
-    email_address: {type: String, required: true},
-    email_verified: {type: Boolean, required: true},
+    _id: { type: String, required: true },
+    first_name: { type: String, required: true },
+    last_name: { type: String, required: true },
+    email_address: { type: String, required: true },
+    email_verified: { type: Boolean, required: true },
     email_verification_token: {
-      id: {type: String},
-      // TODO: Add token expiration
+      id: { type: String },
     },
-    skill: {type: Number, required: false},
-    instagram: {type: String, required: false},
-    profile: {type: String, required: true},
-    provider: {type: String, required: true},
+    skill: { type: Number, required: false },
+    instagram: { type: String, required: false },
+    profile: { type: String, required: true },
+    provider: { type: String, required: true },
   },
-  {_id: false}
+  { _id: false },
 );
 
 export const User =
-  mongoose.models.User || mongoose.model<User>('User', schema);
+  (mongoose.models.User as mongoose.Model<User>) ||
+  mongoose.model<User>("User", schema);
 
 export const DeletedUser =
-  mongoose.models.DeletedUser || mongoose.model<User>('DeletedUser', schema);
+  (mongoose.models.DeletedUser as mongoose.Model<User>) ||
+  mongoose.model<User>("DeletedUser", schema);
