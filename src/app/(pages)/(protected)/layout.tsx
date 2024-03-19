@@ -1,7 +1,7 @@
 'use server';
-import {redirect} from 'next/navigation';
-import {headers} from 'next/headers';
-import {getClientSession} from '@utils';
+import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
+import { getClientSession } from '@utils';
 
 export default async function ProtectedLayout({
   children,

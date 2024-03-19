@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import {
   Container,
   Img,
@@ -16,36 +16,36 @@ import {
   Button,
   Avatar,
   AvatarGroup,
-} from '@chakra-ui/react';
-import {useQuery} from '@tanstack/react-query';
-import axios from 'axios';
-import {TennisEvent} from '@types';
-import {format, parseISO} from 'date-fns';
-import {Error} from '@components';
+} from "@chakra-ui/react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { TennisEvent } from "@types";
+import { format, parseISO } from "date-fns";
+import { Error } from "@components";
 import {
   LocationPinIcon,
   ClockIcon,
   SingleUserIcon,
   UserFriendsIcon,
-} from '@icons';
-import Link from 'next/link';
+} from "@icons";
+import Link from "next/link";
 
 // get all events
 const getEvents = async () => {
   const events = await axios.get(
-    `${process.env.NEXT_PUBLIC_HOSTNAME}/api/events/get-all`
+    `${process.env.NEXT_PUBLIC_HOSTNAME}/api/events/get-all`,
   );
   return events.data;
 };
 
 const Events = () => {
-  const {isPending, error, data} = useQuery<Array<TennisEvent>>({
-    queryKey: ['events'],
+  const { isPending, error, data } = useQuery<Array<TennisEvent>>({
+    queryKey: ["events"],
     queryFn: getEvents,
   });
 
   return (
-    <Container maxW="container.xl" py={{base: '12', sm: '20'}}>
+    <Container maxW="container.xl" py={{ base: "12", sm: "20" }}>
       <Flex flexDir="column">
         <Heading
           as="h1"
@@ -68,8 +68,8 @@ const Events = () => {
           <Flex flexDir="column" gap="8">
             {Array(3)
               .fill(0)
-              .map(() => (
-                <Skeleton h="60" w="100%" borderRadius="8" />
+              .map((_, idx) => (
+                <Skeleton h="60" w="100%" borderRadius="8" key={idx} />
               ))}
           </Flex>
         </Container>
@@ -79,9 +79,10 @@ const Events = () => {
 
       {data && data.length !== 0 && (
         <Container maxW="container.md" mt="12">
-          {data.map(i => (
+          {data.map((i, idx) => (
             <Card
-              direction={{base: 'column', sm: 'row'}}
+              key={idx}
+              direction={{ base: "column", md: "row" }}
               overflow="hidden"
               variant="outline"
               borderRadius="8"
@@ -90,10 +91,10 @@ const Events = () => {
             >
               <Image
                 objectFit="cover"
-                maxW={{base: '100%', sm: '52'}}
+                maxW={{ base: "100%", md: "52" }}
                 src={i.cover_image}
                 alt="Caffe Latte"
-                mr="4"
+                mr={{ base: "0", md: "4" }}
                 borderRadius="4"
               />
 
@@ -103,36 +104,79 @@ const Events = () => {
                     {i.name}
                   </Heading>
 
-                  <Flex flexDirection="column" mt="2">
-                    <HStack alignItems="flex-start">
-                      <HStack>
-                        <Icon as={ClockIcon} color="gray.500" />
+                  <Flex flexDirection="column" mt="2" gap="2">
+                    <Flex
+                      alignItems={{ base: "flex-start", sm: "center" }}
+                      flexDir={{ base: "column", sm: "row" }}
+                    >
+                      <Flex alignItems="center" gap="1">
+                        <Icon as={ClockIcon} color="gray.500" fontSize="14" />
                         <Text fontWeight="semibold">Date:</Text>
-                      </HStack>
-                      <Text>{format(parseISO(i.date), 'E, MMM d yyyy')}</Text>
-                    </HStack>
+                        <Text display={{ base: "none", sm: "block" }}>
+                          {format(parseISO(i.date), "E, MMM d yyyy")}
+                        </Text>
+                      </Flex>
+                      <Text display={{ base: "block", sm: "none" }}>
+                        {format(parseISO(i.date), "E, MMM d yyyy")}
+                      </Text>
+                    </Flex>
 
-                    <HStack alignItems="flex-start">
-                      <HStack>
-                        <Icon as={LocationPinIcon} color="gray.500" />
+                    <Flex
+                      alignItems={{ base: "flex-start", sm: "center" }}
+                      flexDir={{ base: "column", sm: "row" }}
+                    >
+                      <Flex alignItems="center" gap="1">
+                        <Icon
+                          as={LocationPinIcon}
+                          color="gray.500"
+                          fontSize="14"
+                        />
                         <Text fontWeight="semibold">Location:</Text>
-                      </HStack>
-                      <Text>{i.location}</Text>
-                    </HStack>
+                        <Text display={{ base: "none", sm: "block" }}>
+                          {i.location}
+                        </Text>
+                      </Flex>
+                      <Text display={{ base: "block", sm: "none" }}>
+                        {i.location}
+                      </Text>
+                    </Flex>
 
-                    <HStack alignItems="flex-start">
-                      <HStack>
-                        <Icon as={SingleUserIcon} color="gray.500" />
-                        <Text fontWeight="semibold">Host:</Text>
-                      </HStack>
-                      <Text>UBC Tennis Circle</Text>
-                    </HStack>
+                    <Flex
+                      alignItems={{ base: "flex-start", sm: "center" }}
+                      flexDir={{ base: "column", sm: "row" }}
+                    >
+                      <Flex alignItems="center" gap="1">
+                        <Icon
+                          as={SingleUserIcon}
+                          color="gray.500"
+                          fontSize="14"
+                        />
+                        <Text fontWeight="semibold">Hosted by:</Text>
+                        <Text display={{ base: "none", sm: "block" }}>
+                          UBC Tennis Circle
+                        </Text>
+                      </Flex>
+                      <Text display={{ base: "block", sm: "none" }}>
+                        UBC Tennis Circle
+                      </Text>
+                    </Flex>
 
-                    <HStack alignItems="flex-start">
-                      <HStack>
-                        <Icon as={UserFriendsIcon} color="gray.500" />
+                    <Flex
+                      alignItems={{ base: "flex-start", sm: "center" }}
+                      flexDir={{ base: "column", sm: "row" }}
+                    >
+                      <Flex alignItems="center" gap="1">
+                        <Icon
+                          as={UserFriendsIcon}
+                          color="gray.500"
+                          fontSize="14"
+                        />
                         <Text fontWeight="semibold">Attendees:</Text>
-                        <AvatarGroup size="sm" max={3}>
+                        <AvatarGroup
+                          size="xs"
+                          max={3}
+                          display={{ base: "none", sm: "flex" }}
+                        >
                           <Avatar
                             name="Segun Adebayo"
                             src="https://bit.ly/sage-adebayo"
@@ -150,21 +194,43 @@ const Events = () => {
                             src="https://bit.ly/code-beast"
                           />
                         </AvatarGroup>
-                      </HStack>
-                    </HStack>
+                      </Flex>
+                      <AvatarGroup
+                        size="sm"
+                        max={3}
+                        display={{ base: "flex", sm: "none" }}
+                      >
+                        <Avatar
+                          name="Segun Adebayo"
+                          src="https://bit.ly/sage-adebayo"
+                        />
+                        <Avatar
+                          name="Kent Dodds"
+                          src="https://bit.ly/kent-c-dodds"
+                        />
+                        <Avatar
+                          name="Prosper Otemuyiwa"
+                          src="https://bit.ly/prosper-baba"
+                        />
+                        <Avatar
+                          name="Christian Nwamba"
+                          src="https://bit.ly/code-beast"
+                        />
+                      </AvatarGroup>
+                    </Flex>
                   </Flex>
                 </CardBody>
+                <Button
+                  as={Link}
+                  href={`/events/detail/${i.id}`}
+                  colorScheme="brand"
+                  position={{ base: "relative", md: "absolute" }}
+                  right={{ base: "unset", md: "4" }}
+                  bottom={{ base: "unset", md: "4" }}
+                >
+                  Join Event
+                </Button>
               </Stack>
-              <Button
-                as={Link}
-                href={`/events/detail/${i.id}`}
-                position="absolute"
-                bottom="4"
-                right="4"
-                colorScheme="brand"
-              >
-                Join Event
-              </Button>
             </Card>
           ))}
         </Container>
@@ -193,13 +259,13 @@ const NoEvents = () => (
       alt="Yellow Tennis Ball"
       borderRadius="lg"
       ml="auto"
-      display={{base: 'none', md: 'block'}}
+      display={{ base: "none", md: "block" }}
     />
     <Img
       src="/static/images/illustrations/tennis-ball-green-events.svg"
       alt="Blue Tennis Ball"
       borderRadius="lg"
-      mt={{base: '12', md: '-4'}}
+      mt={{ base: "12", md: "-4" }}
     />
     <Img
       src="/static/images/illustrations/tennis-ball-blue-events.svg"

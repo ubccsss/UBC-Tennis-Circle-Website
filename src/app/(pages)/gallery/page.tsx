@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import {
   Skeleton,
   Container,
@@ -11,29 +11,29 @@ import {
   Flex,
   Heading,
   Icon,
-} from '@chakra-ui/react';
-import axios from 'axios';
-import {FiAlertCircle} from 'react-icons/fi';
-import {useQuery} from '@tanstack/react-query';
+} from "@chakra-ui/react";
+import axios from "axios";
+import { FiAlertCircle } from "react-icons/fi";
+import { useQuery } from "@tanstack/react-query";
 
 const getPosts = async () => {
   const posts = await axios.get(
-    `${process.env.NEXT_PUBLIC_HOSTNAME}/api/instagram/posts`
+    `${process.env.NEXT_PUBLIC_HOSTNAME}/api/instagram/posts`,
   );
   return posts.data;
 };
 
 const Gallery = () => {
-  const {isPending, error, data} = useQuery<
-    Array<{media_url: string; permalink: string; caption: string}>
+  const { isPending, error, data } = useQuery<
+    Array<{ media_url: string; permalink: string; caption: string }>
   >({
-    queryKey: ['instagram-posts'],
+    queryKey: ["instagram-posts"],
     queryFn: getPosts,
   });
 
   return (
     <Container maxW="container.xl">
-      <Box>
+      <Box mt="8">
         <Center>
           <VStack>
             <Heading as="h1" textAlign="center">
@@ -46,20 +46,27 @@ const Gallery = () => {
           </VStack>
         </Center>
       </Box>
-      <Flex w="100%" justifyContent="center" my="12">
-        <SimpleGrid columns={{base: 1, sm: 2, lg: 3}} gap="6">
-          {error && (
-            <Flex
-              flexDirection="column"
-              alignItems="center"
-              justifyContent="center"
-              textAlign="center"
-              gap="2"
-            >
-              <Icon as={FiAlertCircle} color="red.400" fontSize="28" />
-              <Text maxW="64">An unexpected error has occurred</Text>
-            </Flex>
-          )}
+      <Flex
+        w="100%"
+        justifyContent="center"
+        my="12"
+        alignItems="center"
+        flexDir="column"
+      >
+        {error && (
+          <Flex
+            flexDirection="column"
+            alignItems="center"
+            justifyContent="center"
+            textAlign="center"
+            gap="2"
+            w="100%"
+          >
+            <Icon as={FiAlertCircle} color="red.400" fontSize="28" />
+            <Text maxW="64">An unexpected error has occurred</Text>
+          </Flex>
+        )}
+        <SimpleGrid columns={{ base: 1, sm: 2, lg: 3 }} gap="6">
           {isPending &&
             new Array(9)
               .fill(null)
@@ -67,8 +74,8 @@ const Gallery = () => {
                 <Skeleton
                   key={index}
                   borderRadius="8"
-                  w={{base: '100%', md: '72'}}
-                  h={{base: '100%', md: '72'}}
+                  w={{ base: "100%", md: "72" }}
+                  h={{ base: "100%", md: "72" }}
                 />
               ))}
 
@@ -76,8 +83,8 @@ const Gallery = () => {
             data.map((post, index) => (
               <Box
                 key={`post-${index}`}
-                w={{base: '100%', md: '72'}}
-                h={{base: '100%', md: '72'}}
+                w={{ base: "100%", md: "72" }}
+                h={{ base: "100%", md: "72" }}
                 overflow="hidden"
                 borderRadius="8"
               >

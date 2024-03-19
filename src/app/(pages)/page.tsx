@@ -1,5 +1,5 @@
-'use client';
-import React from 'react';
+"use client";
+import React from "react";
 import {
   Container,
   Flex,
@@ -10,56 +10,56 @@ import {
   Button,
   SimpleGrid,
   Icon,
-} from '@chakra-ui/react';
-import {TennisBallIcon, UserFriendsIcon, CommentsIcon} from '@icons';
-import axios from 'axios';
-import {useQuery} from '@tanstack/react-query';
-import {FiArrowRight} from 'react-icons/fi';
-import {TeamMember} from '@types';
-import {Skeleton} from '@chakra-ui/react';
-import {Error} from '@components';
+} from "@chakra-ui/react";
+import { TennisBallIcon, UserFriendsIcon, CommentsIcon } from "@icons";
+import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
+import { FiArrowRight } from "react-icons/fi";
+import { TeamMember } from "@types";
+import { Skeleton } from "@chakra-ui/react";
+import { Error } from "@components";
 
 // get featured team members
 const getFeatured = async () => {
   const featured = await axios.get(
-    `${process.env.NEXT_PUBLIC_HOSTNAME}/api/team/get-featured`
+    `${process.env.NEXT_PUBLIC_HOSTNAME}/api/team/get-featured`,
   );
   return featured.data;
 };
 
 const Home = () => {
-  const {isPending, error, data} = useQuery<Array<TeamMember>>({
-    queryKey: ['featured-team'],
+  const { isPending, error, data } = useQuery<Array<TeamMember>>({
+    queryKey: ["featured-team"],
     queryFn: getFeatured,
   });
 
   const stats = [
     {
       icon: UserFriendsIcon,
-      title: '100+ Members',
-      body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      title: "100+ Members",
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
     },
     {
       icon: CommentsIcon,
-      title: 'A growing community',
-      body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      title: "A growing community",
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
     },
     {
       icon: TennisBallIcon,
-      title: '15+ courts',
-      body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      title: "15+ courts",
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
     },
   ];
 
   return (
     <>
       <Container maxW="container.xl">
-        <SimpleGrid columns={{base: 1, lg: 2}} spacing="24" mt="12">
+        <SimpleGrid columns={{ base: 1, lg: 2 }} spacing="24" mt="12">
           <Image
             src="static/images/stock/hero.png"
             alt="tennis player"
             borderRadius="md"
-            display={{base: 'none', lg: 'block'}}
+            display={{ base: "none", lg: "block" }}
           />
           <Flex
             flexDirection="column"
@@ -81,8 +81,8 @@ const Home = () => {
             <Image
               zIndex="-1"
               position="absolute"
-              bottom={{base: '-10', lg: '24'}}
-              right={{base: '0', lg: '24'}}
+              bottom={{ base: "-10", lg: "24" }}
+              right={{ base: "0", lg: "24" }}
               src="static/images/illustrations/tennis-ball-yellow-lg.svg"
               w="16"
               alt="Tennis ball"
@@ -92,9 +92,10 @@ const Home = () => {
       </Container>
       <Box w="100%" py="12" bg="brand.500" my="24">
         <Container maxW="container.xl">
-          <SimpleGrid columns={{base: 1, md: 3}} gap="14">
-            {stats.map(i => (
+          <SimpleGrid columns={{ base: 1, md: 3 }} gap="14">
+            {stats.map((i, idx) => (
               <Flex
+                key={idx}
                 alignItems="center"
                 justifyContent="center"
                 flexDirection="column"
@@ -115,8 +116,8 @@ const Home = () => {
       </Box>
       <Container maxW="container.xl" my="12">
         <SimpleGrid
-          columns={{base: 1, md: 2}}
-          spacing={{base: 12, md: 14, lg: 24}}
+          columns={{ base: 1, md: 2 }}
+          spacing={{ base: 12, md: 14, lg: 24 }}
         >
           <Flex flexDirection="column" gap="4" justifyContent="center">
             <Heading as="h1">
@@ -160,7 +161,7 @@ const Home = () => {
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a leo
             tempus, euismod purus vitae, blandit lectus.
           </Text>
-          <Flex mt="8" flexDirection={{base: 'column', md: 'row'}} w="100%">
+          <Flex mt="8" flexDirection={{ base: "column", md: "row" }} w="100%">
             <Box>
               <Image
                 src="static/images/illustrations/tennis-racket.svg"
@@ -168,7 +169,7 @@ const Home = () => {
                 position="absolute"
                 left="-20"
                 bottom="44"
-                display={{base: 'none', md: 'block'}}
+                display={{ base: "none", md: "block" }}
               />
             </Box>
 
@@ -178,19 +179,19 @@ const Home = () => {
               <SimpleGrid
                 w="100%"
                 spacing="4"
-                columns={{base: 1, sm: 2, md: 4}}
+                columns={{ base: 1, sm: 2, md: 4 }}
               >
                 {Array(4)
                   .fill(0, 0, 4)
-                  .map(() => (
-                    <Skeleton h="96" w="100%" />
+                  .map((_, idx) => (
+                    <Skeleton h="96" w="100%" key={idx} />
                   ))}
               </SimpleGrid>
             )}
             {data && (
-              <SimpleGrid spacing="4" columns={{base: 1, sm: 2, md: 4}}>
-                {data.map(i => (
-                  <Box position="relative">
+              <SimpleGrid spacing="4" columns={{ base: 1, sm: 2, md: 4 }}>
+                {data.map((i, idx) => (
+                  <Box position="relative" key={idx}>
                     <Image
                       src={i.headshot}
                       alt={i.name}

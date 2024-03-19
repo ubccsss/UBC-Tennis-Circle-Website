@@ -1,5 +1,5 @@
-'use client';
-import {useState, useEffect} from 'react';
+"use client";
+import { useState, useEffect } from "react";
 import {
   Container,
   VStack,
@@ -21,16 +21,16 @@ import {
   ModalContent,
   ModalCloseButton,
   ModalBody,
-} from '@chakra-ui/react';
-import {FiArrowRight, FiMail} from 'react-icons/fi';
-import {FaGoogle} from 'react-icons/fa';
-import {Subheader} from '@components';
-import {useForm} from 'react-hook-form';
-import z from 'zod';
-import axios from 'axios';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {DEFAULT_SERVER_ERR, ZOD_ERR} from '@constants';
-import {useSearchParams} from 'next/navigation';
+} from "@chakra-ui/react";
+import { FiArrowRight, FiMail } from "react-icons/fi";
+import { FaGoogle } from "react-icons/fa";
+import { Subheader } from "@components";
+import { useForm } from "react-hook-form";
+import z from "zod";
+import axios from "axios";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { DEFAULT_SERVER_ERR, ZOD_ERR } from "@constants";
+import { useSearchParams } from "next/navigation";
 
 const schema = z
   .object({
@@ -39,13 +39,13 @@ const schema = z
     email_address: z.string().email(ZOD_ERR.INVALID_EMAIL),
     password: z
       .string()
-      .min(8, {message: 'Password must be at least 8 characters'})
-      .max(256, {message: 'Password must be less than 256 characters'}),
+      .min(8, { message: "Password must be at least 8 characters" })
+      .max(256, { message: "Password must be less than 256 characters" }),
     confirm_password: z.string().min(1, ZOD_ERR.REQ_FIELD),
   })
-  .refine(data => data.password === data.confirm_password, {
-    message: 'Does not match password field',
-    path: ['confirm_password'],
+  .refine((data) => data.password === data.confirm_password, {
+    message: "Does not match password field",
+    path: ["confirm_password"],
   });
 
 type Form = z.infer<typeof schema>;
@@ -55,31 +55,31 @@ const Signup = () => {
 
   const statusToast = useToast();
 
-  const {isOpen, onOpen, onClose} = useDisclosure();
-  const [sentTo, setSentTo] = useState('');
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [sentTo, setSentTo] = useState("");
 
   const params = useSearchParams();
-  const sameGoogleEmail = params.get('same-google-email');
+  const sameGoogleEmail = params.get("same-google-email");
 
   useEffect(() => {
     if (sameGoogleEmail) {
-      if (sameGoogleEmail === 'true') {
+      if (sameGoogleEmail === "true") {
         statusToast({
-          id: 'google_email',
-          title: 'A non-google account with the same email exists',
-          status: 'error',
+          id: "google_email",
+          title: "A non-google account with the same email exists",
+          status: "error",
         });
       }
     }
-  }, []);
+  }, [sameGoogleEmail, statusToast]);
 
   const {
     handleSubmit,
     register,
-    formState: {errors, isSubmitting},
+    formState: { errors, isSubmitting },
     getValues,
     reset,
-  } = useForm<Form>({resolver: zodResolver(schema)});
+  } = useForm<Form>({ resolver: zodResolver(schema) });
 
   const onSubmit = async ({
     first_name,
@@ -105,16 +105,16 @@ const Signup = () => {
       if (axios.isAxiosError(e)) {
         statusToast({
           title: e?.response?.data?.message || DEFAULT_SERVER_ERR,
-          status: 'error',
+          status: "error",
         });
       }
     }
   };
 
   return (
-    <Container maxW="container.xl" py={{base: '32', lg: '20'}}>
+    <Container maxW="container.xl" py={{ base: "32", lg: "20" }}>
       <SimpleGrid
-        columns={{base: 1, lg: 2}}
+        columns={{ base: 1, lg: 2 }}
         px="4"
         alignItems="center"
         spacing="16"
@@ -122,7 +122,7 @@ const Signup = () => {
         <Box
           w="100%"
           h="100%"
-          display={{base: 'none', lg: 'block'}}
+          display={{ base: "none", lg: "block" }}
           position="relative"
         >
           <Img
@@ -151,7 +151,7 @@ const Signup = () => {
           <VStack
             align="flex-start"
             spacing="19"
-            w={{base: '100%', sm: 'max-content'}}
+            w={{ base: "100%", sm: "max-content" }}
             mx="auto"
           >
             <Heading as="h1" size="2xl">
@@ -169,13 +169,13 @@ const Signup = () => {
               variant="outline"
               size="lg"
               _hover={{
-                bg: 'gray.100',
+                bg: "gray.100",
               }}
             >
               <Icon as={FaGoogle} mr={4} color="brand.500" /> Sign up with
               Google
             </Button>
-            <SimpleGrid w={{base: '100%', sm: 'sm'}} columns={2} spacing="4">
+            <SimpleGrid w={{ base: "100%", sm: "sm" }} columns={2} spacing="4">
               <FormControl isInvalid={Boolean(errors.first_name)}>
                 <Input
                   id="first_name"
@@ -183,7 +183,7 @@ const Signup = () => {
                   disabled={isSubmitting}
                   w="100%"
                   size="lg"
-                  {...register('first_name')}
+                  {...register("first_name")}
                 />
                 <FormErrorMessage>
                   {errors?.first_name?.message}
@@ -196,7 +196,7 @@ const Signup = () => {
                   disabled={isSubmitting}
                   w="100%"
                   size="lg"
-                  {...register('last_name')}
+                  {...register("last_name")}
                 />
                 <FormErrorMessage>
                   {errors?.last_name?.message}
@@ -209,9 +209,9 @@ const Signup = () => {
                 type="email"
                 placeholder="Email Address"
                 disabled={isSubmitting}
-                w={{base: '100%', sm: 'sm'}}
+                w={{ base: "100%", sm: "sm" }}
                 size="lg"
-                {...register('email_address')}
+                {...register("email_address")}
               />
               <FormErrorMessage>
                 {errors?.email_address?.message}
@@ -223,9 +223,9 @@ const Signup = () => {
                 type="password"
                 placeholder="Password"
                 disabled={isSubmitting}
-                w={{base: '100%', sm: 'sm'}}
+                w={{ base: "100%", sm: "sm" }}
                 size="lg"
-                {...register('password')}
+                {...register("password")}
               />
               <FormErrorMessage>{errors?.password?.message}</FormErrorMessage>
             </FormControl>
@@ -235,9 +235,9 @@ const Signup = () => {
                 type="password"
                 placeholder="Confirm Password"
                 disabled={isSubmitting}
-                w={{base: '100%', sm: 'sm'}}
+                w={{ base: "100%", sm: "sm" }}
                 size="lg"
-                {...register('confirm_password')}
+                {...register("confirm_password")}
               />
               <FormErrorMessage>
                 {errors?.confirm_password?.message}

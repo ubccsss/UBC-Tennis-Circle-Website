@@ -1,5 +1,5 @@
-'use client';
-import {useEffect, useState, createContext, useContext} from 'react';
+"use client";
+import { useEffect, useState, createContext, useContext } from "react";
 import {
   Box,
   Img,
@@ -15,12 +15,12 @@ import {
   Collapse,
   Skeleton,
   HStack,
-} from '@chakra-ui/react';
-import {HamburgerIcon, CloseIcon} from '@chakra-ui/icons';
-import NextLink from 'next/link';
-import {AuthComponent} from './AuthComponent';
-import axios from 'axios';
-import {authBroadcast} from '@broadcasts';
+} from "@chakra-ui/react";
+import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
+import NextLink from "next/link";
+import { AuthComponent } from "./AuthComponent";
+import axios from "axios";
+import { authBroadcast } from "@broadcasts";
 
 interface Link {
   name: string;
@@ -28,17 +28,17 @@ interface Link {
 }
 
 const links: Array<Link> = [
-  {name: 'Home', href: '/'},
-  {name: 'About us', href: '/about'},
-  {name: 'Events', href: '/events'},
-  {name: 'Gallery', href: '/gallery'},
-  {name: 'Contact', href: '/contact'},
+  { name: "Home", href: "/" },
+  { name: "About us", href: "/about" },
+  { name: "Events", href: "/events" },
+  { name: "Gallery", href: "/gallery" },
+  { name: "Contact", href: "/contact" },
 ];
 
 const authButtonHrefs = {
-  login: '/login',
-  signup: '/signup',
-  myAccount: '/profile/public',
+  login: "/login",
+  signup: "/signup",
+  myAccount: "/profile/public",
 };
 
 interface NavbarContext {
@@ -51,7 +51,7 @@ const NavbarContext = createContext<NavbarContext>({} as NavbarContext);
 
 export const Navbar = () => {
   // state for mobile nav
-  const {isOpen, onToggle} = useDisclosure();
+  const { isOpen, onToggle } = useDisclosure();
 
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -64,9 +64,9 @@ export const Navbar = () => {
   };
 
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll, {passive: true});
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -75,20 +75,20 @@ export const Navbar = () => {
     try {
       await axios.post(`${process.env.NEXT_PUBLIC_HOSTNAME}/api/auth/logout`);
 
-      authBroadcast.postMessage('reload-auth');
+      authBroadcast.postMessage("reload-auth");
 
-      window.location.href = '/';
+      window.location.href = "/";
     } catch (e) {
       console.log(e);
     }
   };
 
   return (
-    <NavbarContext.Provider value={{onToggle, logout, isLoggingOut}}>
+    <NavbarContext.Provider value={{ onToggle, logout, isLoggingOut }}>
       <Box as="nav" bg="white" w="100%" position="fixed" zIndex="500">
         <Box
           w="100%"
-          borderBottomWidth={scrollPosition > 0 ? '2px' : '0px'}
+          borderBottomWidth={scrollPosition > 0 ? "2px" : "0px"}
           transition="ease-in-out border 0.1s"
         >
           <Container maxW="container.xl" ml="auto" mr="auto">
@@ -99,7 +99,7 @@ export const Navbar = () => {
                 w="20"
               />
               <Spacer />
-              <Flex display={{base: 'flex', lg: 'none'}} alignItems="center">
+              <Flex display={{ base: "flex", lg: "none" }} alignItems="center">
                 <IconButton
                   onClick={onToggle}
                   icon={
@@ -109,8 +109,8 @@ export const Navbar = () => {
                       <HamburgerIcon w={5} h={5} />
                     )
                   }
-                  variant={'ghost'}
-                  aria-label={'Toggle Navigation'}
+                  variant={"ghost"}
+                  aria-label={"Toggle Navigation"}
                 />
               </Flex>
               <Stack
@@ -118,9 +118,9 @@ export const Navbar = () => {
                 direction="row"
                 align="center"
                 pl="24"
-                display={{base: 'none', lg: 'flex'}}
+                display={{ base: "none", lg: "flex" }}
               >
-                {links.map(i => (
+                {links.map((i) => (
                   <Link
                     as={NextLink}
                     href={i.href}
@@ -128,12 +128,12 @@ export const Navbar = () => {
                     fontWeight="medium"
                     color="gray.500"
                     sx={{
-                      ':hover': {
-                        color: 'brand.500',
-                        textDecoration: 'none',
+                      ":hover": {
+                        color: "brand.500",
+                        textDecoration: "none",
                       },
-                      ':focus': {
-                        color: 'brand.800',
+                      ":focus": {
+                        color: "brand.800",
                       },
                     }}
                   >
@@ -141,8 +141,8 @@ export const Navbar = () => {
                   </Link>
                 ))}
               </Stack>
-              <Spacer display={{base: 'none', lg: 'flex'}} />
-              <Flex display={{base: 'none', lg: 'flex'}} alignItems="center">
+              <Spacer display={{ base: "none", lg: "flex" }} />
+              <Flex display={{ base: "none", lg: "flex" }} alignItems="center">
                 <AuthComponent
                   unauthenticated={
                     <HStack spacing="4">
@@ -200,20 +200,20 @@ export const Navbar = () => {
 };
 
 const MobileNav = () => {
-  const {onToggle, logout, isLoggingOut} = useContext(NavbarContext);
+  const { onToggle, logout, isLoggingOut } = useContext(NavbarContext);
 
   return (
     <Container
       maxW="container.xl"
       ml="auto"
       mr="auto"
-      display={{lg: 'none'}}
+      display={{ lg: "none" }}
       pb="8"
       borderBottomWidth="2px"
     >
       <Box px="5" pt="3" bg="white">
         <VStack align="left">
-          {links.map(i => (
+          {links.map((i) => (
             <Link
               as={NextLink}
               href={i.href}
@@ -223,12 +223,12 @@ const MobileNav = () => {
               color="gray.500"
               py="2"
               sx={{
-                ':hover': {
-                  color: 'brand.500',
-                  textDecoration: 'none',
+                ":hover": {
+                  color: "brand.500",
+                  textDecoration: "none",
                 },
-                ':focus': {
-                  color: 'brand.800',
+                ":focus": {
+                  color: "brand.800",
                 },
               }}
             >
@@ -238,14 +238,14 @@ const MobileNav = () => {
           <AuthComponent
             loading={
               <VStack align="flex-start">
-                <Button w={{base: 'auto', sm: 'xs'}}>My Account</Button>
-                <Button w={{base: 'auto', sm: 'xs'}}>Sign Out</Button>
+                <Button w={{ base: "100%", sm: "xs" }}>My Account</Button>
+                <Button w={{ base: "100%", sm: "xs" }}>Sign Out</Button>
               </VStack>
             }
             unauthenticated={
               <VStack align="flex-start">
                 <Button
-                  w={{base: 'auto', sm: 'xs'}}
+                  w={{ base: "100%", sm: "xs" }}
                   as={NextLink}
                   href={authButtonHrefs.login}
                   onClick={onToggle}
@@ -253,7 +253,7 @@ const MobileNav = () => {
                   Login
                 </Button>
                 <Button
-                  w={{base: 'auto', sm: 'xs'}}
+                  w={{ base: "100%", sm: "xs" }}
                   colorScheme="brand"
                   as={NextLink}
                   href={authButtonHrefs.signup}
@@ -266,7 +266,7 @@ const MobileNav = () => {
             authenticated={
               <VStack align="flex-start">
                 <Button
-                  w={{base: 'auto', sm: 'xs'}}
+                  w={{ base: "100%", sm: "xs" }}
                   as={NextLink}
                   href={authButtonHrefs.login}
                   onClick={onToggle}
@@ -275,7 +275,7 @@ const MobileNav = () => {
                   My Account
                 </Button>
                 <Button
-                  w={{base: 'auto', sm: 'xs'}}
+                  w={{ base: "100%", sm: "xs" }}
                   isDisabled={isLoggingOut}
                   isLoading={isLoggingOut}
                   onClick={() => {

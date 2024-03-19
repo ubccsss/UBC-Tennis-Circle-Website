@@ -1,5 +1,4 @@
 {
-  "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
     "target": "es5",
     "rootDir": ".",
@@ -35,7 +34,6 @@
       "@types/*": ["./src/types/*"],
       "@helpers/*": ["./src/app/api/helpers/*"],
       "@emails/*": ["./src/app/api/emails/*"],
-
       "@lib": ["./src/lib"],
       "@models": ["./src/models"],
       "@components": ["./src/components"],
@@ -49,9 +47,10 @@
       "@types": ["./src/types"],
       "@helpers": ["./src/app/api/helpers"],
       "@emails": ["./src/app/api/emails"],
-
       "@/*": ["./src/*"]
-    }
+    },
+    "strict": false,
+    "module": "esnext"
   },
   "include": [
     "src/**/*.ts",
@@ -63,5 +62,6 @@
     "**/**/*.tsx",
     ".next/types/**/*.ts",
     "./src/types/*.d.ts"
-  ]
+  ],
+  "exclude": ["node_modules"]
 }

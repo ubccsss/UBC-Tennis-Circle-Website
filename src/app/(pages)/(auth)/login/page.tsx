@@ -1,5 +1,5 @@
-'use client';
-import {useEffect} from 'react';
+"use client";
+import { useEffect } from "react";
 import {
   Container,
   VStack,
@@ -14,17 +14,17 @@ import {
   FormControl,
   FormErrorMessage,
   Link,
-} from '@chakra-ui/react';
-import {useForm} from 'react-hook-form';
-import {FiArrowRight} from 'react-icons/fi';
-import {FaGoogle} from 'react-icons/fa';
-import {Subheader} from '@components';
-import {useSearchParams} from 'next/navigation';
-import {authBroadcast} from '@broadcasts';
-import z from 'zod';
-import axios from 'axios';
-import {ZOD_ERR} from '@constants';
-import {zodResolver} from '@hookform/resolvers/zod';
+} from "@chakra-ui/react";
+import { useForm } from "react-hook-form";
+import { FiArrowRight } from "react-icons/fi";
+import { FaGoogle } from "react-icons/fa";
+import { Subheader } from "@components";
+import { useSearchParams } from "next/navigation";
+import { authBroadcast } from "@broadcasts";
+import z from "zod";
+import axios from "axios";
+import { ZOD_ERR } from "@constants";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const schema = z.object({
   email_address: z.string().email(ZOD_ERR.INVALID_EMAIL),
@@ -37,68 +37,68 @@ const Login = () => {
   const statusToast = useToast();
   const params = useSearchParams();
 
-  const redirectURL = params.get('redirect');
-  const confirmationStatus = params.get('confirmation-status');
-  const recoveryStatus = params.get('recovery-status');
-  const invalidate = params.get('invalidate');
-  const sameGoogleEmail = params.get('same-google-email');
-  const badOauth = params.get('bad-oauth');
+  const redirectURL = params.get("redirect");
+  const confirmationStatus = params.get("confirmation-status");
+  const recoveryStatus = params.get("recovery-status");
+  const invalidate = params.get("invalidate");
+  const sameGoogleEmail = params.get("same-google-email");
+  const badOauth = params.get("bad-oauth");
 
   const GOOGLE_AUTH_LINK = `${process.env.NEXT_PUBLIC_HOSTNAME}/api/auth/login/google`;
 
   useEffect(() => {
-    if (sameGoogleEmail === 'true') {
+    if (sameGoogleEmail === "true") {
       statusToast({
-        id: 'same_google_email',
-        title: 'A non-google account with the same email exists',
-        status: 'error',
+        id: "same_google_email",
+        title: "A non-google account with the same email exists",
+        status: "error",
       });
     }
 
-    if (badOauth === 'true') {
+    if (badOauth === "true") {
       statusToast({
-        id: 'bad_oauth',
-        title: 'You need to sign up before logging in',
-        status: 'error',
+        id: "bad_oauth",
+        title: "You need to sign up before logging in",
+        status: "error",
       });
     }
-  }, [sameGoogleEmail, badOauth]);
+  }, [sameGoogleEmail, badOauth, statusToast]);
 
   useEffect(() => {
-    if (invalidate === 'true') {
-      authBroadcast.postMessage('reload-auth');
+    if (invalidate === "true") {
+      authBroadcast.postMessage("reload-auth");
     }
   }, [invalidate]);
 
   useEffect(() => {
-    if (recoveryStatus === 'true') {
-      if (!statusToast.isActive('recovery_status')) {
+    if (recoveryStatus === "true") {
+      if (!statusToast.isActive("recovery_status")) {
         statusToast({
-          id: 'recovery_status',
-          title: 'Password reset successful. Please login',
-          status: 'success',
+          id: "recovery_status",
+          title: "Password reset successful. Please login",
+          status: "success",
         });
       }
     }
-  }, [recoveryStatus]);
+  }, [recoveryStatus, statusToast]);
 
   useEffect(() => {
     // only render statusToast if param is actually set in url
     if (confirmationStatus) {
-      if (confirmationStatus === 'true') {
-        if (!statusToast.isActive('email_confirmed')) {
+      if (confirmationStatus === "true") {
+        if (!statusToast.isActive("email_confirmed")) {
           statusToast({
-            id: 'email_confirmed',
-            title: 'Email address successfully confirmed',
-            status: 'success',
+            id: "email_confirmed",
+            title: "Email address successfully confirmed",
+            status: "success",
           });
         }
       } else {
-        if (!statusToast.isActive('email_invalid_token')) {
+        if (!statusToast.isActive("email_invalid_token")) {
           statusToast({
-            id: 'email_invalid_token',
-            title: 'Invalid email address confirmation token',
-            status: 'error',
+            id: "email_invalid_token",
+            title: "Invalid email address confirmation token",
+            status: "error",
           });
         }
       }
@@ -107,12 +107,12 @@ const Login = () => {
 
   useEffect(() => {
     if (redirectURL) {
-      if (!statusToast.isActive('auth_error')) {
+      if (!statusToast.isActive("auth_error")) {
         statusToast({
-          id: 'auth_error',
-          title: 'Sign in first',
-          description: 'Please sign in before proceeding',
-          status: 'info',
+          id: "auth_error",
+          title: "Sign in first",
+          description: "Please sign in before proceeding",
+          status: "info",
         });
       }
     }
@@ -124,39 +124,39 @@ const Login = () => {
       window.location.href = redirectURL;
     } else {
       // redirect home if no redirect url is specified
-      window.location.href = '/';
+      window.location.href = "/";
     }
   };
 
   const {
     handleSubmit,
     register,
-    formState: {errors, isSubmitting},
-  } = useForm<Form>({resolver: zodResolver(schema)});
+    formState: { errors, isSubmitting },
+  } = useForm<Form>({ resolver: zodResolver(schema) });
 
-  const onSubmit = async ({email_address, password}: Form) => {
+  const onSubmit = async ({ email_address, password }: Form) => {
     try {
       await axios.post(`${process.env.NEXT_PUBLIC_HOSTNAME}/api/auth/login`, {
         email_address,
         password,
       });
 
-      authBroadcast.postMessage('reload-auth');
+      authBroadcast.postMessage("reload-auth");
       redirect();
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
         statusToast({
           title: e?.response?.data?.message,
-          status: 'error',
+          status: "error",
         });
       }
     }
   };
 
   return (
-    <Container maxW="container.xl" py={{base: '32', lg: '20'}}>
+    <Container maxW="container.xl" py={{ base: "32", lg: "20" }}>
       <SimpleGrid
-        columns={{base: 1, lg: 2}}
+        columns={{ base: 1, lg: 2 }}
         px="4"
         alignItems="center"
         spacing="16"
@@ -164,7 +164,7 @@ const Login = () => {
         <Box
           w="100%"
           h="100%"
-          display={{base: 'none', lg: 'block'}}
+          display={{ base: "none", lg: "block" }}
           position="relative"
         >
           <Img
@@ -193,7 +193,7 @@ const Login = () => {
           <VStack
             align="flex-start"
             spacing="19"
-            w={{base: '100%', sm: 'max-content'}}
+            w={{ base: "100%", sm: "max-content" }}
             mx="auto"
           >
             <Heading as="h1" size="2xl">
@@ -212,7 +212,7 @@ const Login = () => {
               variant="outline"
               size="lg"
               _hover={{
-                bg: 'gray.100',
+                bg: "gray.100",
               }}
             >
               <Icon as={FaGoogle} mr={4} color="brand.500" /> Login with Google
@@ -223,9 +223,9 @@ const Login = () => {
                 type="email"
                 placeholder="Email Address"
                 disabled={isSubmitting}
-                w={{base: '100%', sm: 'sm'}}
+                w={{ base: "100%", sm: "sm" }}
                 size="lg"
-                {...register('email_address')}
+                {...register("email_address")}
               />
               <FormErrorMessage>
                 {errors?.email_address?.message}
@@ -237,9 +237,9 @@ const Login = () => {
                 type="password"
                 placeholder="Password"
                 disabled={isSubmitting}
-                w={{base: '100%', sm: 'sm'}}
+                w={{ base: "100%", sm: "sm" }}
                 size="lg"
-                {...register('password')}
+                {...register("password")}
               />
               <FormErrorMessage>{errors?.password?.message}</FormErrorMessage>
             </FormControl>
