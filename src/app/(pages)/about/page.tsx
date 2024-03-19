@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import {
   Skeleton,
   Container,
@@ -8,23 +8,23 @@ import {
   Box,
   Image,
   SimpleGrid,
-} from '@chakra-ui/react';
-import axios from 'axios';
-import {Error} from '@components';
-import {useQuery} from '@tanstack/react-query';
-import {TeamMember} from '@types';
+} from "@chakra-ui/react";
+import axios from "axios";
+import { Error } from "@components";
+import { useQuery } from "@tanstack/react-query";
+import { TeamMember } from "@types";
 
 // get all team members
 const getFeatured = async () => {
   const featured = await axios.get(
-    `${process.env.NEXT_PUBLIC_HOSTNAME}/api/team/get-all`
+    `${process.env.NEXT_PUBLIC_HOSTNAME}/api/team/get-all`,
   );
   return featured.data;
 };
 
 const About = () => {
-  const {isPending, error, data} = useQuery<Array<TeamMember>>({
-    queryKey: ['team'],
+  const { isPending, error, data } = useQuery<Array<TeamMember>>({
+    queryKey: ["team"],
     queryFn: getFeatured,
   });
 
@@ -47,14 +47,14 @@ const About = () => {
         </Flex>
 
         <SimpleGrid
-          columns={{base: 1, md: 2}}
-          spacing={{base: 12, md: 14, lg: 24}}
+          columns={{ base: 1, md: 2 }}
+          spacing={{ base: 12, md: 14, lg: 24 }}
         >
           <Image
             src="static/images/stock/who-we-are.png"
             alt="team photo"
             borderRadius="md"
-            display={{base: 'none', md: 'block'}}
+            display={{ base: "none", md: "block" }}
             height="100%"
             objectFit="cover"
           />
@@ -74,15 +74,15 @@ const About = () => {
             src="static/images/stock/who-we-are.png"
             alt="team photo"
             borderRadius="md"
-            display={{base: 'block', md: 'none'}}
+            display={{ base: "block", md: "none" }}
             height="100%"
             objectFit="cover"
           />
         </SimpleGrid>
 
         <SimpleGrid
-          columns={{base: 1, md: 2}}
-          spacing={{base: 12, md: 14, lg: 24}}
+          columns={{ base: 1, md: 2 }}
+          spacing={{ base: 12, md: 14, lg: 24 }}
         >
           <Flex flexDirection="column" gap="4" justifyContent="center">
             <Heading as="h1">
@@ -119,7 +119,7 @@ const About = () => {
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a leo
           tempus, euismod purus vitae, blandit lectus.
         </Text>
-        <Flex mt="8" flexDirection={{base: 'column', md: 'row'}} w="100%">
+        <Flex mt="8" flexDirection={{ base: "column", md: "row" }} w="100%">
           <Box>
             <Image
               src="static/images/illustrations/tennis-racket.svg"
@@ -127,25 +127,29 @@ const About = () => {
               position="absolute"
               left="-20"
               bottom="44"
-              display={{base: 'none', md: 'block'}}
+              display={{ base: "none", md: "block" }}
             />
           </Box>
 
           {error && <Error />}
 
           {isPending && (
-            <SimpleGrid w="100%" spacing="4" columns={{base: 1, sm: 2, md: 4}}>
+            <SimpleGrid
+              w="100%"
+              spacing="4"
+              columns={{ base: 1, sm: 2, md: 4 }}
+            >
               {Array(4)
                 .fill(0, 0, 4)
-                .map(() => (
-                  <Skeleton h="96" w="100%" />
+                .map((_, idx) => (
+                  <Skeleton h="96" w="100%" key={idx} />
                 ))}
             </SimpleGrid>
           )}
           {data && (
-            <SimpleGrid spacing="4" columns={{base: 1, sm: 2, md: 4}}>
-              {data.map(i => (
-                <Box position="relative">
+            <SimpleGrid spacing="4" columns={{ base: 1, sm: 2, md: 4 }}>
+              {data.map((i, idx) => (
+                <Box position="relative" key={idx}>
                   <Image
                     src={i.headshot}
                     alt={i.name}
