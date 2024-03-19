@@ -1,14 +1,13 @@
-import {getSession} from '@helpers/getSession';
-import {ServerResponse} from '@helpers/serverResponse';
-import {auth} from '@lib/lucia';
-import {connectToDatabase} from '@lib/mongoose';
-import {DeletedUser} from '@models/User';
-import {NextRequest} from 'next/server';
+import { getSession, ServerResponse } from "@helpers";
+import { auth } from "@lib/lucia";
+import { connectToDatabase } from "@lib/mongoose";
+import { DeletedUser } from "@models";
+import { NextRequest } from "next/server";
 
 export const GET = async (request: NextRequest) => {
   await connectToDatabase();
 
-  const {session} = await getSession(request);
+  const { session } = await getSession(request);
 
   if (!session) {
     return ServerResponse.unauthorizedError();
@@ -33,7 +32,7 @@ export const GET = async (request: NextRequest) => {
 
     await auth.deleteUser(userId);
 
-    return ServerResponse.success('Successfully deleted account');
+    return ServerResponse.success("Successfully deleted account");
   } catch (e) {
     return ServerResponse.serverError();
   }

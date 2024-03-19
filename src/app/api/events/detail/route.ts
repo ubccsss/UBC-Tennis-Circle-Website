@@ -1,19 +1,19 @@
-import {contentfulClient} from '@lib';
-import {ServerResponse} from '@helpers';
-import {TypeEventSkeleton} from '@types';
-import {Asset} from 'contentful';
-import z from 'zod';
-import {NextRequest} from 'next/server';
+import { contentfulClient } from "@lib";
+import { ServerResponse } from "@helpers";
+import { TypeEventSkeleton } from "@types";
+import { Asset } from "contentful";
+import z from "zod";
+import { NextRequest } from "next/server";
 
 const detailSchema = z.object({
-  id: z.string({required_error: 'Event ID is required'}),
+  id: z.string({ required_error: "Event ID is required" }),
 });
 
 export const POST = async (request: NextRequest) => {
   try {
-    const {id} = await request.json();
+    const { id } = await request.json();
 
-    const validation = detailSchema.safeParse({id});
+    const validation = detailSchema.safeParse({ id });
 
     if (validation.success) {
       const res = await contentfulClient.getEntry<TypeEventSkeleton>(id);
@@ -31,7 +31,7 @@ export const POST = async (request: NextRequest) => {
 
       return ServerResponse.success(event);
     } else {
-      return ServerResponse.userError('Invalid event ID provided to server');
+      return ServerResponse.userError("Invalid event ID");
     }
   } catch (e) {
     return ServerResponse.serverError();
