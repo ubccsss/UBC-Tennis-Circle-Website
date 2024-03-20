@@ -5,12 +5,15 @@ export interface TicketReservation {
   expires: string;
 }
 
+export type UserId = string;
+
 export interface AttendeeList {
   _id: string;
   event_id: string;
   available_tickets: number;
   initial_tickets: number;
   reserved_tickets: Array<TicketReservation>;
+  attendees: Array<UserId>;
 }
 
 mongoose.Promise = global.Promise;
@@ -29,6 +32,8 @@ const schema = new Schema<AttendeeList>({
     default: [],
     requried: true,
   },
+  // list of user_ids
+  attendees: [{ type: String, required: true }],
 });
 
 export const AttendeeList =
