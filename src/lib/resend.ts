@@ -1,14 +1,14 @@
-'use server';
-import React from 'react';
-import {Resend} from 'resend';
-import {renderAsync} from '@react-email/render';
-import {logger} from './winston';
-import {ServerResponse} from '@helpers';
+"use server";
+import React from "react";
+import { Resend } from "resend";
+import { renderAsync } from "@react-email/render";
+import { logger } from "./winston";
+import { ServerResponse } from "@helpers";
 
-const resend = new Resend(process.env.NEXT_RESEND_API);
+export const resend = new Resend(process.env.NEXT_RESEND_API);
 
 interface SendMailProps {
-  to: string;
+  to: string | string[];
   subject: string;
   emailComponent: React.ReactElement;
 }
@@ -30,7 +30,7 @@ export const sendMail = async ({
   } catch (e: unknown) {
     logger.error(e);
     return ServerResponse.serverError(
-      'We are currently experiencing a problem with our email server.'
+      "We are currently experiencing a problem with our email server.",
     );
   }
 };
