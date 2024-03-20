@@ -1,30 +1,30 @@
 import { NextRequest } from "next/server";
-import { verifyRequest } from "@contentful/node-apps-toolkit";
 import { logger } from "@lib/winston";
 import { ServerResponse } from "@helpers/serverResponse";
+import z from "zod";
 
+const DeleteSchema = z.object({
+  event_id: z.string({ required_error: "Event is required" }),
+  secret: z.string({ required_error: "Invalid webhook secret" }),
+});
 export const POST = async (request: NextRequest) => {
-  const contentfulRequest = {
-    method: request.method as "POST",
-    path: request.url,
-  };
+  const body = await request.json();
 
-  try {
-    const isValid = verifyRequest(
-      process.env.NEXT_CONTENTFUL_SECRET,
-      contentfulRequest,
-    );
+  const validation = DeleteSchema.safeParse(body);
 
-    if (!isValid) {
-      return ServerResponse.unauthorizedError();
+  if (validation.success) {
+    try {
+      if (body.secret !== process.env.NEXT_CONTENTFUL_SECRET) {
+        return ServerResponse.unauthorizedError("Invalid contentful request");
+      }
+
+      return ServerResponse.success("success");
+    } catch (e) {
+      logger.error(e);
+      console.log(e);
+      return ServerResponse.serverError();
     }
-
-    const body = request.json();
-    console.log(body);
-    return ServerResponse.success("success");
-  } catch (e) {
-    logger.error(e);
-    console.log(e);
-    return ServerResponse.serverError();
+  } else {
+    return ServerResponse.validationError(validation);
   }
 };
