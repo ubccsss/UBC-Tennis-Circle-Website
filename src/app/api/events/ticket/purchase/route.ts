@@ -1,9 +1,8 @@
-import { connectToDatabase } from "@lib/mongoose";
+import { stripe, connectToDatabase } from "@lib";
 import axios, { AxiosResponse } from "axios";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import z from "zod";
 import { getSession, ServerResponse } from "@helpers";
-import Stripe from "stripe";
 import { TennisEvent } from "@types";
 
 const purchaseSchema = z.object({
@@ -34,10 +33,6 @@ export const POST = async (request: NextRequest) => {
         },
       );
 
-      console.log(event.data);
-
-      const stripe = new Stripe(process.env.NEXT_STRIPE_SECRET_KEY);
-
       const session = await stripe.checkout.sessions.create({
         line_items: [
           {
@@ -57,7 +52,7 @@ export const POST = async (request: NextRequest) => {
         },
         //TODO: MAKE THESE ROUTES
         success_url: `${process.env.NEXT_PUBLIC_HOSTNAME}/api/ticket/purchase/success`,
-        cancel_url: `${process.env.NEXT_PUBLIC_HOSTNAME}/events/detail/${event_id}?cancelled=true`,
+        cancel_url: `${process.env.NEXT_PUBLIC_HOSTNAME}/events/detail/${event_id}`,
         automatic_tax: { enabled: true },
       });
 
