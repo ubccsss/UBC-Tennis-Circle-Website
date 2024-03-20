@@ -1,16 +1,16 @@
-import {NextRequest} from 'next/server';
-import {z} from 'zod';
-import {connectToDatabase} from '@lib';
-import {logger, sendMail} from '@lib';
-import {ServerResponse} from '@helpers';
-import ContactEmail from '@emails/ContactEmail';
+import { NextRequest } from "next/server";
+import { z } from "zod";
+import { connectToDatabase } from "@lib";
+import { logger, sendMail } from "@lib";
+import { ServerResponse } from "@helpers";
+import ContactEmail from "@emails/ContactEmail";
 
 const ContactEmailSchema = z.object({
-  name: z.string({required_error: 'Username is required'}),
+  name: z.string({ required_error: "Username is required" }),
   email_address: z
-    .string({required_error: 'Email Address is required'})
+    .string({ required_error: "Email Address is required" })
     .email(),
-  message: z.string({required_error: 'Message is required'}),
+  message: z.string({ required_error: "Message is required" }),
 });
 
 export const POST = async (request: NextRequest) => {
@@ -18,7 +18,7 @@ export const POST = async (request: NextRequest) => {
 
   const body = await request.json();
 
-  const {name, email_address, message} = structuredClone(body);
+  const { name, email_address, message } = structuredClone(body);
   const validation = ContactEmailSchema.safeParse({
     name,
     email_address,
@@ -38,7 +38,7 @@ export const POST = async (request: NextRequest) => {
         }),
       });
 
-      return ServerResponse.success('Successfully sent message.');
+      return ServerResponse.success("Successfully sent message.");
     } catch (e) {
       logger.error(e);
 
