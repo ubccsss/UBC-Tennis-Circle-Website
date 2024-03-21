@@ -6,4 +6,5 @@ export interface TennisEvent {
   date: string;
   cover_image: string;
   description: string;
+  initial_tickets: number;
 }

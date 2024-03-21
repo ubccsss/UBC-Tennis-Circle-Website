@@ -18,6 +18,10 @@ export const POST = async (request: NextRequest) => {
     if (validation.success) {
       const res = await contentfulClient.getEntry<TypeEventSkeleton>(id);
 
+      if (res.fields.openingStatus === "Coming Soon") {
+        return ServerResponse.userError("Invalid event ID");
+      }
+
       const event = {
         id: res.sys.id,
         name: res.fields.name,
@@ -27,6 +31,7 @@ export const POST = async (request: NextRequest) => {
         cover_image: `https:${(res.fields.coverImage as Asset)?.fields?.file
           ?.url}`,
         description: res.fields.description,
+        initial_tickets: res.fields.amountOfTickets,
       };
 
       return ServerResponse.success(event);
@@ -34,6 +39,6 @@ export const POST = async (request: NextRequest) => {
       return ServerResponse.userError("Invalid event ID");
     }
   } catch (e) {
-    return ServerResponse.serverError();
+    return ServerResponse.userError("Event not found");
   }
 };

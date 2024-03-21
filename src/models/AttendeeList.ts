@@ -10,8 +10,9 @@ export type UserId = string;
 export interface AttendeeList {
   _id: string;
   event_id: string;
+  event_name: string;
+  ticket_price: number;
   available_tickets: number;
-  initial_tickets: number;
   reserved_tickets: Array<TicketReservation>;
   attendees: Array<UserId>;
 }
@@ -20,8 +21,9 @@ mongoose.Promise = global.Promise;
 
 const schema = new Schema<AttendeeList>({
   event_id: { type: String, required: true },
+  event_name: { type: String, required: true },
+  ticket_price: { type: Number, required: true },
   available_tickets: { type: Number, required: true },
-  initial_tickets: { type: Number, requried: true },
   reserved_tickets: {
     type: [
       {
@@ -30,7 +32,6 @@ const schema = new Schema<AttendeeList>({
       },
     ],
     default: [],
-    requried: true,
   },
   // list of user_ids
   attendees: [{ type: String, required: true }],

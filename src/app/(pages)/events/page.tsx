@@ -78,103 +78,127 @@ const Events = () => {
 
       {data && data.length !== 0 && (
         <Container maxW="container.md" mt="12">
-          {data.map((i, idx) => (
-            <Card
-              key={idx}
-              direction={{ base: "column", md: "row" }}
-              overflow="hidden"
-              variant="outline"
-              borderRadius="8"
-              p="4"
-              position="relative"
-            >
-              <Image
-                objectFit="cover"
-                maxW={{ base: "100%", md: "52" }}
-                src={i.cover_image}
-                alt="Caffe Latte"
-                mr={{ base: "0", md: "4" }}
-                borderRadius="4"
-              />
+          <Flex flexDir="column" gap="4">
+            {data.map((i, idx) => (
+              <Card
+                key={idx}
+                direction={{ base: "column", md: "row" }}
+                overflow="hidden"
+                variant="outline"
+                borderRadius="8"
+                p="4"
+                position="relative"
+              >
+                <Image
+                  objectFit="cover"
+                  maxW={{ base: "100%", md: "52" }}
+                  src={i.cover_image}
+                  alt="Caffe Latte"
+                  mr={{ base: "0", md: "4" }}
+                  borderRadius="4"
+                />
 
-              <Stack>
-                <CardBody>
-                  <Heading size="md" mb="2" fontSize="24">
-                    {i.name}
-                  </Heading>
+                <Stack>
+                  <CardBody>
+                    <Heading size="md" mb="2" fontSize="24">
+                      {i.name}
+                    </Heading>
 
-                  <Flex flexDirection="column" mt="2" gap="2">
-                    <Flex
-                      alignItems={{ base: "flex-start", sm: "center" }}
-                      flexDir={{ base: "column", sm: "row" }}
-                    >
-                      <Flex alignItems="center" gap="1">
-                        <Icon as={ClockIcon} color="gray.500" fontSize="14" />
-                        <Text fontWeight="semibold">Date:</Text>
-                        <Text display={{ base: "none", sm: "block" }}>
+                    <Flex flexDirection="column" mt="2" gap="2">
+                      <Flex
+                        alignItems={{ base: "flex-start", sm: "center" }}
+                        flexDir={{ base: "column", sm: "row" }}
+                      >
+                        <Flex alignItems="center" gap="1">
+                          <Icon as={ClockIcon} color="gray.500" fontSize="14" />
+                          <Text fontWeight="semibold">Date:</Text>
+                          <Text display={{ base: "none", sm: "block" }}>
+                            {format(parseISO(i.date), "E, MMM d yyyy")}
+                          </Text>
+                        </Flex>
+                        <Text display={{ base: "block", sm: "none" }}>
                           {format(parseISO(i.date), "E, MMM d yyyy")}
                         </Text>
                       </Flex>
-                      <Text display={{ base: "block", sm: "none" }}>
-                        {format(parseISO(i.date), "E, MMM d yyyy")}
-                      </Text>
-                    </Flex>
 
-                    <Flex
-                      alignItems={{ base: "flex-start", sm: "center" }}
-                      flexDir={{ base: "column", sm: "row" }}
-                    >
-                      <Flex alignItems="center" gap="1">
-                        <Icon
-                          as={LocationPinIcon}
-                          color="gray.500"
-                          fontSize="14"
-                        />
-                        <Text fontWeight="semibold">Location:</Text>
-                        <Text display={{ base: "none", sm: "block" }}>
+                      <Flex
+                        alignItems={{ base: "flex-start", sm: "center" }}
+                        flexDir={{ base: "column", sm: "row" }}
+                      >
+                        <Flex alignItems="center" gap="1">
+                          <Icon
+                            as={LocationPinIcon}
+                            color="gray.500"
+                            fontSize="14"
+                          />
+                          <Text fontWeight="semibold">Location:</Text>
+                          <Text display={{ base: "none", sm: "block" }}>
+                            {i.location}
+                          </Text>
+                        </Flex>
+                        <Text display={{ base: "block", sm: "none" }}>
                           {i.location}
                         </Text>
                       </Flex>
-                      <Text display={{ base: "block", sm: "none" }}>
-                        {i.location}
-                      </Text>
-                    </Flex>
 
-                    <Flex
-                      alignItems={{ base: "flex-start", sm: "center" }}
-                      flexDir={{ base: "column", sm: "row" }}
-                    >
-                      <Flex alignItems="center" gap="1">
-                        <Icon
-                          as={SingleUserIcon}
-                          color="gray.500"
-                          fontSize="14"
-                        />
-                        <Text fontWeight="semibold">Hosted by:</Text>
-                        <Text display={{ base: "none", sm: "block" }}>
+                      <Flex
+                        alignItems={{ base: "flex-start", sm: "center" }}
+                        flexDir={{ base: "column", sm: "row" }}
+                      >
+                        <Flex alignItems="center" gap="1">
+                          <Icon
+                            as={SingleUserIcon}
+                            color="gray.500"
+                            fontSize="14"
+                          />
+                          <Text fontWeight="semibold">Hosted by:</Text>
+                          <Text display={{ base: "none", sm: "block" }}>
+                            UBC Tennis Circle
+                          </Text>
+                        </Flex>
+                        <Text display={{ base: "block", sm: "none" }}>
                           UBC Tennis Circle
                         </Text>
                       </Flex>
-                      <Text display={{ base: "block", sm: "none" }}>
-                        UBC Tennis Circle
-                      </Text>
-                    </Flex>
 
-                    <Flex
-                      alignItems={{ base: "flex-start", sm: "center" }}
-                      flexDir={{ base: "column", sm: "row" }}
-                    >
-                      <Flex alignItems="center" gap="1">
-                        <Icon
-                          as={UserFriendsIcon}
-                          color="gray.500"
-                          fontSize="14"
-                        />
-                        <Text fontWeight="semibold">Attendees:</Text>
+                      <Flex
+                        alignItems={{ base: "flex-start", sm: "center" }}
+                        flexDir={{ base: "column", sm: "row" }}
+                      >
+                        <Flex alignItems="center" gap="1">
+                          <Icon
+                            as={UserFriendsIcon}
+                            color="gray.500"
+                            fontSize="14"
+                          />
+                          <Text fontWeight="semibold">Attendees:</Text>
+                          <AvatarGroup
+                            size="xs"
+                            max={3}
+                            display={{ base: "none", sm: "flex" }}
+                          >
+                            <Avatar
+                              name="Segun Adebayo"
+                              src="https://bit.ly/sage-adebayo"
+                            />
+                            <Avatar
+                              name="Kent Dodds"
+                              src="https://bit.ly/kent-c-dodds"
+                            />
+                            <Avatar
+                              name="Prosper Otemuyiwa"
+                              src="https://bit.ly/prosper-baba"
+                            />
+                            <Avatar
+                              name="Christian Nwamba"
+                              src="https://bit.ly/code-beast"
+                            />
+                          </AvatarGroup>
+                        </Flex>
                         <AvatarGroup
-                          size="xs"
+                          size="sm"
                           max={3}
-                          display={{ base: "none", sm: "flex" }}
+                          display={{ base: "flex", sm: "none" }}
                         >
                           <Avatar
                             name="Segun Adebayo"
@@ -194,44 +218,22 @@ const Events = () => {
                           />
                         </AvatarGroup>
                       </Flex>
-                      <AvatarGroup
-                        size="sm"
-                        max={3}
-                        display={{ base: "flex", sm: "none" }}
-                      >
-                        <Avatar
-                          name="Segun Adebayo"
-                          src="https://bit.ly/sage-adebayo"
-                        />
-                        <Avatar
-                          name="Kent Dodds"
-                          src="https://bit.ly/kent-c-dodds"
-                        />
-                        <Avatar
-                          name="Prosper Otemuyiwa"
-                          src="https://bit.ly/prosper-baba"
-                        />
-                        <Avatar
-                          name="Christian Nwamba"
-                          src="https://bit.ly/code-beast"
-                        />
-                      </AvatarGroup>
                     </Flex>
-                  </Flex>
-                </CardBody>
-                <Button
-                  as={Link}
-                  href={`/events/detail/${i.id}`}
-                  colorScheme="brand"
-                  position={{ base: "relative", md: "absolute" }}
-                  right={{ base: "unset", md: "4" }}
-                  bottom={{ base: "unset", md: "4" }}
-                >
-                  Join Event
-                </Button>
-              </Stack>
-            </Card>
-          ))}
+                  </CardBody>
+                  <Button
+                    as={Link}
+                    href={`/events/detail/${i.id}`}
+                    colorScheme="brand"
+                    position={{ base: "relative", md: "absolute" }}
+                    right={{ base: "unset", md: "4" }}
+                    bottom={{ base: "unset", md: "4" }}
+                  >
+                    Join Event
+                  </Button>
+                </Stack>
+              </Card>
+            ))}
+          </Flex>
         </Container>
       )}
     </Container>

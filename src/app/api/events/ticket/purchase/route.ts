@@ -18,9 +18,13 @@ export const POST = async (request: NextRequest) => {
 
   const { session } = await getSession(request);
 
+  const url = new URL(request.url);
+
+  const pathname = url.pathname;
+
   if (!session) {
     return ServerResponse.success({
-      url: `${process.env.NEXT_PUBLIC_HOSTNAME}/login?redirect=${request.url}`,
+      url: `${process.env.NEXT_PUBLIC_HOSTNAME}/login?redirect=${pathname}`,
     });
   }
 
