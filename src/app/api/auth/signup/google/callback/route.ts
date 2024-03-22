@@ -1,20 +1,22 @@
-import {ServerResponse} from '@helpers';
-import {auth, googleSignup} from '@lib/lucia';
-import {OAuthRequestError} from '@lucia-auth/oauth';
-import {cookies, headers} from 'next/headers';
-import {NextResponse, NextRequest} from 'next/server';
-import {User} from '@models/User';
+import { ServerResponse } from "@helpers";
+import { auth, googleSignup } from "@lib/lucia";
+import { OAuthRequestError } from "@lucia-auth/oauth";
+import { cookies, headers } from "next/headers";
+import { NextResponse, NextRequest } from "next/server";
+import { User } from "@models/User";
 
 export const GET = async (request: NextRequest) => {
-  const state = request.nextUrl.searchParams.get('state');
-  const code = request.nextUrl.searchParams.get('code');
+  const state = request.nextUrl.searchParams.get("state");
+  const code = request.nextUrl.searchParams.get("code");
 
   if (!state || !code) {
-    return ServerResponse.serverError('Could not process request');
+    return ServerResponse.serverError("Could not process request");
   }
 
   try {
-    const {createUser, googleUser} = await googleSignup.validateCallback(code!);
+    const { createUser, googleUser } = await googleSignup.validateCallback(
+      code!,
+    );
 
     const userAttributes = {
       first_name: googleUser.given_name,
@@ -24,7 +26,7 @@ export const GET = async (request: NextRequest) => {
       skill: 1,
       instagram: null,
       profile: googleUser.picture,
-      provider: 'google',
+      provider: "google",
     };
 
     const sameEmailUser = await User.findOne({
@@ -33,7 +35,7 @@ export const GET = async (request: NextRequest) => {
 
     if (sameEmailUser) {
       return NextResponse.redirect(
-        new URL('/signup?same-google-email=true', request.url)
+        `${process.env.NEXT_PUBLIC_HOSTNAME}/signup?same-google-email=true`,
       );
     }
 
@@ -53,10 +55,12 @@ export const GET = async (request: NextRequest) => {
       headers,
     });
     authRequest.setSession(session);
-    return NextResponse.redirect(new URL('/profile/setup', request.url));
+    return NextResponse.redirect(
+      `${process.env.NEXT_PUBLIC_HOSTNAME}/profile/setup`,
+    );
   } catch (e) {
     if (e instanceof OAuthRequestError) {
-      return ServerResponse.userError('Bad oauth request');
+      return ServerResponse.userError("Bad oauth request");
     }
     return ServerResponse.serverError();
   }

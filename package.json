@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "email": "email dev --port 4000 --dir src/app/api/emails",
     "prepare": "npm run compile",
     "compile": "tsc",
     "fix": "next lint",
@@ -13,7 +14,7 @@
     "posttest": "npm run lint",
     "cf-type-gen": "dotenv -- bash -c 'cf-content-types-generator -s $NEXT_CONTENTFUL_SPACE_ID -t $NEXT_CONTENTFUL_CMA_TOKEN -X -o ./src/types/contentful' && npm run fix",
     "gen-example-env": "sed 's/=.*/=/' .env > .env.example",
-    "ngrok": "ngrok http --domain=https://initially-cosmic-panther.ngrok-free.app 3000"
+    "ngrok": "ngrok http --domain=initially-cosmic-panther.ngrok-free.app 3000"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
@@ -37,6 +38,7 @@
     "contentful": "^10.8.4",
     "date-fns": "^3.3.1",
     "dotenv-cli": "^7.3.0",
+    "encoding": "^0.1.13",
     "framer-motion": "^10.16.4",
     "ioredis": "^5.3.2",
     "keyv": "^4.5.4",
@@ -49,7 +51,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-dropzone": "^14.2.3",
-    "react-email": "^1.10.0",
+    "react-email": "^1.10.1",
     "react-hook-form": "^7.49.3",
     "react-icons": "^5.0.1",
     "resend": "^2.0.0",

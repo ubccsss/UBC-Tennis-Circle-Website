@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
+  useToast,
   Container,
   Button,
   Text,
@@ -19,15 +20,58 @@ import { TennisEvent } from "@types";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { format, parseISO } from "date-fns";
+import { useSearchParams } from "next/navigation";
 import {
   LocationPinIcon,
   ClockIcon,
   SingleUserIcon,
   UserFriendsIcon,
 } from "@icons";
+import { getClientSession } from "@utils";
 
 const EventDetail = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
+  const statusToast = useToast();
+  const searchParams = useSearchParams();
+
+  const soldOut = searchParams.get("sold-out");
+  const unsuccessfulPayment = searchParams.get("unsuccessful-payment");
+  const successfulPayment = searchParams.get("successful-payment");
+  const purchased = searchParams.get("purchased");
+
+  useEffect(() => {
+    if (soldOut === "true") {
+      statusToast({
+        id: "sold_out",
+        title: "Unfortunately, this event just sold out.",
+        status: "error",
+      });
+    }
+
+    if (purchased === "true") {
+      statusToast({
+        id: "purchased",
+        title: "You have already purchased this ticket.",
+        status: "error",
+      });
+    }
+
+    if (unsuccessfulPayment === "true") {
+      statusToast({
+        id: "unsuccessful_payment",
+        title: "An error has occurred and you will be issued a refund.",
+        status: "error",
+      });
+    }
+
+    if (successfulPayment === "true") {
+      statusToast({
+        id: "successful_payment",
+        title: "Successfully purchased ticket.",
+        status: "success",
+      });
+    }
+  }, [soldOut, statusToast, unsuccessfulPayment, successfulPayment, purchased]);
 
   const getEvent = async () => {
     const event = await axios.post(
@@ -53,8 +97,13 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
   const [purchaseLoading, setPurchaseLoading] = useState(false);
 
   const purchaseTicket = async () => {
+    const session = await getClientSession();
     try {
       setPurchaseLoading(true);
+
+      if (!session) {
+        router.push(`/login/?redirect=/events/detail/${params.id}`);
+      }
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_HOSTNAME}/api/events/ticket/purchase`,
         { event_id: params.id },
@@ -87,8 +136,16 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
           colorScheme="brand"
           onClick={purchaseTicket}
           isLoading={purchaseLoading}
+          loadingText="Reserving Ticket"
+          isDisabled={
+            (!data.reserved && data.available_tickets <= 0) || data.purchased
+          }
         >
-          Buy Ticket
+          {data.purchased
+            ? "Purchased Ticket"
+            : !data.reserved && data.available_tickets <= 0
+              ? "Sold out"
+              : "Buy Ticket"}
         </Button>
       </Flex>
     );

@@ -5,7 +5,7 @@ import { renderAsync } from "@react-email/render";
 import { logger } from "./winston";
 import { ServerResponse } from "@helpers";
 
-export const resend = new Resend(process.env.NEXT_RESEND_API);
+const resend = new Resend(process.env.NEXT_RESEND_API);
 
 interface SendMailProps {
   to: string | string[];

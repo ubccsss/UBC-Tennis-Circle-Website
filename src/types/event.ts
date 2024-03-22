@@ -6,4 +6,8 @@ export interface TennisEvent {
   date: string;
   cover_image: string;
   description: string;
+  available_tickets: number;
+  opening_status: string;
+  reserved: boolean;
+  purchased: boolean;
 }
