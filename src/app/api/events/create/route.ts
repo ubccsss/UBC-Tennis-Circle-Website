@@ -43,13 +43,15 @@ export const POST = async (request: NextRequest) => {
         event_id: res.id,
         event_name: res.name,
         ticket_price: res.ticket_price,
-        available_tickets: res.initial_tickets,
+        available_tickets: res.available_tickets,
         reserved_tickets: [],
         attendees: [],
+        reservation_expire_tasks: [],
       });
 
       return ServerResponse.success(attendeeList);
     } catch (e) {
+      console.log(e);
       logger.error(e);
       return ServerResponse.serverError(e);
     }

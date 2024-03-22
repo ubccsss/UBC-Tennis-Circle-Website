@@ -4,6 +4,9 @@ import { NextRequest } from "next/server";
 import z from "zod";
 import { getSession, ServerResponse } from "@helpers";
 import { TennisEvent } from "@types";
+import { logger, mergent } from "@lib";
+import { AttendeeList } from "@models/AttendeeList";
+import { addMinutes, getUnixTime } from "date-fns";
 
 const purchaseSchema = z.object({
   event_id: z.string({ required_error: "Event token is required" }),
@@ -18,13 +21,11 @@ export const POST = async (request: NextRequest) => {
 
   const { session } = await getSession(request);
 
-  const url = new URL(request.url);
-
-  const pathname = url.pathname;
+  const eventURLPath = `/events/detail/${event_id}`;
 
   if (!session) {
     return ServerResponse.success({
-      url: `${process.env.NEXT_PUBLIC_HOSTNAME}/login?redirect=${pathname}`,
+      url: `${process.env.NEXT_PUBLIC_HOSTNAME}/login?redirect=${eventURLPath}`,
     });
   }
 
@@ -37,7 +38,78 @@ export const POST = async (request: NextRequest) => {
         },
       );
 
-      const session = await stripe.checkout.sessions.create({
+      const attendeeList = await AttendeeList.findOne({
+        event_id: event.data.id,
+      });
+
+      if (attendeeList.attendees.includes(session.user.userId)) {
+        return ServerResponse.success({
+          url: `${process.env.NEXT_PUBLIC_HOSTNAME}${eventURLPath}?purchased=true`,
+        });
+      }
+
+      if (!attendeeList.reserved_tickets.includes(session.user.userId)) {
+        if (attendeeList.available_tickets <= 0) {
+          return ServerResponse.success({
+            url: `${process.env.NEXT_PUBLIC_HOSTNAME}${eventURLPath}?sold-out=true`,
+          });
+        } else {
+          await AttendeeList.findOneAndUpdate(
+            {
+              event_id: event.data.id,
+            },
+            {
+              $push: {
+                reserved_tickets: session.user.userId,
+              },
+              $inc: { available_tickets: -1 },
+            },
+          );
+
+          const mergentTask = await mergent.tasks.create({
+            request: {
+              url: `${process.env.NEXT_PUBLIC_HOSTNAME}/api/events/ticket/expire-reservation`,
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                reservation_secret: process.env.NEXT_RESERVATION_SECRET,
+                event_id: event.data.id,
+                user_id: session.user.userId,
+              }),
+            },
+            scheduledFor: addMinutes(new Date(), 30),
+          });
+
+          await AttendeeList.findOneAndUpdate(
+            {
+              event_id: event.data.id,
+            },
+            {
+              $push: {
+                reservation_expire_tasks: {
+                  user_id: session.user.userId,
+                  task_id: mergentTask.id,
+                },
+              },
+            },
+          );
+        }
+      } else {
+        const dBexistingTask = attendeeList.reservation_expire_tasks.find(
+          (e) => e.user_id === session.user.userId,
+        );
+
+        const task = await mergent.tasks.retrieve(dBexistingTask.task_id);
+
+        if (task.status === "queued") {
+          await mergent.tasks.update(dBexistingTask.task_id, {
+            scheduledFor: addMinutes(new Date(), 30),
+          });
+        }
+      }
+
+      const expires = getUnixTime(addMinutes(new Date(), 30));
+
+      const stripeSession = await stripe.checkout.sessions.create({
         line_items: [
           {
             price_data: {
@@ -52,17 +124,19 @@ export const POST = async (request: NextRequest) => {
         ],
         mode: "payment",
         metadata: {
-          event_id,
+          event_id: event.data.id,
+          user_id: session.user.userId,
         },
-        //TODO: MAKE THESE ROUTES
-        success_url: `${process.env.NEXT_PUBLIC_HOSTNAME}/api/ticket/purchase/success`,
+        success_url: `${process.env.NEXT_PUBLIC_HOSTNAME}/api/events/ticket/purchase/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${process.env.NEXT_PUBLIC_HOSTNAME}/events/detail/${event_id}`,
         automatic_tax: { enabled: true },
+        expires_at: expires,
       });
 
-      return ServerResponse.success({ url: session.url });
+      return ServerResponse.success({ url: stripeSession.url });
     } catch (e) {
       console.log(e);
+      logger.error(e);
       return ServerResponse.serverError();
     }
   }

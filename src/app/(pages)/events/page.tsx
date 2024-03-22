@@ -1,6 +1,8 @@
 "use client";
 import {
+  useToast,
   Container,
+  Box,
   Img,
   Text,
   Heading,
@@ -15,6 +17,7 @@ import {
   Button,
   Avatar,
   AvatarGroup,
+  Badge,
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -28,6 +31,8 @@ import {
   UserFriendsIcon,
 } from "@icons";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 // get all events
 const getEvents = async () => {
@@ -43,6 +48,20 @@ const Events = () => {
     queryFn: getEvents,
   });
 
+  const searchParams = useSearchParams();
+  const unsuccessfulPayment = searchParams.get("unsuccessful-payment");
+
+  const statusToast = useToast();
+
+  useEffect(() => {
+    if (unsuccessfulPayment === "true") {
+      statusToast({
+        id: "unsuccessful_payment",
+        title: "An error has occurred and you were not charged",
+        status: "error",
+      });
+    }
+  }, [unsuccessfulPayment, statusToast]);
   return (
     <Container maxW="container.xl" py={{ base: "12", sm: "20" }}>
       <Flex flexDir="column">
@@ -81,6 +100,7 @@ const Events = () => {
           <Flex flexDir="column" gap="4">
             {data.map((i, idx) => (
               <Card
+                minH={{ base: "unset", md: "60" }}
                 key={idx}
                 direction={{ base: "column", md: "row" }}
                 overflow="hidden"
@@ -161,21 +181,45 @@ const Events = () => {
                         </Text>
                       </Flex>
 
-                      <Flex
-                        alignItems={{ base: "flex-start", sm: "center" }}
-                        flexDir={{ base: "column", sm: "row" }}
-                      >
-                        <Flex alignItems="center" gap="1">
-                          <Icon
-                            as={UserFriendsIcon}
-                            color="gray.500"
-                            fontSize="14"
-                          />
-                          <Text fontWeight="semibold">Attendees:</Text>
+                      {i.opening_status === "Open" && (
+                        <Flex
+                          alignItems={{ base: "flex-start", sm: "center" }}
+                          flexDir={{ base: "column", sm: "row" }}
+                        >
+                          <Flex alignItems="center" gap="1">
+                            <Icon
+                              as={UserFriendsIcon}
+                              color="gray.500"
+                              fontSize="14"
+                            />
+                            <Text fontWeight="semibold">Attendees:</Text>
+                            <AvatarGroup
+                              size="xs"
+                              max={3}
+                              display={{ base: "none", sm: "flex" }}
+                            >
+                              <Avatar
+                                name="Segun Adebayo"
+                                src="https://bit.ly/sage-adebayo"
+                              />
+                              <Avatar
+                                name="Kent Dodds"
+                                src="https://bit.ly/kent-c-dodds"
+                              />
+                              <Avatar
+                                name="Prosper Otemuyiwa"
+                                src="https://bit.ly/prosper-baba"
+                              />
+                              <Avatar
+                                name="Christian Nwamba"
+                                src="https://bit.ly/code-beast"
+                              />
+                            </AvatarGroup>
+                          </Flex>
                           <AvatarGroup
-                            size="xs"
+                            size="sm"
                             max={3}
-                            display={{ base: "none", sm: "flex" }}
+                            display={{ base: "flex", sm: "none" }}
                           >
                             <Avatar
                               name="Segun Adebayo"
@@ -195,41 +239,40 @@ const Events = () => {
                             />
                           </AvatarGroup>
                         </Flex>
-                        <AvatarGroup
-                          size="sm"
-                          max={3}
-                          display={{ base: "flex", sm: "none" }}
-                        >
-                          <Avatar
-                            name="Segun Adebayo"
-                            src="https://bit.ly/sage-adebayo"
-                          />
-                          <Avatar
-                            name="Kent Dodds"
-                            src="https://bit.ly/kent-c-dodds"
-                          />
-                          <Avatar
-                            name="Prosper Otemuyiwa"
-                            src="https://bit.ly/prosper-baba"
-                          />
-                          <Avatar
-                            name="Christian Nwamba"
-                            src="https://bit.ly/code-beast"
-                          />
-                        </AvatarGroup>
-                      </Flex>
+                      )}
                     </Flex>
                   </CardBody>
-                  <Button
-                    as={Link}
-                    href={`/events/detail/${i.id}`}
-                    colorScheme="brand"
-                    position={{ base: "relative", md: "absolute" }}
-                    right={{ base: "unset", md: "4" }}
-                    bottom={{ base: "unset", md: "4" }}
-                  >
-                    Join Event
-                  </Button>
+                  {i.opening_status === "Open" ? (
+                    <Button
+                      as={Link}
+                      href={`/events/detail/${i.id}`}
+                      colorScheme="brand"
+                      position={{ base: "relative", md: "absolute" }}
+                      right={{ base: "unset", md: "4" }}
+                      bottom={{ base: "unset", md: "4" }}
+                    >
+                      Join Event
+                    </Button>
+                  ) : (
+                    <Box
+                      position={{ base: "relative", md: "absolute" }}
+                      right={{ base: "unset", md: "4" }}
+                      bottom={{ base: "unset", md: "4" }}
+                    >
+                      <Badge
+                        size="xl"
+                        colorScheme="orange"
+                        fontSize="14"
+                        w="100%"
+                        textAlign="center"
+                        px="2"
+                        py="1"
+                        borderRadius="6"
+                      >
+                        OPENING SOON
+                      </Badge>
+                    </Box>
+                  )}
                 </Stack>
               </Card>
             ))}
