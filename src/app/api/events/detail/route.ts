@@ -4,7 +4,7 @@ import { TypeEventSkeleton } from "@types";
 import { Asset } from "contentful";
 import z from "zod";
 import { NextRequest } from "next/server";
-import { AttendeeList } from "@models";
+import { AttendeeList, User } from "@models";
 
 const detailSchema = z.object({
   id: z.string({ required_error: "Event ID is required" }),
@@ -54,6 +54,10 @@ export const POST = async (request: NextRequest) => {
         }
       }
 
+      const attendees = await User.find({
+        _id: { $in: attendeeList.attendees },
+      }).select("profile instagram first_name last_name skill");
+
       const event = {
         id: res.sys.id,
         name: res.fields.name,
@@ -66,6 +70,7 @@ export const POST = async (request: NextRequest) => {
         available_tickets: availableTickets,
         reserved,
         purchased,
+        attendees,
       };
 
       return ServerResponse.success(event);

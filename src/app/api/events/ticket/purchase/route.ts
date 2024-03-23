@@ -5,7 +5,7 @@ import z from "zod";
 import { getSession, ServerResponse } from "@helpers";
 import { TennisEvent } from "@types";
 import { logger, mergent } from "@lib";
-import { AttendeeList } from "@models/AttendeeList";
+import { AttendeeList } from "@models";
 import { addMinutes, getUnixTime } from "date-fns";
 
 const purchaseSchema = z.object({

@@ -47,7 +47,7 @@ export const GET = async (request: NextRequest) => {
 
       return NextResponse.redirect(
         new URL(
-          `${process.env.NEXT_PUBLIC_HOSTNAME}/events/detail/${event_id}?successful_payment=true`,
+          `${process.env.NEXT_PUBLIC_HOSTNAME}/events/detail/${event_id}?successful-payment=true`,
         ),
       );
     } else {

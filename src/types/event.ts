@@ -10,4 +10,12 @@ export interface TennisEvent {
   opening_status: string;
   reserved: boolean;
   purchased: boolean;
+  attendees: Array<{
+    profile: string;
+    instagram: string;
+    first_name?: string;
+    last_name?: string;
+    name?: string;
+    skill: string;
+  }>;
 }
