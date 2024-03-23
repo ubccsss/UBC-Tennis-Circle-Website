@@ -10,6 +10,7 @@ export interface AttendeeList {
   available_tickets: number;
   reserved_tickets: Array<string>;
   attendees: Array<UserId>;
+  time_slot: number;
   reservation_expire_tasks: Array<{
     user_id: string;
     task_id: string;
@@ -23,6 +24,7 @@ const schema = new Schema<AttendeeList>({
   event_name: { type: String, required: true },
   ticket_price: { type: Number, required: true },
   available_tickets: { type: Number, required: true },
+  time_slot: { type: Number, required: true },
   // list of user_ids
   reserved_tickets: [{ type: String, required: true }],
   attendees: [{ type: String, required: true }],

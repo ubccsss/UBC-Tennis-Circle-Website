@@ -1,5 +1,5 @@
 import { contentfulClient } from "@lib";
-import { ServerResponse } from "@helpers";
+import { ServerResponse, mergeAttendees } from "@helpers";
 import { TypeEventSkeleton } from "@types";
 import { Asset } from "contentful";
 import { AttendeeList, User } from "@models";
@@ -14,13 +14,19 @@ export const GET = async () => {
 
     const events = await Promise.all(
       res.items.map(async (i) => {
-        const attendeeList = await AttendeeList.findOne({
+        const attendeeList = await AttendeeList.find({
           event_id: i.sys.id,
         }).select("attendees");
 
-        const profiles = await User.find({
-          _id: { $in: attendeeList.attendees },
-        }).select("profile first_name last_name");
+        const attendees =
+          attendeeList.length > 0
+            ? await mergeAttendees(
+              attendeeList[0],
+              attendeeList[1],
+              i.fields.date,
+              "profile first_name last_name",
+            )
+            : [];
 
         return {
           id: i.sys.id,
@@ -32,16 +38,14 @@ export const GET = async () => {
             ?.url}`,
           description: i.fields.description,
           opening_status: i.fields.openingStatus,
-          attendees: profiles.map((j) => ({
-            profile: j.profile,
-            name: `${j.first_name} ${j.last_name}`,
-          })),
+          attendees,
         };
       }),
     );
 
     return ServerResponse.success(events);
   } catch (e) {
+    console.log(e);
     return ServerResponse.serverError();
   }
 };

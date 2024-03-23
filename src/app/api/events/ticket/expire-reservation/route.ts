@@ -10,6 +10,7 @@ const expireReservationSchema = z.object({
   }),
   event_id: z.string({ required_error: "Event ID is required" }),
   user_id: z.string({ required_error: "User ID to expire is required" }),
+  time_slot: z.union([z.literal(1), z.literal(2)]),
 });
 
 export const POST = async (request: NextRequest) => {
@@ -29,6 +30,7 @@ export const POST = async (request: NextRequest) => {
         {
           event_id: body.event_id,
           reserved_tickets: { $in: [body.user_id] },
+          time_slot: body.time_slot,
         },
         {
           $pull: {

@@ -25,13 +25,16 @@ import {
   useDisclosure,
   IconButton,
   Divider,
+  FlexProps,
+  VStack,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { TennisEvent } from "@types";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, addHours } from "date-fns";
 import { useSearchParams } from "next/navigation";
+import { rangeHours } from "@utils";
 import {
   LocationPinIcon,
   ClockIcon,
@@ -56,10 +59,10 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
   useEffect(() => {
     if (soldOut === "true") {
       statusToast({
-        id: "sold_out",
-        title: "Unfortunately, this event just sold out.",
+        title: "Unfortunately, this slot just sold out.",
         status: "error",
       });
+      router.push(`/events/detail/${params.id}`);
     }
 
     if (purchased === "true") {
@@ -68,6 +71,7 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
         title: "You have already purchased this ticket.",
         status: "error",
       });
+      router.push(`/events/detail/${params.id}`);
     }
 
     if (unsuccessfulPayment === "true") {
@@ -76,6 +80,7 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
         title: "An error has occurred and you will be issued a refund.",
         status: "error",
       });
+      router.push(`/events/detail/${params.id}`);
     }
 
     if (successfulPayment === "true") {
@@ -84,8 +89,17 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
         title: "Successfully purchased ticket.",
         status: "success",
       });
+      router.push(`/events/detail/${params.id}`);
     }
-  }, [soldOut, statusToast, unsuccessfulPayment, successfulPayment, purchased]);
+  }, [
+    soldOut,
+    statusToast,
+    unsuccessfulPayment,
+    successfulPayment,
+    purchased,
+    params.id,
+    router,
+  ]);
 
   const getEvent = async () => {
     const event = await axios.post(
@@ -108,28 +122,45 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
     router.push("/not-found");
   }
 
-  const [purchaseLoading, setPurchaseLoading] = useState(false);
+  console.log(data);
 
-  const purchaseTicket = async () => {
+  interface BuyTicketBoxProps extends FlexProps {
+    time: string;
+    timeSlot: number;
+  }
+
+  const [purchaseLoading, setPurchaseLoading] = useState(null);
+
+  const purchaseTicket = async (timeSlot: number) => {
     const session = await getClientSession();
     try {
-      setPurchaseLoading(true);
+      setPurchaseLoading(timeSlot);
 
       if (!session) {
         router.push(`/login/?redirect=/events/detail/${params.id}`);
       }
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_HOSTNAME}/api/events/ticket/purchase`,
-        { event_id: params.id },
+        { event_id: params.id, time_slot: timeSlot },
       );
-      router.push(res.data.url);
+
+      if (res.data?.url) {
+        router.push(res.data.url);
+      } else {
+        statusToast({
+          id: "failure",
+          title: "An unexpected error has occurred",
+          status: "error",
+        });
+      }
     } catch (e) {
       console.error(e);
     }
-    setPurchaseLoading(false);
   };
 
-  const BuyTicketBox = ({ ...props }) => {
+  const BuyTicketBox = ({ time, timeSlot, ...props }: BuyTicketBoxProps) => {
+    const slotObj = data.time_slots[timeSlot];
+
     return (
       <Flex
         borderRadius="8"
@@ -142,24 +173,28 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
         minW={{ base: "unset", sm: "64" }}
         {...props}
       >
-        <Heading as="h4" fontSize="xl" textAlign="center">
-          Admission ${data.ticket_price}
-        </Heading>
+        <Text fontSize="lg" textAlign="center" mb="-2" fontWeight="medium">
+          {time}
+        </Text>
         <Button
           w="100%"
           colorScheme="brand"
-          onClick={purchaseTicket}
-          isLoading={purchaseLoading}
+          onClick={() => {
+            purchaseTicket(timeSlot);
+          }}
+          isLoading={purchaseLoading && purchaseLoading === timeSlot}
           loadingText="Reserving Ticket"
           isDisabled={
-            (!data.reserved && data.available_tickets <= 0) || data.purchased
+            (purchaseLoading && purchaseLoading !== timeSlot) ||
+            (!slotObj.reserved && slotObj.available_tickets <= 0) ||
+            slotObj.purchased
           }
         >
-          {data.purchased
+          {slotObj.purchased
             ? "Purchased Ticket"
-            : !data.reserved && data.available_tickets <= 0
+            : !slotObj.reserved && slotObj.available_tickets <= 0
               ? "Sold out"
-              : "Buy Ticket"}
+              : `Purchase ($${data.ticket_price})`}
         </Button>
       </Flex>
     );
@@ -173,12 +208,23 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
             <Skeleton
               borderRadius="8"
               w="100%"
-              h={{ base: "36", sm: "64" }}
+              h={{ base: "72", sm: "80" }}
               mb="2"
             />
             <HStack gap="8" alignItems="flex-start">
-              <SkeletonText skeletonHeight="4" w="70%" noOfLines={4} />
-              <Skeleton borderRadius="8" h="32" w="30%" />
+              <VStack w="70%">
+                <SkeletonText
+                  skeletonHeight="8"
+                  noOfLines={1}
+                  w="100%"
+                  mb="4"
+                />
+                <SkeletonText skeletonHeight="4" noOfLines={8} w="100%" />
+              </VStack>
+              <VStack w="30%" gap="4">
+                <Skeleton borderRadius="8" h="32" w="100%" />
+                <Skeleton borderRadius="8" h="32" w="100%" />
+              </VStack>
             </HStack>
           </Flex>
         )}
@@ -189,6 +235,7 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
               isOpen={isOpen}
               onClose={onClose}
               size={{ base: "full", sm: "md" }}
+              scrollBehavior="inside"
             >
               <ModalOverlay />
               <ModalContent>
@@ -219,9 +266,20 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
                               name={i.first_name}
                               size="sm"
                             />
-                            <Text maxW="52" wordBreak="break-all">
-                              {i.first_name} {i.last_name}
-                            </Text>
+                            <VStack alignItems="flex-start" gap="-8">
+                              <Text maxW="52" wordBreak="break-all">
+                                {i.first_name} {i.last_name}
+                              </Text>
+                              <Text
+                                maxW="52"
+                                wordBreak="break-all"
+                                fontSize="12"
+                                mt="-0.5"
+                                fontWeight="medium"
+                              >
+                                {i.time}
+                              </Text>
+                            </VStack>
                           </Flex>
 
                           <Flex
@@ -303,7 +361,20 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
                   </Heading>
                   <Text>{data.description}</Text>
 
-                  <BuyTicketBox display={{ base: "flex", md: "none" }} my="4" />
+                  <Flex flexDir="column">
+                    <BuyTicketBox
+                      time={rangeHours(data.date, 1)}
+                      display={{ base: "flex", md: "none" }}
+                      my="4"
+                      timeSlot={1}
+                    />
+                    <BuyTicketBox
+                      time={rangeHours(data.date, 1, 1)}
+                      display={{ base: "flex", md: "none" }}
+                      my="4"
+                      timeSlot={2}
+                    />
+                  </Flex>
                   <Box h="0.4" bg="gray.300" my="4" />
                   <Flex flexDir="column">
                     <Flex alignItems="center" gap="2" color="gray.500">
@@ -311,18 +382,14 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
                       <Text>
                         <b>Time: </b>
                         <Text display={{ base: "none", sm: "inline" }}>
-                          {format(
-                            parseISO(data.date),
-                            "EEEE, MMM d yyyy, h:mm aaa",
-                          )}
+                          {format(parseISO(data.date), "EEEE, MMM d yyyy, ")}
+                          {rangeHours(data.date)}
                         </Text>
                       </Text>
                     </Flex>
                     <Text display={{ base: "block", sm: "none" }}>
-                      {format(
-                        parseISO(data.date),
-                        "EEEE, MMM d yyyy, h:mm aaa",
-                      )}
+                      {format(parseISO(data.date), "EEEE, MMM d yyyy, h:mmaaa")}{" "}
+                      - {format(addHours(parseISO(data.date), 2), "h:mmaaa")}
                     </Text>
                   </Flex>
 
@@ -413,7 +480,24 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
                     </Flex>
                   </Flex>
                 </Flex>
-                <BuyTicketBox display={{ base: "none", md: "flex" }} />
+                <Flex
+                  flexDir="column"
+                  gap="4"
+                  display={{ base: "none", md: "flex" }}
+                >
+                  <Box>
+                    <BuyTicketBox
+                      time={rangeHours(data.date, 1)}
+                      timeSlot={1}
+                    />
+                  </Box>
+                  <Box>
+                    <BuyTicketBox
+                      time={rangeHours(data.date, 1, 1)}
+                      timeSlot={2}
+                    />
+                  </Box>
+                </Flex>
               </Flex>
             </Flex>
           </>

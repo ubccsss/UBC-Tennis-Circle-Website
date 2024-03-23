@@ -1,3 +1,20 @@
+export interface PublicEventUser {
+  profile: string;
+  instagram: string;
+  first_name?: string;
+  last_name?: string;
+  name?: string;
+  skill: string;
+  time: string;
+}
+
+export interface TimeSlot {
+  reserved: boolean;
+  purchased: boolean;
+  attendees: Array<string>;
+  available_tickets: number;
+}
+
 export interface TennisEvent {
   id: string;
   name: string;
@@ -6,16 +23,7 @@ export interface TennisEvent {
   date: string;
   cover_image: string;
   description: string;
-  available_tickets: number;
   opening_status: string;
-  reserved: boolean;
-  purchased: boolean;
-  attendees: Array<{
-    profile: string;
-    instagram: string;
-    first_name?: string;
-    last_name?: string;
-    name?: string;
-    skill: string;
-  }>;
+  attendees: Array<PublicEventUser>;
+  time_slots: Record<1 | 2, TimeSlot>;
 }
