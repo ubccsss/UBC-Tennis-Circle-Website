@@ -1,23 +1,25 @@
 import { stripe, connectToDatabase } from "@lib";
 import axios, { AxiosResponse } from "axios";
 import { NextRequest } from "next/server";
-import z from "zod";
+import z, { date } from "zod";
 import { getSession, ServerResponse } from "@helpers";
 import { TennisEvent } from "@types";
 import { logger, mergent } from "@lib";
-import { AttendeeList } from "@models/AttendeeList";
+import { AttendeeList } from "@models";
 import { addMinutes, getUnixTime } from "date-fns";
+import { rangeHours } from "@utils/time";
 
 const purchaseSchema = z.object({
   event_id: z.string({ required_error: "Event token is required" }),
+  time_slot: z.union([z.literal(1), z.literal(2)]),
 });
 
 export const POST = async (request: NextRequest) => {
   await connectToDatabase();
 
-  const { event_id } = await request.json();
+  const { event_id, time_slot } = await request.json();
 
-  const validation = purchaseSchema.safeParse({ event_id });
+  const validation = purchaseSchema.safeParse({ event_id, time_slot });
 
   const { session } = await getSession(request);
 
@@ -40,6 +42,7 @@ export const POST = async (request: NextRequest) => {
 
       const attendeeList = await AttendeeList.findOne({
         event_id: event.data.id,
+        time_slot,
       });
 
       if (attendeeList.attendees.includes(session.user.userId)) {
@@ -57,6 +60,7 @@ export const POST = async (request: NextRequest) => {
           await AttendeeList.findOneAndUpdate(
             {
               event_id: event.data.id,
+              time_slot,
             },
             {
               $push: {
@@ -74,6 +78,7 @@ export const POST = async (request: NextRequest) => {
                 reservation_secret: process.env.NEXT_RESERVATION_SECRET,
                 event_id: event.data.id,
                 user_id: session.user.userId,
+                time_slot,
               }),
             },
             scheduledFor: addMinutes(new Date(), 30),
@@ -82,6 +87,7 @@ export const POST = async (request: NextRequest) => {
           await AttendeeList.findOneAndUpdate(
             {
               event_id: event.data.id,
+              time_slot,
             },
             {
               $push: {
@@ -116,7 +122,11 @@ export const POST = async (request: NextRequest) => {
               unit_amount: event.data.ticket_price * 100,
               currency: "cad",
               product_data: {
-                name: `${event.data.name} Ticket`,
+                name: `${event.data.name} Ticket (${rangeHours(
+                  event.data.date,
+                  1,
+                  time_slot === 2 ? 1 : 0,
+                )})`,
               },
             },
             quantity: 1,
@@ -126,6 +136,7 @@ export const POST = async (request: NextRequest) => {
         metadata: {
           event_id: event.data.id,
           user_id: session.user.userId,
+          time_slot,
         },
         success_url: `${process.env.NEXT_PUBLIC_HOSTNAME}/api/events/ticket/purchase/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${process.env.NEXT_PUBLIC_HOSTNAME}/events/detail/${event_id}`,
@@ -139,5 +150,7 @@ export const POST = async (request: NextRequest) => {
       logger.error(e);
       return ServerResponse.serverError();
     }
+  } else {
+    return ServerResponse.validationError(validation);
   }
 };

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import {
   Container,
   VStack,
@@ -14,19 +14,19 @@ import {
   useToast,
   Textarea,
   Text,
-} from '@chakra-ui/react';
-import {FiArrowRight} from 'react-icons/fi';
-import {z} from 'zod';
-import {ZOD_ERR, DEFAULT_SERVER_ERR} from '@constants/error-messages';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {useForm} from 'react-hook-form';
-import axios from 'axios';
+} from "@chakra-ui/react";
+import { FiArrowRight } from "react-icons/fi";
+import { z } from "zod";
+import { ZOD_ERR, DEFAULT_SERVER_ERR } from "@constants/error-messages";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import axios from "axios";
 
 const schema = z.object({
   name: z.string().min(1, ZOD_ERR.REQ_FIELD),
   email_address: z.string().email(ZOD_ERR.INVALID_EMAIL),
   message: z.string().min(1, ZOD_ERR.REQ_FIELD).max(700, {
-    message: 'Your message is too long',
+    message: "Your message is too long",
   }),
 });
 
@@ -38,11 +38,11 @@ const Contact = () => {
   const {
     handleSubmit,
     register,
-    formState: {errors, isSubmitting},
+    formState: { errors, isSubmitting },
     watch,
-  } = useForm<Form>({resolver: zodResolver(schema)});
+  } = useForm<Form>({ resolver: zodResolver(schema) });
 
-  const onSubmit = async ({name, email_address, message}: Form) => {
+  const onSubmit = async ({ name, email_address, message }: Form) => {
     try {
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_HOSTNAME}/api/contact`,
@@ -50,20 +50,20 @@ const Contact = () => {
           name,
           email_address,
           message,
-        }
+        },
       );
 
       if (res.data) {
         statusToast({
           title: res.data.message,
-          status: 'success',
+          status: "success",
         });
       }
     } catch (e) {
       if (axios.isAxiosError(e)) {
         statusToast({
           title: e?.response?.data?.message || DEFAULT_SERVER_ERR,
-          status: 'error',
+          status: "error",
         });
       }
     }
@@ -72,20 +72,20 @@ const Contact = () => {
   const watched = watch();
 
   return (
-    <Container maxW="container.xl" py={{base: '32', lg: '20'}}>
+    <Container maxW="container.xl" py={{ base: "32", lg: "20" }}>
       <Flex flexDirection="row" w="100%" justifyContent="center" gap="36">
         <Img
           sizes="lg"
           src="/static/images/illustrations/question-mark.svg"
           alt="Solar Panel"
           borderRadius="lg"
-          display={{base: 'none', lg: 'block'}}
+          display={{ base: "none", lg: "block" }}
           ml="24"
         />
         <form onSubmit={handleSubmit(onSubmit)}>
           <VStack
             align="flex-start"
-            w={{base: '100%', sm: 'max-content'}}
+            w={{ base: "100%", sm: "max-content" }}
             spacing="19"
           >
             <Heading as="h1" size="2xl">
@@ -102,9 +102,9 @@ const Contact = () => {
                   type="text"
                   placeholder="Your Name"
                   disabled={isSubmitting}
-                  w={{base: '100%', sm: 'sm'}}
+                  w={{ base: "100%", sm: "sm" }}
                   size="lg"
-                  {...register('name')}
+                  {...register("name")}
                 />
               </Stack>
               <FormErrorMessage>{errors?.name?.message}</FormErrorMessage>
@@ -116,9 +116,9 @@ const Contact = () => {
                   type="email"
                   placeholder="Email Address"
                   disabled={isSubmitting}
-                  w={{base: '100%', sm: 'sm'}}
+                  w={{ base: "100%", sm: "sm" }}
                   size="lg"
-                  {...register('email_address')}
+                  {...register("email_address")}
                 />
               </Stack>
               <FormErrorMessage>
@@ -132,9 +132,9 @@ const Contact = () => {
                   h="36"
                   placeholder="Message"
                   disabled={isSubmitting}
-                  w={{base: '100%', sm: 'sm'}}
+                  w={{ base: "100%", sm: "sm" }}
                   size="lg"
-                  {...register('message')}
+                  {...register("message")}
                 />
               </Stack>
               {errors?.message?.message ? (
@@ -142,7 +142,7 @@ const Contact = () => {
               ) : (
                 <Text
                   color={
-                    watched?.message?.length > 700 ? 'red.500' : 'gray.500'
+                    watched?.message?.length > 700 ? "red.500" : "gray.500"
                   }
                   fontSize="sm"
                   mt="2"
@@ -158,7 +158,6 @@ const Contact = () => {
               colorScheme="brand"
               type="submit"
               loadingText="Submitting..."
-              size="lg"
               rightIcon={<Icon as={FiArrowRight} />}
               isLoading={isSubmitting}
             >

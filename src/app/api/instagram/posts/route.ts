@@ -22,7 +22,10 @@ const fetchPosts = async () => {
     params,
   });
 
-  return response.data;
+  const posts = await response.data;
+
+  // see first 24 posts
+  return { ...posts, data: posts.data.slice(0, 24) };
 };
 
 export const GET = async () => {

@@ -30,24 +30,32 @@ export const POST = async (request: NextRequest) => {
 
       const res = event.data;
 
-      const existingList = await AttendeeList.findOneAndUpdate(
+      const existingList = await AttendeeList.updateMany(
         { event_id: res.id },
         { event_name: res.name, ticket_price: res.ticket_price }, // name and ticket price of the event could change
       );
 
-      if (existingList) {
+      if (existingList.modifiedCount !== 0) {
         return ServerResponse.success(existingList);
       }
 
-      const attendeeList = await AttendeeList.create({
+      const genAttendeeList = (slot: number) => ({
         event_id: res.id,
         event_name: res.name,
         ticket_price: res.ticket_price,
-        available_tickets: res.available_tickets,
+        // available tickets for first and second will be the same on initialization
+        available_tickets: res.time_slots[1].available_tickets,
+        time_slot: slot,
         reserved_tickets: [],
         attendees: [],
         reservation_expire_tasks: [],
       });
+
+      console.log(genAttendeeList(1));
+      const attendeeList = await AttendeeList.create([
+        genAttendeeList(1),
+        genAttendeeList(2),
+      ]);
 
       return ServerResponse.success(attendeeList);
     } catch (e) {

@@ -62,6 +62,9 @@ const Events = () => {
       });
     }
   }, [unsuccessfulPayment, statusToast]);
+
+  console.log(data);
+
   return (
     <Container maxW="container.xl" py={{ base: "12", sm: "20" }}>
       <Flex flexDir="column">
@@ -181,65 +184,48 @@ const Events = () => {
                         </Text>
                       </Flex>
 
-                      {i.opening_status === "Open" && (
-                        <Flex
-                          alignItems={{ base: "flex-start", sm: "center" }}
-                          flexDir={{ base: "column", sm: "row" }}
-                        >
-                          <Flex alignItems="center" gap="1">
-                            <Icon
-                              as={UserFriendsIcon}
-                              color="gray.500"
-                              fontSize="14"
-                            />
-                            <Text fontWeight="semibold">Attendees:</Text>
+                      {i.opening_status === "Open" &&
+                        i.attendees.length > 0 && (
+                          <Flex
+                            alignItems={{ base: "flex-start", sm: "center" }}
+                            flexDir={{ base: "column", sm: "row" }}
+                          >
+                            <Flex alignItems="center" gap="1">
+                              <Icon
+                                as={UserFriendsIcon}
+                                color="gray.500"
+                                fontSize="14"
+                              />
+                              <Text fontWeight="semibold">Attendees:</Text>
+                              <AvatarGroup
+                                size="xs"
+                                max={3}
+                                display={{ base: "none", sm: "flex" }}
+                              >
+                                {i.attendees.map((i, idx) => (
+                                  <Avatar
+                                    name={i.name}
+                                    src={i.profile}
+                                    key={idx}
+                                  />
+                                ))}
+                              </AvatarGroup>
+                            </Flex>
                             <AvatarGroup
-                              size="xs"
+                              size="sm"
                               max={3}
-                              display={{ base: "none", sm: "flex" }}
+                              display={{ base: "flex", sm: "none" }}
                             >
-                              <Avatar
-                                name="Segun Adebayo"
-                                src="https://bit.ly/sage-adebayo"
-                              />
-                              <Avatar
-                                name="Kent Dodds"
-                                src="https://bit.ly/kent-c-dodds"
-                              />
-                              <Avatar
-                                name="Prosper Otemuyiwa"
-                                src="https://bit.ly/prosper-baba"
-                              />
-                              <Avatar
-                                name="Christian Nwamba"
-                                src="https://bit.ly/code-beast"
-                              />
+                              {i.attendees.map((i, idx) => (
+                                <Avatar
+                                  name={i.name}
+                                  src={i.profile}
+                                  key={idx}
+                                />
+                              ))}
                             </AvatarGroup>
                           </Flex>
-                          <AvatarGroup
-                            size="sm"
-                            max={3}
-                            display={{ base: "flex", sm: "none" }}
-                          >
-                            <Avatar
-                              name="Segun Adebayo"
-                              src="https://bit.ly/sage-adebayo"
-                            />
-                            <Avatar
-                              name="Kent Dodds"
-                              src="https://bit.ly/kent-c-dodds"
-                            />
-                            <Avatar
-                              name="Prosper Otemuyiwa"
-                              src="https://bit.ly/prosper-baba"
-                            />
-                            <Avatar
-                              name="Christian Nwamba"
-                              src="https://bit.ly/code-beast"
-                            />
-                          </AvatarGroup>
-                        </Flex>
-                      )}
+                        )}
                     </Flex>
                   </CardBody>
                   {i.opening_status === "Open" ? (
@@ -251,7 +237,7 @@ const Events = () => {
                       right={{ base: "unset", md: "4" }}
                       bottom={{ base: "unset", md: "4" }}
                     >
-                      Join Event
+                      See Details
                     </Button>
                   ) : (
                     <Box

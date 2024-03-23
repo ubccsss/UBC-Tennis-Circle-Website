@@ -1,7 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
 import {
+  Link,
+  Icon,
   Box,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
   useToast,
   Container,
   Button,
@@ -14,13 +22,19 @@ import {
   Heading,
   AvatarGroup,
   Avatar,
+  useDisclosure,
+  IconButton,
+  Divider,
+  FlexProps,
+  VStack,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { TennisEvent } from "@types";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, addHours } from "date-fns";
 import { useSearchParams } from "next/navigation";
+import { rangeHours } from "@utils";
 import {
   LocationPinIcon,
   ClockIcon,
@@ -28,6 +42,7 @@ import {
   UserFriendsIcon,
 } from "@icons";
 import { getClientSession } from "@utils";
+import { FiInstagram } from "react-icons/fi";
 
 const EventDetail = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
@@ -39,13 +54,15 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
   const successfulPayment = searchParams.get("successful-payment");
   const purchased = searchParams.get("purchased");
 
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   useEffect(() => {
     if (soldOut === "true") {
       statusToast({
-        id: "sold_out",
-        title: "Unfortunately, this event just sold out.",
+        title: "Unfortunately, this slot just sold out.",
         status: "error",
       });
+      router.push(`/events/detail/${params.id}`);
     }
 
     if (purchased === "true") {
@@ -54,6 +71,7 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
         title: "You have already purchased this ticket.",
         status: "error",
       });
+      router.push(`/events/detail/${params.id}`);
     }
 
     if (unsuccessfulPayment === "true") {
@@ -62,6 +80,7 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
         title: "An error has occurred and you will be issued a refund.",
         status: "error",
       });
+      router.push(`/events/detail/${params.id}`);
     }
 
     if (successfulPayment === "true") {
@@ -70,8 +89,17 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
         title: "Successfully purchased ticket.",
         status: "success",
       });
+      router.push(`/events/detail/${params.id}`);
     }
-  }, [soldOut, statusToast, unsuccessfulPayment, successfulPayment, purchased]);
+  }, [
+    soldOut,
+    statusToast,
+    unsuccessfulPayment,
+    successfulPayment,
+    purchased,
+    params.id,
+    router,
+  ]);
 
   const getEvent = async () => {
     const event = await axios.post(
@@ -94,28 +122,45 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
     router.push("/not-found");
   }
 
-  const [purchaseLoading, setPurchaseLoading] = useState(false);
+  console.log(data);
 
-  const purchaseTicket = async () => {
+  interface BuyTicketBoxProps extends FlexProps {
+    time: string;
+    timeSlot: number;
+  }
+
+  const [purchaseLoading, setPurchaseLoading] = useState(null);
+
+  const purchaseTicket = async (timeSlot: number) => {
     const session = await getClientSession();
     try {
-      setPurchaseLoading(true);
+      setPurchaseLoading(timeSlot);
 
       if (!session) {
         router.push(`/login/?redirect=/events/detail/${params.id}`);
       }
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_HOSTNAME}/api/events/ticket/purchase`,
-        { event_id: params.id },
+        { event_id: params.id, time_slot: timeSlot },
       );
-      router.push(res.data.url);
+
+      if (res.data?.url) {
+        router.push(res.data.url);
+      } else {
+        statusToast({
+          id: "failure",
+          title: "An unexpected error has occurred",
+          status: "error",
+        });
+      }
     } catch (e) {
       console.error(e);
     }
-    setPurchaseLoading(false);
   };
 
-  const BuyTicketBox = ({ ...props }) => {
+  const BuyTicketBox = ({ time, timeSlot, ...props }: BuyTicketBoxProps) => {
+    const slotObj = data.time_slots[timeSlot];
+
     return (
       <Flex
         borderRadius="8"
@@ -128,24 +173,28 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
         minW={{ base: "unset", sm: "64" }}
         {...props}
       >
-        <Heading as="h4" fontSize="xl" textAlign="center">
-          Admission ${data.ticket_price}
-        </Heading>
+        <Text fontSize="lg" textAlign="center" mb="-2" fontWeight="medium">
+          {time}
+        </Text>
         <Button
           w="100%"
           colorScheme="brand"
-          onClick={purchaseTicket}
-          isLoading={purchaseLoading}
+          onClick={() => {
+            purchaseTicket(timeSlot);
+          }}
+          isLoading={purchaseLoading && purchaseLoading === timeSlot}
           loadingText="Reserving Ticket"
           isDisabled={
-            (!data.reserved && data.available_tickets <= 0) || data.purchased
+            (purchaseLoading && purchaseLoading !== timeSlot) ||
+            (!slotObj.reserved && slotObj.available_tickets <= 0) ||
+            slotObj.purchased
           }
         >
-          {data.purchased
+          {slotObj.purchased
             ? "Purchased Ticket"
-            : !data.reserved && data.available_tickets <= 0
+            : !slotObj.reserved && slotObj.available_tickets <= 0
               ? "Sold out"
-              : "Buy Ticket"}
+              : `Purchase ($${data.ticket_price})`}
         </Button>
       </Flex>
     );
@@ -159,179 +208,299 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
             <Skeleton
               borderRadius="8"
               w="100%"
-              h={{ base: "36", sm: "64" }}
+              h={{ base: "72", sm: "80" }}
               mb="2"
             />
             <HStack gap="8" alignItems="flex-start">
-              <SkeletonText skeletonHeight="4" w="70%" noOfLines={4} />
-              <Skeleton borderRadius="8" h="32" w="30%" />
+              <VStack w="70%">
+                <SkeletonText
+                  skeletonHeight="8"
+                  noOfLines={1}
+                  w="100%"
+                  mb="4"
+                />
+                <SkeletonText skeletonHeight="4" noOfLines={8} w="100%" />
+              </VStack>
+              <VStack w="30%" gap="4">
+                <Skeleton borderRadius="8" h="32" w="100%" />
+                <Skeleton borderRadius="8" h="32" w="100%" />
+              </VStack>
             </HStack>
           </Flex>
         )}
 
         {data && (
-          <Flex flexDirection="column" gap="4">
-            <Flex
-              position="relative"
-              justifyContent="center"
-              alignItems="center"
+          <>
+            <Modal
+              isOpen={isOpen}
+              onClose={onClose}
+              size={{ base: "full", sm: "md" }}
+              scrollBehavior="inside"
             >
-              <Image
-                src={data.cover_image}
-                alt="Cover image"
-                w="100%"
-                h="96"
-                objectFit="cover"
-                borderRadius="8"
-              />
+              <ModalOverlay />
+              <ModalContent>
+                <ModalHeader>Attendees</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody mb="4">
+                  <Flex flexDir="column" gap="3">
+                    {data.attendees.map((i, idx) => (
+                      <>
+                        <Flex
+                          w="100%"
+                          key={idx}
+                          alignItems={{ base: "flex-start", md: "center" }}
+                          gap="2"
+                          justifyContent={{
+                            base: "flex-start",
+                            md: "space-between",
+                          }}
+                          flexDir={{ base: "column", md: "row" }}
+                        >
+                          <Flex
+                            gap="2"
+                            alignItems={{ base: "flex-start", md: "center" }}
+                            flexDir={{ base: "column", md: "row" }}
+                          >
+                            <Avatar
+                              src={i.profile}
+                              name={i.first_name}
+                              size="sm"
+                            />
+                            <VStack alignItems="flex-start" gap="-8">
+                              <Text maxW="52" wordBreak="break-all">
+                                {i.first_name} {i.last_name}
+                              </Text>
+                              <Text
+                                maxW="52"
+                                wordBreak="break-all"
+                                fontSize="12"
+                                mt="-0.5"
+                                fontWeight="medium"
+                              >
+                                {i.time}
+                              </Text>
+                            </VStack>
+                          </Flex>
+
+                          <Flex
+                            gap="2"
+                            alignItems="center"
+                            flexDir={{ base: "row-reverse", md: "row" }}
+                          >
+                            {i.instagram && (
+                              <IconButton
+                                as={Link}
+                                colorScheme="pink"
+                                icon={<Icon as={FiInstagram} fontSize="18" />}
+                                aria-label="Instagram"
+                                size="sm"
+                                href={`https://www.instagram.com/${i.instagram}`}
+                                target="_blank"
+                              />
+                            )}
+                            <Flex
+                              border="2px"
+                              borderColor="brand.500"
+                              px="3"
+                              borderRadius="md"
+                              fontSize="14"
+                              fontWeight="medium"
+                              alignItems="center"
+                              h="32px"
+                            >
+                              <Text color="brand.500">Skill {i.skill}</Text>
+                            </Flex>
+                          </Flex>
+                        </Flex>
+                        <Divider
+                          display={
+                            idx === data.attendees.length - 1 ? "none" : "block"
+                          }
+                        />
+                      </>
+                    ))}
+                  </Flex>
+                </ModalBody>
+              </ModalContent>
+            </Modal>
+            <Flex flexDirection="column" gap="4">
               <Flex
-                zIndex={2}
-                h="96"
-                position="absolute"
-                bg="black"
-                w="100%"
+                position="relative"
                 justifyContent="center"
                 alignItems="center"
-                bottom="0"
-                py="2"
-                bgColor="rgb(0, 0, 0, 0.5)"
-                borderRadius="8"
-              />
-            </Flex>
-            <Flex gap="16" mt="8">
-              <Flex flexDir="column" gap="2">
-                <Text mb="-2">
-                  {format(parseISO(data.date), "EEEE, MMM d yyyy")}
-                </Text>
-                <Heading as="h1" size="xl">
-                  {data.name}
-                </Heading>
-                <Text>{data.description}</Text>
+              >
+                <Image
+                  src={data.cover_image}
+                  alt="Cover image"
+                  w="100%"
+                  h="96"
+                  objectFit="cover"
+                  borderRadius="8"
+                />
+                <Flex
+                  zIndex={2}
+                  h="96"
+                  position="absolute"
+                  bg="black"
+                  w="100%"
+                  justifyContent="center"
+                  alignItems="center"
+                  bottom="0"
+                  py="2"
+                  bgColor="rgb(0, 0, 0, 0.5)"
+                  borderRadius="8"
+                />
+              </Flex>
+              <Flex gap="16" mt="8">
+                <Flex flexDir="column" gap="2">
+                  <Text mb="-2">
+                    {format(parseISO(data.date), "EEEE, MMM d yyyy")}
+                  </Text>
+                  <Heading as="h1" size="xl">
+                    {data.name}
+                  </Heading>
+                  <Text>{data.description}</Text>
 
-                <BuyTicketBox display={{ base: "flex", md: "none" }} my="4" />
-                <Box h="0.4" bg="gray.300" my="4" />
-                <Flex flexDir="column">
-                  <Flex alignItems="center" gap="2" color="gray.500">
-                    <ClockIcon />
-                    <Text>
-                      <b>Time: </b>
-                      <Text display={{ base: "none", sm: "inline" }}>
-                        {format(
-                          parseISO(data.date),
-                          "EEEE, MMM d yyyy, h:mm aaa",
-                        )}
+                  <Flex flexDir="column">
+                    <BuyTicketBox
+                      time={rangeHours(data.date, 1)}
+                      display={{ base: "flex", md: "none" }}
+                      my="4"
+                      timeSlot={1}
+                    />
+                    <BuyTicketBox
+                      time={rangeHours(data.date, 1, 1)}
+                      display={{ base: "flex", md: "none" }}
+                      my="4"
+                      timeSlot={2}
+                    />
+                  </Flex>
+                  <Box h="0.4" bg="gray.300" my="4" />
+                  <Flex flexDir="column">
+                    <Flex alignItems="center" gap="2" color="gray.500">
+                      <ClockIcon />
+                      <Text>
+                        <b>Time: </b>
+                        <Text display={{ base: "none", sm: "inline" }}>
+                          {format(parseISO(data.date), "EEEE, MMM d yyyy, ")}
+                          {rangeHours(data.date)}
+                        </Text>
                       </Text>
+                    </Flex>
+                    <Text display={{ base: "block", sm: "none" }}>
+                      {format(parseISO(data.date), "EEEE, MMM d yyyy, h:mmaaa")}{" "}
+                      - {format(addHours(parseISO(data.date), 2), "h:mmaaa")}
                     </Text>
                   </Flex>
-                  <Text display={{ base: "block", sm: "none" }}>
-                    {format(parseISO(data.date), "EEEE, MMM d yyyy, h:mm aaa")}
-                  </Text>
-                </Flex>
 
-                <Flex flexDir="column">
-                  <Flex alignItems="center" gap="2" color="gray.500">
-                    <LocationPinIcon />
-                    <Text>
-                      <b>Location: </b>
-                      <Text display={{ base: "none", sm: "inline" }}>
-                        {data.location}
+                  <Flex flexDir="column">
+                    <Flex alignItems="center" gap="2" color="gray.500">
+                      <LocationPinIcon />
+                      <Text>
+                        <b>Location: </b>
+                        <Text display={{ base: "none", sm: "inline" }}>
+                          {data.location}
+                        </Text>
                       </Text>
+                    </Flex>
+                    <Text display={{ base: "block", sm: "none" }}>
+                      {data.location}
                     </Text>
                   </Flex>
-                  <Text display={{ base: "block", sm: "none" }}>
-                    {data.location}
-                  </Text>
-                </Flex>
 
-                <Flex flexDir="column">
-                  <Flex alignItems="center" gap="2" color="gray.500">
-                    <SingleUserIcon />
-                    <Text>
-                      <b>Hosted by: </b>
-                      <Text display={{ base: "none", sm: "inline" }}>
-                        UBC Tennis Circle
+                  <Flex flexDir="column">
+                    <Flex alignItems="center" gap="2" color="gray.500">
+                      <SingleUserIcon />
+                      <Text>
+                        <b>Hosted by: </b>
+                        <Text display={{ base: "none", sm: "inline" }}>
+                          UBC Tennis Circle
+                        </Text>
                       </Text>
+                    </Flex>
+                    <Text display={{ base: "block", sm: "none" }}>
+                      UBC Tennis Circle
                     </Text>
                   </Flex>
-                  <Text display={{ base: "block", sm: "none" }}>
-                    UBC Tennis Circle
-                  </Text>
-                </Flex>
 
-                <Flex flexDir="column">
-                  <Flex alignItems="center" gap="2" color="gray.500">
-                    <UserFriendsIcon />
-                    <Text>
-                      <b>Attendees: </b>
-                    </Text>
-                    <Flex display={{ base: "none", sm: "flex" }}>
+                  <Flex
+                    flexDir="column"
+                    display={data.attendees.length > 0 ? "flex" : "none"}
+                  >
+                    <Flex alignItems="center" gap="2" color="gray.500">
+                      <UserFriendsIcon />
+                      <Text>
+                        <b>Attendees: </b>
+                      </Text>
+                      <Flex display={{ base: "none", sm: "flex" }}>
+                        <AvatarGroup size="sm" max={3}>
+                          {data.attendees.map((i, idx) => (
+                            <Avatar
+                              name={`${i.first_name} ${i.last_name}`}
+                              src={i.profile}
+                              key={idx}
+                            />
+                          ))}
+                        </AvatarGroup>
+                        <Button
+                          size="sm"
+                          colorScheme="brand"
+                          variant="ghost"
+                          _hover={{
+                            bg: "gray.100",
+                          }}
+                          ml="1"
+                          onClick={onOpen}
+                        >
+                          View attendee list
+                        </Button>
+                      </Flex>
+                    </Flex>
+                    <Flex
+                      display={{ base: "flex", sm: "none" }}
+                      flexDir="column"
+                    >
                       <AvatarGroup size="sm" max={3}>
-                        <Avatar
-                          name="Segun Adebayo"
-                          src="https://bit.ly/sage-adebayo"
-                        />
-                        <Avatar
-                          name="Kent Dodds"
-                          src="https://bit.ly/kent-c-dodds"
-                        />
-                        <Avatar
-                          name="Prosper Otemuyiwa"
-                          src="https://bit.ly/prosper-baba"
-                        />
-                        <Avatar
-                          name="Christian Nwamba"
-                          src="https://bit.ly/code-beast"
-                        />
+                        {data.attendees.map((i, idx) => (
+                          <Avatar name={i.name} src={i.profile} key={idx} />
+                        ))}
                       </AvatarGroup>
                       <Button
                         size="sm"
+                        mt="4"
                         colorScheme="brand"
-                        variant="ghost"
+                        variant="outline"
                         _hover={{
                           bg: "gray.100",
                         }}
-                        ml="1"
+                        onClick={onOpen}
                       >
                         View attendee list
                       </Button>
                     </Flex>
                   </Flex>
-                  <Flex display={{ base: "flex", sm: "none" }} flexDir="column">
-                    <AvatarGroup size="sm" max={3}>
-                      <Avatar
-                        name="Segun Adebayo"
-                        src="https://bit.ly/sage-adebayo"
-                      />
-                      <Avatar
-                        name="Kent Dodds"
-                        src="https://bit.ly/kent-c-dodds"
-                      />
-                      <Avatar
-                        name="Prosper Otemuyiwa"
-                        src="https://bit.ly/prosper-baba"
-                      />
-                      <Avatar
-                        name="Christian Nwamba"
-                        src="https://bit.ly/code-beast"
-                      />
-                    </AvatarGroup>
-                    <Button
-                      size="sm"
-                      mt="4"
-                      colorScheme="brand"
-                      variant="outline"
-                      _hover={{
-                        bg: "gray.100",
-                      }}
-                    >
-                      View attendee list
-                    </Button>
-                  </Flex>
+                </Flex>
+                <Flex
+                  flexDir="column"
+                  gap="4"
+                  display={{ base: "none", md: "flex" }}
+                >
+                  <Box>
+                    <BuyTicketBox
+                      time={rangeHours(data.date, 1)}
+                      timeSlot={1}
+                    />
+                  </Box>
+                  <Box>
+                    <BuyTicketBox
+                      time={rangeHours(data.date, 1, 1)}
+                      timeSlot={2}
+                    />
+                  </Box>
                 </Flex>
               </Flex>
-              <BuyTicketBox display={{ base: "none", md: "flex" }} />
             </Flex>
-          </Flex>
+          </>
         )}
       </Container>
     </Container>

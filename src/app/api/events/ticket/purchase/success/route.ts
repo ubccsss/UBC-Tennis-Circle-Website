@@ -14,10 +14,11 @@ export const GET = async (request: NextRequest) => {
     session.status === "complete" &&
     session.payment_status === "paid"
   ) {
-    const { event_id, user_id } = session.metadata;
+    const { event_id, user_id, time_slot } = session.metadata;
 
     const attendeeList = await AttendeeList.findOne({
       event_id,
+      time_slot,
     });
 
     // standard case where user is in reserved,
@@ -33,6 +34,7 @@ export const GET = async (request: NextRequest) => {
       await AttendeeList.findOneAndUpdate(
         {
           event_id,
+          time_slot,
         },
         {
           $pull: {
@@ -47,7 +49,7 @@ export const GET = async (request: NextRequest) => {
 
       return NextResponse.redirect(
         new URL(
-          `${process.env.NEXT_PUBLIC_HOSTNAME}/events/detail/${event_id}?successful_payment=true`,
+          `${process.env.NEXT_PUBLIC_HOSTNAME}/events/detail/${event_id}?successful-payment=true`,
         ),
       );
     } else {
@@ -58,7 +60,7 @@ export const GET = async (request: NextRequest) => {
 
       if (attendeeList.available_tickets >= 1) {
         await AttendeeList.findOneAndUpdate(
-          { event_id },
+          { event_id, time_slot },
           {
             $push: {
               attendees: user_id,

@@ -1,5 +1,6 @@
 "use client";
 import {
+  Link,
   Skeleton,
   Container,
   Text,
@@ -13,7 +14,7 @@ import {
   Icon,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { FiAlertCircle } from "react-icons/fi";
+import { FiAlertCircle, FiInstagram } from "react-icons/fi";
 import { useQuery } from "@tanstack/react-query";
 
 const getPosts = async () => {
@@ -104,6 +105,27 @@ const Gallery = () => {
               </Box>
             ))}
         </SimpleGrid>
+
+        <Flex
+          justifyContent="center"
+          alignItems="center"
+          pt="24"
+          pb="16"
+          flexDir="column"
+        >
+          <Icon as={FiInstagram} fontSize="28" color="brand.500" />
+          <Link
+            textAlign="center"
+            mt="2"
+            color="brand.600"
+            textDecoration="underline"
+            textUnderlineOffset="4px"
+            href="https://www.instagram.com/ubctenniscircle"
+            target="_blank"
+          >
+            See the rest on Instagram
+          </Link>
+        </Flex>
       </Flex>
     </Container>
   );
