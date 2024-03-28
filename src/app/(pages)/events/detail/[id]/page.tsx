@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, memo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   InputGroup,
   InputLeftElement,
@@ -46,6 +46,7 @@ import {
 import { SearchIcon } from "@chakra-ui/icons";
 import { getClientSession } from "@utils";
 import { FiInstagram } from "react-icons/fi";
+import { useDebounce } from "@uidotdev/usehooks";
 import Fuse from "fuse.js";
 
 const EventDetail = ({ params }: { params: { id: string } }) => {
@@ -136,22 +137,28 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
   const [purchaseLoading, setPurchaseLoading] = useState(null);
 
   const [searchInput, setSearchInput] = useState("");
+  const debouncedSearchInput = useDebounce(searchInput, 350);
   const [attendees, setAttendees] = useState([]);
 
+  const fuse = useMemo(
+    () =>
+      new Fuse(data?.attendees, {
+        keys: ["first_name", "last_name"],
+      }),
+    [data?.attendees],
+  );
+
   useEffect(() => {
-    const fuse = new Fuse(data?.attendees, {
-      keys: ["first_name", "last_name"],
-    });
     if (data) {
-      if (searchInput === "") {
+      if (debouncedSearchInput === "") {
         setAttendees(data?.attendees);
       } else {
-        const searchQuery = fuse.search(searchInput);
+        const searchQuery = fuse.search(debouncedSearchInput);
         const flattenedQuery = searchQuery.map((i) => i.item);
         setAttendees(flattenedQuery);
       }
     }
-  }, [data, searchInput]);
+  }, [data, debouncedSearchInput, fuse]);
 
   const purchaseTicket = async (timeSlot: number) => {
     const session = await getClientSession();
@@ -180,72 +187,80 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
     }
   };
 
-  const AttendeeRow = ({ attendee }: { attendee: PublicEventUser }) => {
-    return (
-      <Flex
-        w="100%"
-        alignItems={{ base: "flex-start", md: "center" }}
-        gap="2"
-        justifyContent={{
-          base: "flex-start",
-          md: "space-between",
-        }}
-        flexDir={{ base: "column", md: "row" }}
-      >
+  const AttendeeRow = React.memo(
+    ({ attendee }: { attendee: PublicEventUser }) => {
+      return (
         <Flex
-          gap="2"
+          w="100%"
           alignItems={{ base: "flex-start", md: "center" }}
+          gap="2"
+          justifyContent={{
+            base: "flex-start",
+            md: "space-between",
+          }}
           flexDir={{ base: "column", md: "row" }}
         >
-          <Avatar src={attendee.profile} name={attendee.first_name} size="sm" />
-          <VStack alignItems="flex-start" gap="-8">
-            <Text maxW="52" wordBreak="break-all">
-              {attendee.first_name} {attendee.last_name}
-            </Text>
-            <Text
-              maxW="52"
-              wordBreak="break-all"
-              fontSize="12"
-              mt="-0.5"
-              fontWeight="medium"
-            >
-              {attendee.time}
-            </Text>
-          </VStack>
-        </Flex>
-
-        <Flex
-          gap="2"
-          alignItems="center"
-          flexDir={{ base: "row-reverse", md: "row" }}
-        >
-          {attendee.instagram && (
-            <IconButton
-              as={Link}
-              colorScheme="pink"
-              icon={<Icon as={FiInstagram} fontSize="18" />}
-              aria-label="Instagram"
-              size="sm"
-              href={`https://www.instagram.com/${attendee.instagram}`}
-              target="_blank"
-            />
-          )}
           <Flex
-            border="2px"
-            borderColor="brand.500"
-            px="3"
-            borderRadius="md"
-            fontSize="14"
-            fontWeight="medium"
-            alignItems="center"
-            h="32px"
+            gap="2"
+            alignItems={{ base: "flex-start", md: "center" }}
+            flexDir={{ base: "column", md: "row" }}
           >
-            <Text color="brand.500">Skill {attendee.skill}</Text>
+            <Avatar
+              src={attendee.profile}
+              name={attendee.first_name}
+              size="sm"
+            />
+            <VStack alignItems="flex-start" gap="-8">
+              <Text maxW="52" wordBreak="break-all">
+                {attendee.first_name} {attendee.last_name}
+              </Text>
+              <Text
+                maxW="52"
+                wordBreak="break-all"
+                fontSize="12"
+                mt="-0.5"
+                fontWeight="medium"
+              >
+                {attendee.time}
+              </Text>
+            </VStack>
+          </Flex>
+
+          <Flex
+            gap="2"
+            alignItems="center"
+            flexDir={{ base: "row-reverse", md: "row" }}
+          >
+            {attendee.instagram && (
+              <IconButton
+                as={Link}
+                colorScheme="pink"
+                icon={<Icon as={FiInstagram} fontSize="18" />}
+                aria-label="Instagram"
+                size="sm"
+                href={`https://www.instagram.com/${attendee.instagram}`}
+                target="_blank"
+              />
+            )}
+            <Flex
+              border="2px"
+              borderColor="brand.500"
+              px="3"
+              borderRadius="md"
+              fontSize="14"
+              fontWeight="medium"
+              alignItems="center"
+              h="32px"
+            >
+              <Text color="brand.500">Skill {attendee.skill}</Text>
+            </Flex>
           </Flex>
         </Flex>
-      </Flex>
-    );
-  };
+      );
+    },
+  );
+
+  AttendeeRow.displayName = "AttendeeRow";
 
   const BuyTicketBox = ({ time, timeSlot, ...props }: BuyTicketBoxProps) => {
     const slotObj = data.time_slots[timeSlot];
@@ -350,11 +365,16 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
                         <AttendeeRow key={i._id} attendee={i} />
                         <Divider
                           display={
-                            idx === data.attendees.length - 1 ? "none" : "block"
+                            idx === attendees.length - 1 ? "none" : "block"
                           }
                         />
                       </>
                     ))}
+                    {attendees.length === 0 && (
+                      <Text mx="auto" textAlign="center">
+                        No Results
+                      </Text>
+                    )}
                   </Flex>
                 </ModalBody>
               </ModalContent>
