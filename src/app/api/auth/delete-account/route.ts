@@ -1,7 +1,7 @@
 import { getSession, ServerResponse } from "@helpers";
 import { auth } from "@lib/lucia";
 import { connectToDatabase } from "@lib/mongoose";
-import { DeletedUser } from "@models";
+import { DeletedUser, AttendeeList } from "@models";
 import { NextRequest } from "next/server";
 
 export const GET = async (request: NextRequest) => {
@@ -17,6 +17,17 @@ export const GET = async (request: NextRequest) => {
 
   try {
     const userId = user.userId;
+
+    // check if user is in any events
+    const events = await AttendeeList.find({
+      attendees: userId,
+    });
+
+    if (events.length > 0) {
+      return ServerResponse.userError(
+        "All registered events must conclude before deletion",
+      );
+    }
 
     await DeletedUser.create({
       _id: userId,

@@ -24,8 +24,17 @@ export const POST = async (request: NextRequest) => {
     }).lean<User>();
 
     if (!user) {
-      return ServerResponse.userError("User does not exist");
+      return ServerResponse.userError(
+        "There is no account associated with this email",
+      );
     }
+
+    if (user.provider === "google") {
+      return ServerResponse.userError(
+        "Cannot reset password for a Google account",
+      );
+    }
+
     try {
       const token = await generatePasswordResetToken(user._id);
       const url = `${process.env.NEXT_PUBLIC_HOSTNAME}/password-reset/${token}`;

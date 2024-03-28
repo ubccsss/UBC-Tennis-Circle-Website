@@ -1,5 +1,8 @@
 "use client";
 import {
+  Tabs,
+  TabList,
+  Tab,
   SimpleGrid,
   Input,
   InputGroup,
@@ -41,7 +44,8 @@ import { Controller, UseFormSetValue, useForm } from "react-hook-form";
 import { AtSignIcon } from "@chakra-ui/icons";
 import { FormatOptionLabelMeta, Select } from "chakra-react-select";
 import { CloseIcon } from "@chakra-ui/icons";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+import { InfoIcon, LockIcon } from "@chakra-ui/icons";
 
 const skillOptions = [
   { value: 1, label: "I've never played before" },
@@ -77,6 +81,7 @@ const initialFormUpdate = async (setValue: UseFormSetValue<Form>) => {
 const AddInfo = () => {
   const statusToast = useToast();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const setup = searchParams.get("setup");
 
   const {
@@ -213,6 +218,21 @@ const AddInfo = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Flex flexDirection="row" w="100%" justifyContent="center" gap="36">
           <VStack width="450px">
+            <Tabs mt="-8" mb="4" colorScheme="brand">
+              <TabList>
+                <Tab>
+                  <InfoIcon mr="2" />
+                  Profile
+                </Tab>
+                <Tab
+                  onClick={() => router.push(`/profile/security`)}
+                  color="gray.600"
+                >
+                  <LockIcon mr="2" />
+                  Security
+                </Tab>
+              </TabList>
+            </Tabs>
             <Heading
               as="h1"
               textAlign={{ base: "left", sm: "center" }}
@@ -253,7 +273,7 @@ const AddInfo = () => {
                 </Flex>
               </Box>
             ) : (
-              <Skeleton w="24" h="24" borderRadius="8" />
+              <Skeleton w="24" h="24" borderRadius="8" mt="10" />
             )}
             <Modal isOpen={isOpen} onClose={onClose}>
               <ModalOverlay />
@@ -383,6 +403,7 @@ const AddInfo = () => {
                         isSearchable={false}
                         isDisabled={isSubmitting}
                         value={skillOptions.find((e) => e.value === value)}
+                        size="lg"
                       />
                     </FormControl>
                   )}
