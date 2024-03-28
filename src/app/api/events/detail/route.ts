@@ -4,19 +4,20 @@ import { TypeEventSkeleton } from "@types";
 import { Asset } from "contentful";
 import z from "zod";
 import { NextRequest } from "next/server";
-import { AttendeeList, User } from "@models";
+import { AttendeeList } from "@models";
 
 const detailSchema = z.object({
   id: z.string({ required_error: "Event ID is required" }),
+  internal_key: z.string().optional(),
 });
 
 export const POST = async (request: NextRequest) => {
   await connectToDatabase();
 
   try {
-    const { id } = await request.json();
+    const { id, internal_key } = await request.json();
 
-    const validation = detailSchema.safeParse({ id });
+    const validation = detailSchema.safeParse({ id, internal_key });
 
     if (validation.success) {
       const res = await contentfulClient.getEntry<TypeEventSkeleton>(id);
@@ -24,6 +25,9 @@ export const POST = async (request: NextRequest) => {
       if (res.fields.openingStatus === "Coming Soon") {
         return ServerResponse.userError("Invalid event ID");
       }
+
+      const matchesInternalKey =
+        internal_key === process.env.NEXT_INTERNAL_SECRET;
 
       const attendeeList = await AttendeeList.find({
         event_id: res.sys.id,
@@ -65,6 +69,8 @@ export const POST = async (request: NextRequest) => {
         slot2 = baseSlot;
       }
 
+      const baseSelect = "profile instagram first_name last_name skill";
+
       const event = {
         id: res.sys.id,
         name: res.fields.name,
@@ -80,13 +86,14 @@ export const POST = async (request: NextRequest) => {
               attendeeList[0],
               attendeeList[1],
               res.fields.date,
-              "profile instagram first_name last_name skill",
+              matchesInternalKey ? `${baseSelect} email_address` : baseSelect,
             )
             : [],
         time_slots: {
           1: slot1,
           2: slot2,
         },
+        status: attendeeList.length > 0 ? attendeeList[0].status : "open",
       };
 
       return ServerResponse.success(event);

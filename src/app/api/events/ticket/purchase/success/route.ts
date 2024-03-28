@@ -1,6 +1,7 @@
-import { connectToDatabase, stripe, logger, mergent } from "@lib";
+import { connectToDatabase, stripe, logger, mergent, sendMail } from "@lib";
 import { NextRequest, NextResponse } from "next/server";
-import { AttendeeList } from "@models/AttendeeList";
+import { AttendeeList, User } from "@models";
+import { PaymentConfirmationEmail } from "@emails";
 
 export const GET = async (request: NextRequest) => {
   await connectToDatabase();
@@ -43,9 +44,21 @@ export const GET = async (request: NextRequest) => {
           },
           $push: {
             attendees: user_id,
+            payments: session.payment_intent,
           },
         },
       );
+
+      const user = await User.findById(user_id).lean();
+
+      await sendMail({
+        to: user.email_address,
+        subject: `Payment Confirmation for ${attendeeList.event_name}`,
+        emailComponent: PaymentConfirmationEmail({
+          user,
+          eventName: attendeeList.event_name,
+        }),
+      });
 
       return NextResponse.redirect(
         new URL(

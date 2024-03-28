@@ -85,8 +85,7 @@ export const POST = async (request: NextRequest) => {
         to: email_address,
         subject: "Confirm your email address",
         emailComponent: ConfirmEmail({
-          first_name,
-          last_name,
+          user,
           url: emailConfirmationURL,
         }),
       });

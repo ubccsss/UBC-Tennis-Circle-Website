@@ -13,6 +13,10 @@ interface SendMailProps {
   emailComponent: React.ReactElement;
 }
 
+interface BatchMailProps {
+  emailArray: Array<SendMailProps>;
+}
+
 export const sendMail = async ({
   to,
   subject,
@@ -27,6 +31,31 @@ export const sendMail = async ({
       subject,
       html: emailHTML,
     });
+  } catch (e: unknown) {
+    logger.error(e);
+    return ServerResponse.serverError(
+      "We are currently experiencing a problem with our email server.",
+    );
+  }
+};
+
+export const batchMail = async ({ emailArray }: BatchMailProps) => {
+  try {
+    // avoid batch limit
+    if (emailArray.length >= 95) {
+      const half = Math.ceil(emailArray.length / 2);
+      await batchMail({ emailArray: emailArray.slice(0, half) });
+      await batchMail({ emailArray: emailArray.slice(half) });
+    }
+    const convertedEmailArray = await Promise.all(
+      emailArray.map(async (i) => ({
+        ...i,
+        html: await renderAsync(i.emailComponent),
+        from: `UBC Tennis Circle <${process.env.NEXT_SEND_EMAIL!}>`,
+      })),
+    );
+
+    return await resend.batch.send(convertedEmailArray);
   } catch (e: unknown) {
     logger.error(e);
     return ServerResponse.serverError(

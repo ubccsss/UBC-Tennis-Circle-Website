@@ -185,6 +185,7 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
           isLoading={purchaseLoading && purchaseLoading === timeSlot}
           loadingText="Reserving Ticket"
           isDisabled={
+            data.status === "closed" ||
             (purchaseLoading && purchaseLoading !== timeSlot) ||
             (!slotObj.reserved && slotObj.available_tickets <= 0) ||
             slotObj.purchased
@@ -192,9 +193,11 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
         >
           {slotObj.purchased
             ? "Purchased Ticket"
-            : !slotObj.reserved && slotObj.available_tickets <= 0
-              ? "Sold out"
-              : `Purchase ($${data.ticket_price})`}
+            : data.status === "closed"
+              ? "Sale Closed"
+              : !slotObj.reserved && slotObj.available_tickets <= 0
+                ? "Sold out"
+                : `Purchase ($${data.ticket_price})`}
         </Button>
       </Flex>
     );
