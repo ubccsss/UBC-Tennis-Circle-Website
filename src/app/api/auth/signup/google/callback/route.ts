@@ -56,7 +56,7 @@ export const GET = async (request: NextRequest) => {
     });
     authRequest.setSession(session);
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_HOSTNAME}/profile/setup`,
+      `${process.env.NEXT_PUBLIC_HOSTNAME}/profile/profile?setup=true`,
     );
   } catch (e) {
     if (e instanceof OAuthRequestError) {
