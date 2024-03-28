@@ -63,7 +63,7 @@ export const POST = async (request: NextRequest) => {
           email_verified: false,
           skill: 1,
           instagram: null,
-          profile: `https://source.boringavatars.com/beam/120/${profilePictureGenerationURL}`,
+          profile: `https://source.boringavatars.com/beam/120/${profilePictureGenerationURL}?square`,
           provider: "password",
         },
       });

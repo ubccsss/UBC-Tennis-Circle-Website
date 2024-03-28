@@ -57,7 +57,7 @@ export const GET = async (
   }
 
   if (success) {
-    redirect("/profile/setup");
+    redirect("/profile/public?setup=true");
   } else {
     redirect("/login?confirmation-status=failed");
   }

@@ -1,6 +1,10 @@
-'use client';
-
+"use client";
 import {
+  Box,
+  Img,
+  Tabs,
+  TabList,
+  Tab,
   Button,
   Container,
   Flex,
@@ -26,16 +30,20 @@ import {
   AlertDialogFooter,
   AlertDialogBody,
   AlertDialogHeader,
-} from '@chakra-ui/react';
-import {getClientSession} from '@utils/getClientSession';
-import axios from 'axios';
-import {DEFAULT_SERVER_ERR} from '@constants/error-messages';
-import {useEffect, useState} from 'react';
-import z from 'zod';
-import {ZOD_ERR} from '@constants/error-messages';
-import {useForm} from 'react-hook-form';
-import {zodResolver} from '@hookform/resolvers/zod';
-import React from 'react';
+  Skeleton,
+  SkeletonText,
+} from "@chakra-ui/react";
+import { getClientSession } from "@utils/getClientSession";
+import axios from "axios";
+import { DEFAULT_SERVER_ERR } from "@constants/error-messages";
+import { useEffect, useState } from "react";
+import z from "zod";
+import { ZOD_ERR } from "@constants/error-messages";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import React from "react";
+import { useRouter } from "next/navigation";
+import { InfoIcon, LockIcon } from "@chakra-ui/icons";
 
 const schema = z.object({
   email_address: z.string().email(ZOD_ERR.INVALID_EMAIL),
@@ -45,7 +53,9 @@ const schema = z.object({
 type Form = z.infer<typeof schema>;
 
 const Security = () => {
-  const [isPassword, setIsPassword] = useState<boolean>(false);
+  const router = useRouter();
+
+  const [isPassword, setIsPassword] = useState<boolean>(null);
 
   const [isPasswordSubmitting, setIsPasswordSubmitting] =
     useState<boolean>(false);
@@ -60,8 +70,10 @@ const Security = () => {
   useEffect(() => {
     const getSessionProvider = async () => {
       const session = await getSession();
-      if (session.user.provider === 'password') {
+      if (session?.user?.provider === "password") {
         setIsPassword(true);
+      } else {
+        setIsPassword(false);
       }
     };
     getSessionProvider();
@@ -70,8 +82,8 @@ const Security = () => {
   const {
     handleSubmit,
     register,
-    formState: {errors, isSubmitting},
-  } = useForm<Form>({resolver: zodResolver(schema)});
+    formState: { errors, isSubmitting },
+  } = useForm<Form>({ resolver: zodResolver(schema) });
 
   const statusToast = useToast();
 
@@ -88,13 +100,13 @@ const Security = () => {
         `${process.env.NEXT_PUBLIC_HOSTNAME}/api/auth/password-reset`,
         {
           email_address: session.user.email_address,
-        }
+        },
       );
 
       if (res.data) {
         statusToast({
           title: res.data.message,
-          status: 'success',
+          status: "success",
         });
       }
       setIsPasswordSubmitting(false);
@@ -102,7 +114,7 @@ const Security = () => {
       if (axios.isAxiosError(e)) {
         statusToast({
           title: e?.response?.data?.message || DEFAULT_SERVER_ERR,
-          status: 'error',
+          status: "error",
         });
       }
       setIsPasswordSubmitting(false);
@@ -113,98 +125,117 @@ const Security = () => {
     try {
       setIsDeletingAccount(true);
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_HOSTNAME}/api/auth/delete-account`
+        `${process.env.NEXT_PUBLIC_HOSTNAME}/api/auth/delete-account`,
       );
 
       if (res.data) {
         statusToast({
           title: res.data.message,
-          status: 'success',
+          status: "success",
         });
       }
 
       setIsDeletingAccount(false);
-      window.location.href = '/';
+      window.location.href = "/";
     } catch (e) {
       if (axios.isAxiosError(e)) {
         statusToast({
           title: e?.response?.data?.message || DEFAULT_SERVER_ERR,
-          status: 'error',
+          status: "error",
         });
       }
       setIsDeletingAccount(false);
     }
   };
 
-  const onSubmit = async ({email_address, password}: Form) => {
+  const onSubmit = async ({ email_address, password }: Form) => {
     try {
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_HOSTNAME}/api/auth/email-reset`,
         {
           email_address,
           password,
-        }
+        },
       );
 
       if (res.data) {
         statusToast({
           title: res.data.message,
-          status: 'success',
+          status: "success",
         });
       }
     } catch (e) {
       if (axios.isAxiosError(e)) {
         statusToast({
           title: e?.response?.data?.message || DEFAULT_SERVER_ERR,
-          status: 'error',
+          status: "error",
         });
       }
     }
   };
 
   return (
-    <Container maxW="container.xl" py={{base: '32', lg: '20'}}>
+    <Container maxW="container.xl" py={{ base: "32", lg: "20" }}>
       <Flex flexDirection="row" w="100%" justifyContent="center" gap="36">
         <VStack width="450px">
-          <Heading as="h1" textAlign="center">
+          <Tabs mt="-8" mb="4" defaultIndex={1} colorScheme="brand">
+            <TabList>
+              <Tab
+                color="gray.600"
+                onClick={() => router.push(`/profile/public`)}
+              >
+                <InfoIcon mr="2" />
+                Profile
+              </Tab>
+              <Tab>
+                <LockIcon mr="2" />
+                Security
+              </Tab>
+            </TabList>
+          </Tabs>
+          <Heading as="h1" textAlign={{ base: "left", sm: "center" }} w="100%">
             Secure your account
           </Heading>
-          <Text textAlign="center">
+          <Text textAlign={{ base: "left", sm: "center" }}>
             Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint
             cillum sint consectetur cupidatat.
           </Text>
 
-          <VStack spacing={4} mt={4}>
+          <Flex
+            gap={4}
+            mt={4}
+            w={{ base: "100%", sm: "80" }}
+            flexDir="column"
+            mx="auto"
+          >
             {isPassword && (
-              <Button
-                isLoading={isPasswordSubmitting}
-                flexGrow={1}
-                colorScheme="brand"
-                variant="outline"
-                size="lg"
-                _hover={{
-                  bg: 'gray.100',
-                }}
-                width={{base: '18vw', sm: '30vw', xl: '24vw'}}
-                onClick={handleResetPassword}
-              >
-                Reset your password
-              </Button>
-            )}
-            {isPassword && (
-              <Button
-                flexGrow={1}
-                colorScheme="brand"
-                variant="outline"
-                size="lg"
-                _hover={{
-                  bg: 'gray.100',
-                }}
-                onClick={resetEmailModal.onOpen}
-                width={{base: '18vw', sm: '30vw', xl: '24vw'}}
-              >
-                Reset your email
-              </Button>
+              <>
+                <Button
+                  isLoading={isPasswordSubmitting}
+                  flexGrow={1}
+                  colorScheme="brand"
+                  variant="outline"
+                  _hover={{
+                    bg: "gray.100",
+                  }}
+                  onClick={handleResetPassword}
+                  size={{ base: "lg", sm: "md" }}
+                >
+                  Reset your password
+                </Button>
+                <Button
+                  flexGrow={1}
+                  colorScheme="brand"
+                  variant="outline"
+                  _hover={{
+                    bg: "gray.100",
+                  }}
+                  onClick={resetEmailModal.onOpen}
+                  size={{ base: "lg", sm: "md" }}
+                >
+                  Reset your email
+                </Button>
+              </>
             )}
             <Modal
               isOpen={resetEmailModal.isOpen}
@@ -223,7 +254,7 @@ const Security = () => {
                         type="password"
                         placeholder="Your password"
                         disabled={isSubmitting}
-                        {...register('password')}
+                        {...register("password")}
                       />
                       <FormErrorMessage>
                         {errors?.password?.message}
@@ -239,7 +270,7 @@ const Security = () => {
                         type="email"
                         placeholder="Your new email"
                         disabled={isSubmitting}
-                        {...register('email_address')}
+                        {...register("email_address")}
                       />
                       <FormErrorMessage>
                         {errors?.email_address?.message}
@@ -248,34 +279,44 @@ const Security = () => {
                   </ModalBody>
 
                   <ModalFooter>
+                    <Button onClick={resetEmailModal.onClose}>Cancel</Button>
                     <Button
                       type="submit"
                       isLoading={isSubmitting}
                       colorScheme="brand"
-                      mr={3}
+                      ml="2"
                     >
                       Confirm
                     </Button>
-                    <Button onClick={resetEmailModal.onClose}>Cancel</Button>
                   </ModalFooter>
                 </form>
               </ModalContent>
             </Modal>
-
+            {isPassword === false && (
+              <Flex
+                flexDir="column"
+                textAlign="center"
+                justifyContent="center"
+                alignItems="center"
+                mb="4"
+              >
+                <Img
+                  src="https://upload.wikimedia.org/wikipedia/commons/8/8b/Google_2015_logo_colorless_mourning_period.svg"
+                  w="36"
+                  alt="Google"
+                />
+                <Text mt="2">Your account is managed by Google.</Text>
+              </Flex>
+            )}
             <Button
               flexGrow={1}
               colorScheme="red"
               variant="outline"
-              size="lg"
-              _hover={{
-                bg: 'gray.100',
-              }}
-              width={{base: '18vw', sm: '30vw', xl: '24vw'}}
+              size={{ base: "lg", sm: "md" }}
               onClick={deleteAccountModal.onOpen}
             >
-              Delete your account
+              Delete my account
             </Button>
-
             <AlertDialog
               leastDestructiveRef={cancelRef}
               isOpen={deleteAccountModal.isOpen}
@@ -283,12 +324,14 @@ const Security = () => {
             >
               <AlertDialogOverlay>
                 <AlertDialogContent>
-                  <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                  <AlertDialogHeader fontSize="lg">
                     Delete Account
                   </AlertDialogHeader>
 
                   <AlertDialogBody>
-                    Are you sure? Your account cannot be recovered afterwards.
+                    <Text>
+                      Are you sure? Your account cannot be recovered afterwards.
+                    </Text>
                   </AlertDialogBody>
 
                   <AlertDialogFooter>
@@ -300,7 +343,8 @@ const Security = () => {
                     </Button>
                     <Button
                       colorScheme="red"
-                      ml={3}
+                      variant="outline"
+                      ml="2"
                       isLoading={isDeletingAccount}
                       onClick={handleDeleteAccount}
                     >
@@ -310,7 +354,7 @@ const Security = () => {
                 </AlertDialogContent>
               </AlertDialogOverlay>
             </AlertDialog>
-          </VStack>
+          </Flex>
         </VStack>
       </Flex>
     </Container>

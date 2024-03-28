@@ -1,5 +1,8 @@
 "use client";
 import {
+  Tabs,
+  TabList,
+  Tab,
   SimpleGrid,
   Input,
   InputGroup,
@@ -11,7 +14,6 @@ import {
   Heading,
   Icon,
   Image,
-  Select,
   Button,
   Spacer,
   FormControl,
@@ -28,6 +30,7 @@ import {
   Text,
   Box,
   Skeleton,
+  IconButton,
 } from "@chakra-ui/react";
 import { FiArrowRight, FiCamera, FiInstagram } from "react-icons/fi";
 import z from "zod";
@@ -37,13 +40,34 @@ import axios from "axios";
 import { useState, useCallback, useEffect } from "react";
 import { useDropzone, FileRejection } from "react-dropzone";
 import { getClientSession } from "@utils";
-import { UseFormSetValue, useForm } from "react-hook-form";
+import { Controller, UseFormSetValue, useForm } from "react-hook-form";
+import { AtSignIcon } from "@chakra-ui/icons";
+import { FormatOptionLabelMeta, Select } from "chakra-react-select";
+import { CloseIcon } from "@chakra-ui/icons";
+import { useSearchParams, useRouter } from "next/navigation";
+import { InfoIcon, LockIcon } from "@chakra-ui/icons";
+
+const skillOptions = [
+  { value: 1, label: "I've never played before" },
+  { value: 2, label: "I'm a beginner player" },
+  { value: 3, label: "I'm an intermediate player" },
+  { value: 4, label: "I'm an advanced player" },
+];
 
 const schema = z.object({
   first_name: z.string().min(1, ZOD_ERR.REQ_FIELD),
   last_name: z.string().min(1, ZOD_ERR.REQ_FIELD),
-  skill: z.string().min(1, ZOD_ERR.REQ_FIELD),
-  instagram: z.string().min(1, ZOD_ERR.REQ_FIELD),
+  skill: z.number(),
+  instagram: z
+    .literal("")
+    .or(
+      z
+        .string()
+        .regex(
+          /^([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?)$/,
+          "Invalid Instagram Username",
+        ),
+    ),
   profile: z.string().min(1),
 });
 
@@ -56,12 +80,17 @@ const initialFormUpdate = async (setValue: UseFormSetValue<Form>) => {
 
 const AddInfo = () => {
   const statusToast = useToast();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const setup = searchParams.get("setup");
 
   const {
     handleSubmit,
     register,
     setValue,
+    setFocus,
     watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<Form>({ resolver: zodResolver(schema) });
 
@@ -82,7 +111,7 @@ const AddInfo = () => {
         {
           first_name,
           last_name,
-          skill: parseInt(skill),
+          skill,
           instagram,
           profile,
         },
@@ -93,7 +122,6 @@ const AddInfo = () => {
           title: res.data.message,
           status: "success",
         });
-        window.location.href = "/profile/public";
       }
     } catch (e) {
       if (axios.isAxiosError(e)) {
@@ -142,6 +170,8 @@ const AddInfo = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const [session, setSession] = useState({ user: { profile: "" } });
+
   const watched = watch();
 
   useEffect(() => {
@@ -152,7 +182,7 @@ const AddInfo = () => {
 
     const fetchSession = async () => {
       const session = await getUserFromSession();
-      console.log(session.user);
+      setSession(session);
       setValue("first_name", session.user.first_name);
       setValue("last_name", session.user.last_name);
       setValue("skill", session.user.skill);
@@ -163,15 +193,54 @@ const AddInfo = () => {
     fetchSession();
   }, [setValue]);
 
+  interface SkillOptionSelect {
+    value: number;
+    label: string;
+  }
+  const SkillOption = (
+    { value, label }: SkillOptionSelect,
+    meta: FormatOptionLabelMeta<SkillOptionSelect>,
+  ) => {
+    const selected =
+      meta.context === "menu" && meta.selectValue?.[0]?.value === value;
+    return (
+      <Box w="100%">
+        <Text color={selected ? "white" : "black"}>Skill {value}</Text>
+        <Text fontSize="sm" color={selected ? "white" : "gray.500"} mt="-1">
+          {label}
+        </Text>
+      </Box>
+    );
+  };
+
   return (
     <Container maxW="container.xl" py={{ base: "32", lg: "20" }}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Flex flexDirection="row" w="100%" justifyContent="center" gap="36">
           <VStack width="450px">
-            <Heading as="h1" textAlign="center">
-              Update your profile
+            <Tabs mt="-8" mb="4" colorScheme="brand">
+              <TabList>
+                <Tab>
+                  <InfoIcon mr="2" />
+                  Profile
+                </Tab>
+                <Tab
+                  onClick={() => router.push(`/profile/security`)}
+                  color="gray.600"
+                >
+                  <LockIcon mr="2" />
+                  Security
+                </Tab>
+              </TabList>
+            </Tabs>
+            <Heading
+              as="h1"
+              textAlign={{ base: "left", sm: "center" }}
+              w="100%"
+            >
+              {setup ? "Complete your profile" : "Update your profile"}
             </Heading>
-            <Text textAlign="center">
+            <Text textAlign={{ base: "left", sm: "center" }}>
               Lorem ipsum dolor sit amet, qui minim labore adipisicing minim
               sint cillum sint consectetur cupidatat.
             </Text>
@@ -204,7 +273,7 @@ const AddInfo = () => {
                 </Flex>
               </Box>
             ) : (
-              <Skeleton w="24" h="24" borderRadius="8" />
+              <Skeleton w="24" h="24" borderRadius="8" mt="10" />
             )}
             <Modal isOpen={isOpen} onClose={onClose}>
               <ModalOverlay />
@@ -248,7 +317,7 @@ const AddInfo = () => {
                           alt="profile"
                         />
                         <Text color="gray.500" textAlign="center">
-                          Upload your new profile here
+                          Upload new profile picture
                         </Text>
                       </VStack>
                     </Box>
@@ -259,23 +328,34 @@ const AddInfo = () => {
                 </ModalBody>
 
                 <ModalFooter>
-                  <Button colorScheme="red" mr={3} onClick={onClose}>
-                    Cancel
+                  <Button
+                    colorScheme="gray"
+                    mr={3}
+                    onClick={() => {
+                      setValue("profile", session?.user?.profile);
+                      onClose();
+                    }}
+                  >
+                    Reset
                   </Button>
                   <Button
                     onClick={() => {
-                      console.log("Updated profile successfully");
                       setValue("profile", watched.profile);
                       onClose();
                     }}
-                    variant="ghost"
+                    colorScheme="brand"
                   >
-                    Update Profile
+                    Select
                   </Button>
                 </ModalFooter>
               </ModalContent>
             </Modal>
-            <SimpleGrid mt={6} columns={2} spacing="4">
+            <SimpleGrid
+              mt={6}
+              columns={{ base: 1, sm: 2 }}
+              spacing="4"
+              w="100%"
+            >
               <FormControl isInvalid={Boolean(errors.first_name)}>
                 <Input
                   id="first_name"
@@ -304,37 +384,62 @@ const AddInfo = () => {
               </FormControl>
             </SimpleGrid>
             <FormControl isInvalid={Boolean(errors.skill)}>
-              <InputGroup size="lg">
-                <Select
-                  color="gray.500"
-                  placeholder="Skill level"
-                  {...register("skill")}
-                >
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                </Select>
+              <InputGroup size="lg" my="2" zIndex={2} w="100%">
+                <Controller
+                  control={control}
+                  name="skill"
+                  render={({ field: { onChange, onBlur, ref, value } }) => (
+                    <FormControl isInvalid={Boolean(errors.skill)}>
+                      <Select
+                        ref={ref}
+                        onChange={(e) => {
+                          onChange(e.value);
+                        }}
+                        onBlur={onBlur}
+                        selectedOptionColorScheme="brand"
+                        options={skillOptions}
+                        formatOptionLabel={SkillOption}
+                        placeholder="Skill Level"
+                        isSearchable={false}
+                        isDisabled={isSubmitting}
+                        value={skillOptions.find((e) => e.value === value)}
+                        size="lg"
+                      />
+                    </FormControl>
+                  )}
+                />
               </InputGroup>
               <FormErrorMessage>{errors?.skill?.message}</FormErrorMessage>
             </FormControl>
             <FormControl isInvalid={Boolean(errors.instagram)}>
-              <InputGroup size="lg">
-                <InputLeftElement
-                  pointerEvents="none"
-                  color="gray.300"
-                  fontSize="1.2em"
-                >
-                  @
+              <InputGroup size="lg" w="100%">
+                <InputLeftElement pointerEvents="none">
+                  <AtSignIcon color="gray.300" />
                 </InputLeftElement>
                 <Input
                   placeholder="Instagram Username"
+                  isDisabled={isSubmitting}
                   {...register("instagram")}
                 />
 
-                <InputRightElement pointerEvents="none">
-                  <Icon as={FiInstagram} color="gray.500" />
+                <InputRightElement
+                  pointerEvents={watched.instagram !== "" ? "visible" : "none"}
+                >
+                  {watched.instagram !== "" ? (
+                    <IconButton
+                      aria-label="Clear"
+                      icon={<CloseIcon color="gray.500" />}
+                      size="sm"
+                      variant="ghost"
+                      isDisabled={isSubmitting}
+                      onClick={() => {
+                        setValue("instagram", "");
+                        setFocus("instagram");
+                      }}
+                    />
+                  ) : (
+                    <Icon as={FiInstagram} color="gray.500" />
+                  )}
                 </InputRightElement>
               </InputGroup>
               <FormErrorMessage>{errors?.instagram?.message}</FormErrorMessage>
@@ -346,11 +451,11 @@ const AddInfo = () => {
                 type="submit"
                 isLoading={isSubmitting}
                 loadingText="Updating ..."
-                size="md"
+                size={{ base: "lg", sm: "md" }}
                 rightIcon={<Icon as={FiArrowRight} />}
-                marginLeft={2}
+                w={{ base: "100%", sm: "auto" }}
               >
-                Update Profile
+                {setup ? "Complete" : "Update"} Profile
               </Button>
             </Flex>
           </VStack>
