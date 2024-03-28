@@ -1,6 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 import {
+  InputGroup,
+  InputLeftElement,
   Link,
   Icon,
   Box,
@@ -18,7 +20,6 @@ import {
   Flex,
   Skeleton,
   SkeletonText,
-  HStack,
   Heading,
   AvatarGroup,
   Avatar,
@@ -27,9 +28,10 @@ import {
   Divider,
   FlexProps,
   VStack,
+  Input,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { TennisEvent } from "@types";
+import { PublicEventUser, TennisEvent } from "@types";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { format, parseISO, addHours } from "date-fns";
@@ -41,8 +43,10 @@ import {
   SingleUserIcon,
   UserFriendsIcon,
 } from "@icons";
+import { SearchIcon } from "@chakra-ui/icons";
 import { getClientSession } from "@utils";
 import { FiInstagram } from "react-icons/fi";
+import Fuse from "fuse.js";
 
 const EventDetail = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
@@ -131,6 +135,24 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
 
   const [purchaseLoading, setPurchaseLoading] = useState(null);
 
+  const [searchInput, setSearchInput] = useState("");
+  const [attendees, setAttendees] = useState([]);
+
+  useEffect(() => {
+    const fuse = new Fuse(data?.attendees, {
+      keys: ["first_name", "last_name"],
+    });
+    if (data) {
+      if (searchInput === "") {
+        setAttendees(data?.attendees);
+      } else {
+        const searchQuery = fuse.search(searchInput);
+        const flattenedQuery = searchQuery.map((i) => i.item);
+        setAttendees(flattenedQuery);
+      }
+    }
+  }, [data, searchInput]);
+
   const purchaseTicket = async (timeSlot: number) => {
     const session = await getClientSession();
     try {
@@ -156,6 +178,73 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
     } catch (e) {
       console.error(e);
     }
+  };
+
+  const AttendeeRow = ({ attendee }: { attendee: PublicEventUser }) => {
+    return (
+      <Flex
+        w="100%"
+        alignItems={{ base: "flex-start", md: "center" }}
+        gap="2"
+        justifyContent={{
+          base: "flex-start",
+          md: "space-between",
+        }}
+        flexDir={{ base: "column", md: "row" }}
+      >
+        <Flex
+          gap="2"
+          alignItems={{ base: "flex-start", md: "center" }}
+          flexDir={{ base: "column", md: "row" }}
+        >
+          <Avatar src={attendee.profile} name={attendee.first_name} size="sm" />
+          <VStack alignItems="flex-start" gap="-8">
+            <Text maxW="52" wordBreak="break-all">
+              {attendee.first_name} {attendee.last_name}
+            </Text>
+            <Text
+              maxW="52"
+              wordBreak="break-all"
+              fontSize="12"
+              mt="-0.5"
+              fontWeight="medium"
+            >
+              {attendee.time}
+            </Text>
+          </VStack>
+        </Flex>
+
+        <Flex
+          gap="2"
+          alignItems="center"
+          flexDir={{ base: "row-reverse", md: "row" }}
+        >
+          {attendee.instagram && (
+            <IconButton
+              as={Link}
+              colorScheme="pink"
+              icon={<Icon as={FiInstagram} fontSize="18" />}
+              aria-label="Instagram"
+              size="sm"
+              href={`https://www.instagram.com/${attendee.instagram}`}
+              target="_blank"
+            />
+          )}
+          <Flex
+            border="2px"
+            borderColor="brand.500"
+            px="3"
+            borderRadius="md"
+            fontSize="14"
+            fontWeight="medium"
+            alignItems="center"
+            h="32px"
+          >
+            <Text color="brand.500">Skill {attendee.skill}</Text>
+          </Flex>
+        </Flex>
+      </Flex>
+    );
   };
 
   const BuyTicketBox = ({ time, timeSlot, ...props }: BuyTicketBoxProps) => {
@@ -244,77 +333,21 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
               <ModalContent>
                 <ModalHeader>Attendees</ModalHeader>
                 <ModalCloseButton />
-                <ModalBody mb="4">
+                <ModalBody mb="4" mt="-2">
                   <Flex flexDir="column" gap="3">
-                    {data.attendees.map((i, idx) => (
+                    <InputGroup mb="2">
+                      <InputLeftElement pointerEvents="none">
+                        <SearchIcon color="gray.300" />
+                      </InputLeftElement>
+                      <Input
+                        placeholder="Search attendees"
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                      />
+                    </InputGroup>
+                    {attendees.map((i: PublicEventUser, idx) => (
                       <>
-                        <Flex
-                          w="100%"
-                          key={idx}
-                          alignItems={{ base: "flex-start", md: "center" }}
-                          gap="2"
-                          justifyContent={{
-                            base: "flex-start",
-                            md: "space-between",
-                          }}
-                          flexDir={{ base: "column", md: "row" }}
-                        >
-                          <Flex
-                            gap="2"
-                            alignItems={{ base: "flex-start", md: "center" }}
-                            flexDir={{ base: "column", md: "row" }}
-                          >
-                            <Avatar
-                              src={i.profile}
-                              name={i.first_name}
-                              size="sm"
-                            />
-                            <VStack alignItems="flex-start" gap="-8">
-                              <Text maxW="52" wordBreak="break-all">
-                                {i.first_name} {i.last_name}
-                              </Text>
-                              <Text
-                                maxW="52"
-                                wordBreak="break-all"
-                                fontSize="12"
-                                mt="-0.5"
-                                fontWeight="medium"
-                              >
-                                {i.time}
-                              </Text>
-                            </VStack>
-                          </Flex>
-
-                          <Flex
-                            gap="2"
-                            alignItems="center"
-                            flexDir={{ base: "row-reverse", md: "row" }}
-                          >
-                            {i.instagram && (
-                              <IconButton
-                                as={Link}
-                                colorScheme="pink"
-                                icon={<Icon as={FiInstagram} fontSize="18" />}
-                                aria-label="Instagram"
-                                size="sm"
-                                href={`https://www.instagram.com/${i.instagram}`}
-                                target="_blank"
-                              />
-                            )}
-                            <Flex
-                              border="2px"
-                              borderColor="brand.500"
-                              px="3"
-                              borderRadius="md"
-                              fontSize="14"
-                              fontWeight="medium"
-                              alignItems="center"
-                              h="32px"
-                            >
-                              <Text color="brand.500">Skill {i.skill}</Text>
-                            </Flex>
-                          </Flex>
-                        </Flex>
+                        <AttendeeRow key={i._id} attendee={i} />
                         <Divider
                           display={
                             idx === data.attendees.length - 1 ? "none" : "block"
