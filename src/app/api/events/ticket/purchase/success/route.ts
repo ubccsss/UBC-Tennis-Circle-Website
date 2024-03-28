@@ -1,6 +1,10 @@
-import { connectToDatabase, stripe, logger, mergent } from "@lib";
+import { connectToDatabase, stripe, logger, mergent, sendMail } from "@lib";
 import { NextRequest, NextResponse } from "next/server";
-import { AttendeeList } from "@models/AttendeeList";
+import { AttendeeList, User } from "@models";
+import { PaymentConfirmationEmail } from "@emails";
+import axios, { AxiosResponse } from "axios";
+import { TennisEvent } from "@types";
+import { rangeHours } from "@utils";
 
 export const GET = async (request: NextRequest) => {
   await connectToDatabase();
@@ -15,6 +19,13 @@ export const GET = async (request: NextRequest) => {
     session.payment_status === "paid"
   ) {
     const { event_id, user_id, time_slot } = session.metadata;
+
+    const { data: event }: AxiosResponse<TennisEvent> = await axios.post(
+      `${process.env.NEXT_PUBLIC_HOSTNAME}/api/events/detail`,
+      {
+        id: event_id,
+      },
+    );
 
     const attendeeList = await AttendeeList.findOne({
       event_id,
@@ -43,9 +54,22 @@ export const GET = async (request: NextRequest) => {
           },
           $push: {
             attendees: user_id,
+            payments: session.payment_intent,
           },
         },
       );
+
+      const user = await User.findById(user_id).lean();
+
+      await sendMail({
+        to: user.email_address,
+        subject: `Payment Confirmation for ${attendeeList.event_name}`,
+        emailComponent: PaymentConfirmationEmail({
+          user,
+          eventName: attendeeList.event_name,
+          time: rangeHours(event.date, 1, parseInt(time_slot) === 1 ? 0 : 1),
+        }),
+      });
 
       return NextResponse.redirect(
         new URL(

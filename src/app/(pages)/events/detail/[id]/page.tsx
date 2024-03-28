@@ -170,7 +170,7 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
         flexDir="column"
         gap="4"
         h="100%"
-        minW={{ base: "unset", sm: "64" }}
+        minW={{ base: "100%", sm: "64" }}
         {...props}
       >
         <Text fontSize="lg" textAlign="center" mb="-2" fontWeight="medium">
@@ -185,6 +185,7 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
           isLoading={purchaseLoading && purchaseLoading === timeSlot}
           loadingText="Reserving Ticket"
           isDisabled={
+            data.status === "closed" ||
             (purchaseLoading && purchaseLoading !== timeSlot) ||
             (!slotObj.reserved && slotObj.available_tickets <= 0) ||
             slotObj.purchased
@@ -192,9 +193,11 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
         >
           {slotObj.purchased
             ? "Purchased Ticket"
-            : !slotObj.reserved && slotObj.available_tickets <= 0
-              ? "Sold out"
-              : `Purchase ($${data.ticket_price})`}
+            : data.status === "closed"
+              ? "Sale Closed"
+              : !slotObj.reserved && slotObj.available_tickets <= 0
+                ? "Sold out"
+                : `Purchase ($${data.ticket_price})`}
         </Button>
       </Flex>
     );
@@ -211,8 +214,8 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
               h={{ base: "72", sm: "80" }}
               mb="2"
             />
-            <HStack gap="8" alignItems="flex-start">
-              <VStack w="70%">
+            <Flex gap="8" flexDir={{ base: "column", md: "row" }}>
+              <VStack w={{ base: "100%", md: "70%" }}>
                 <SkeletonText
                   skeletonHeight="8"
                   noOfLines={1}
@@ -221,11 +224,11 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
                 />
                 <SkeletonText skeletonHeight="4" noOfLines={8} w="100%" />
               </VStack>
-              <VStack w="30%" gap="4">
+              <VStack w={{ base: "100%", md: "30%" }} gap="4">
                 <Skeleton borderRadius="8" h="32" w="100%" />
                 <Skeleton borderRadius="8" h="32" w="100%" />
               </VStack>
-            </HStack>
+            </Flex>
           </Flex>
         )}
 
@@ -333,13 +336,13 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
                   src={data.cover_image}
                   alt="Cover image"
                   w="100%"
-                  h="96"
+                  h={{ base: "64", md: "96" }}
                   objectFit="cover"
                   borderRadius="8"
                 />
                 <Flex
                   zIndex={2}
-                  h="96"
+                  h={{ base: "64", md: "96" }}
                   position="absolute"
                   bg="black"
                   w="100%"
@@ -351,8 +354,8 @@ const EventDetail = ({ params }: { params: { id: string } }) => {
                   borderRadius="8"
                 />
               </Flex>
-              <Flex gap="16" mt="8">
-                <Flex flexDir="column" gap="2">
+              <Flex gap="16" mt="8" w="100%">
+                <Flex flexDir="column" gap="2" w="100%">
                   <Text mb="-2">
                     {format(parseISO(data.date), "EEEE, MMM d yyyy")}
                   </Text>

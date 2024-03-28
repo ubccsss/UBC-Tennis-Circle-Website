@@ -2,7 +2,7 @@ import { contentfulClient } from "@lib";
 import { ServerResponse, mergeAttendees } from "@helpers";
 import { TypeEventSkeleton } from "@types";
 import { Asset } from "contentful";
-import { AttendeeList, User } from "@models";
+import { AttendeeList } from "@models";
 
 export const GET = async () => {
   try {

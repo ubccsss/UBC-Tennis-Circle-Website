@@ -1,7 +1,7 @@
 import { stripe, connectToDatabase } from "@lib";
 import axios, { AxiosResponse } from "axios";
 import { NextRequest } from "next/server";
-import z, { date } from "zod";
+import z from "zod";
 import { getSession, ServerResponse } from "@helpers";
 import { TennisEvent } from "@types";
 import { logger, mergent } from "@lib";
@@ -43,7 +43,12 @@ export const POST = async (request: NextRequest) => {
       const attendeeList = await AttendeeList.findOne({
         event_id: event.data.id,
         time_slot,
+        status: "open",
       });
+
+      if (!attendeeList) {
+        return ServerResponse.userError("Event is closed or does not exist");
+      }
 
       if (attendeeList.attendees.includes(session.user.userId)) {
         return ServerResponse.success({
