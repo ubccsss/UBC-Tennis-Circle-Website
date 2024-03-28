@@ -2,6 +2,9 @@ import { connectToDatabase, stripe, logger, mergent, sendMail } from "@lib";
 import { NextRequest, NextResponse } from "next/server";
 import { AttendeeList, User } from "@models";
 import { PaymentConfirmationEmail } from "@emails";
+import axios, { AxiosResponse } from "axios";
+import { TennisEvent } from "@types";
+import { rangeHours } from "@utils";
 
 export const GET = async (request: NextRequest) => {
   await connectToDatabase();
@@ -16,6 +19,13 @@ export const GET = async (request: NextRequest) => {
     session.payment_status === "paid"
   ) {
     const { event_id, user_id, time_slot } = session.metadata;
+
+    const { data: event }: AxiosResponse<TennisEvent> = await axios.post(
+      `${process.env.NEXT_PUBLIC_HOSTNAME}/api/events/detail`,
+      {
+        id: event_id,
+      },
+    );
 
     const attendeeList = await AttendeeList.findOne({
       event_id,
@@ -57,6 +67,7 @@ export const GET = async (request: NextRequest) => {
         emailComponent: PaymentConfirmationEmail({
           user,
           eventName: attendeeList.event_name,
+          time: rangeHours(event.date, 1, parseInt(time_slot) === 1 ? 0 : 1),
         }),
       });
 

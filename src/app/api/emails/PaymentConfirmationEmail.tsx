@@ -6,11 +6,13 @@ import { User } from "lucia";
 interface PaymentConfirmationEmail {
   user: User;
   eventName: string;
+  time: string;
 }
 
 export const PaymentConfirmationEmail = ({
   user,
   eventName,
+  time,
 }: PaymentConfirmationEmail) => {
   return (
     <EmailWrapper
@@ -20,7 +22,7 @@ export const PaymentConfirmationEmail = ({
     >
       <Text className="text-black text-[14px] leading-[24px]">
         Hey <b>{user.first_name}</b>, this is payment confirmation for your
-        purchase for {eventName}.
+        purchase for {eventName} ({time}).
       </Text>
     </EmailWrapper>
   );
