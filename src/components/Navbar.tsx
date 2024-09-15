@@ -13,14 +13,9 @@ import {
   IconButton,
   VStack,
   Collapse,
-  Skeleton,
-  HStack,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import NextLink from "next/link";
-import { AuthComponent } from "./AuthComponent";
-import axios from "axios";
-import { authBroadcast } from "@broadcasts";
 
 interface Link {
   name: string;
@@ -30,21 +25,12 @@ interface Link {
 const links: Array<Link> = [
   { name: "Home", href: "/" },
   { name: "About us", href: "/about" },
-  { name: "Events", href: "/events" },
   { name: "Gallery", href: "/gallery" },
   { name: "Contact", href: "/contact" },
 ];
 
-const authButtonHrefs = {
-  login: "/login",
-  signup: "/signup",
-  myAccount: "/profile/public",
-};
-
 interface NavbarContext {
   onToggle: () => void;
-  logout: () => void;
-  isLoggingOut: boolean;
 }
 
 const NavbarContext = createContext<NavbarContext>({} as NavbarContext);
@@ -52,8 +38,6 @@ const NavbarContext = createContext<NavbarContext>({} as NavbarContext);
 export const Navbar = () => {
   // state for mobile nav
   const { isOpen, onToggle } = useDisclosure();
-
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   // on scroll, border will appear
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -70,21 +54,8 @@ export const Navbar = () => {
     };
   }, []);
 
-  const logout = async () => {
-    setIsLoggingOut(true);
-    try {
-      await axios.post(`${process.env.NEXT_PUBLIC_HOSTNAME}/api/auth/logout`);
-
-      authBroadcast.postMessage("reload-auth");
-
-      window.location.href = "/";
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
   return (
-    <NavbarContext.Provider value={{ onToggle, logout, isLoggingOut }}>
+    <NavbarContext.Provider value={{ onToggle }}>
       <Box as="nav" bg="white" w="100%" position="fixed" zIndex="500">
         <Box
           w="100%"
@@ -93,11 +64,13 @@ export const Navbar = () => {
         >
           <Container maxW="container.xl" ml="auto" mr="auto">
             <Flex w="100%" p="3" flexDirection="row">
-              <Img
-                src="/static/images/brand/logo.svg"
-                alt="Tennis Circle"
-                w="20"
-              />
+              <Link display="block" href="/">
+                <Img
+                  src="/static/images/brand/logo.svg"
+                  alt="Tennis Circle"
+                  w="20"
+                />
+              </Link>
               <Spacer />
               <Flex display={{ base: "flex", lg: "none" }} alignItems="center">
                 <IconButton
@@ -143,50 +116,7 @@ export const Navbar = () => {
               </Stack>
               <Spacer display={{ base: "none", lg: "flex" }} />
               <Flex display={{ base: "none", lg: "flex" }} alignItems="center">
-                <AuthComponent
-                  unauthenticated={
-                    <HStack spacing="4">
-                      <Button as={NextLink} href={authButtonHrefs.login}>
-                        Login
-                      </Button>
-                      <Button
-                        colorScheme="brand"
-                        as={NextLink}
-                        href={authButtonHrefs.signup}
-                      >
-                        Sign up
-                      </Button>
-                    </HStack>
-                  }
-                  loading={
-                    <HStack spacing="4">
-                      <Skeleton>
-                        <Button>My Account</Button>
-                      </Skeleton>
-                      <Skeleton>
-                        <Button>Sign Out</Button>
-                      </Skeleton>
-                    </HStack>
-                  }
-                  authenticated={
-                    <HStack spacing="4">
-                      <Button
-                        colorScheme="brand"
-                        as={NextLink}
-                        href={authButtonHrefs.myAccount}
-                      >
-                        My Account
-                      </Button>
-                      <Button
-                        isDisabled={isLoggingOut}
-                        isLoading={isLoggingOut}
-                        onClick={logout}
-                      >
-                        Sign Out
-                      </Button>
-                    </HStack>
-                  }
-                />
+                <Button as={NextLink} href="https://www.showpass.com/o/ams-tennis-circle-ubc/" colorScheme="brand" >See Events</Button>
               </Flex>
             </Flex>
           </Container>
@@ -200,7 +130,7 @@ export const Navbar = () => {
 };
 
 const MobileNav = () => {
-  const { onToggle, logout, isLoggingOut } = useContext(NavbarContext);
+  const { onToggle } = useContext(NavbarContext);
 
   return (
     <Container
@@ -235,59 +165,9 @@ const MobileNav = () => {
               {i.name}
             </Link>
           ))}
-          <AuthComponent
-            loading={
-              <VStack align="flex-start">
-                <Button w={{ base: "100%", sm: "xs" }}>My Account</Button>
-                <Button w={{ base: "100%", sm: "xs" }}>Sign Out</Button>
-              </VStack>
-            }
-            unauthenticated={
-              <VStack align="flex-start">
-                <Button
-                  w={{ base: "100%", sm: "xs" }}
-                  as={NextLink}
-                  href={authButtonHrefs.login}
-                  onClick={onToggle}
-                >
-                  Login
-                </Button>
-                <Button
-                  w={{ base: "100%", sm: "xs" }}
-                  colorScheme="brand"
-                  as={NextLink}
-                  href={authButtonHrefs.signup}
-                  onClick={onToggle}
-                >
-                  Sign up
-                </Button>
-              </VStack>
-            }
-            authenticated={
-              <VStack align="flex-start">
-                <Button
-                  w={{ base: "100%", sm: "xs" }}
-                  as={NextLink}
-                  href={authButtonHrefs.login}
-                  onClick={onToggle}
-                  colorScheme="brand"
-                >
-                  My Account
-                </Button>
-                <Button
-                  w={{ base: "100%", sm: "xs" }}
-                  isDisabled={isLoggingOut}
-                  isLoading={isLoggingOut}
-                  onClick={() => {
-                    logout();
-                    onToggle();
-                  }}
-                >
-                  Sign Out
-                </Button>
-              </VStack>
-            }
-          />
+          <VStack align="flex-start">
+            <Button as={NextLink} w={{ base: "100%", sm: "xs" }} href="https://www.showpass.com/o/ams-tennis-circle-ubc/" colorScheme="brand">See Events</Button>
+          </VStack>
         </VStack>
       </Box>
     </Container>

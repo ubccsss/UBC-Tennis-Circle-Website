@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import {logger} from './winston';
+import { logger } from './winston';
 
 export const connectToDatabase = async () => {
   try {

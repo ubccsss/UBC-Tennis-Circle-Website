@@ -41,8 +41,7 @@ const About = () => {
             Welcome to the Circle
           </Heading>
           <Text textAlign="center" maxW="xl">
-            Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint
-            cillum sint consectetur cupidatat.
+            Step into the UBC Tennis Circle, where passion for the game meets community and camaraderie!
           </Text>
         </Flex>
 
@@ -63,11 +62,7 @@ const About = () => {
               Find events and connect with other tennis players!
             </Heading>
             <Text>
-              Lorem ipsum dolor sit amet, officia excepteur ex fugiat
-              reprehenderit enim labore culpa sint ad nisi Lorem pariatur mollit
-              ex esse exercitation amet. Nisi anim cupidatat excepteur officia.
-              Reprehenderit nostrud nostrud ipsum Lorem est aliquip amet
-              voluptate voluptate dolor minim nulla est proident.
+              At the UBC Tennis Circle, we offer a variety of events throughout the year, from casual meetups to competitive tournaments. Whether you're looking to improve your game or just meet new people, our events provide the perfect opportunity to bond with fellow tennis enthusiasts. No matter your experience level, you'll find players who share your passion and a welcoming community to grow with.
             </Text>
           </Flex>
           <Image
@@ -86,14 +81,10 @@ const About = () => {
         >
           <Flex flexDirection="column" gap="4" justifyContent="center">
             <Heading as="h1">
-              Find events and connect with other tennis players!
+              Our Mission
             </Heading>
             <Text>
-              Lorem ipsum dolor sit amet, officia excepteur ex fugiat
-              reprehenderit enim labore culpa sint ad nisi Lorem pariatur mollit
-              ex esse exercitation amet. Nisi anim cupidatat excepteur officia.
-              Reprehenderit nostrud nostrud ipsum Lorem est aliquip amet
-              voluptate voluptate dolor minim nulla est proident.
+              Our mission is to create an inclusive, vibrant space where tennis lovers of all skill levels can connect, play, and grow. At UBC Tennis Circle, we’re committed to fostering a supportive community that encourages both personal improvement and teamwork, all while promoting a love for the game. Whether you're here to compete or just have fun, we aim to provide a platform where everyone feels welcome on and off the court.
             </Text>
           </Flex>
           <Image
@@ -116,8 +107,7 @@ const About = () => {
           Meet the Team
         </Heading>
         <Text maxW="xl" textAlign="center">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a leo
-          tempus, euismod purus vitae, blandit lectus.
+          Meet the passionate team that makes the UBC Tennis Circle a vibrant and welcoming community!
         </Text>
         <Flex mt="8" flexDirection={{ base: "column", md: "row" }} w="100%">
           <Box>

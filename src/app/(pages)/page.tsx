@@ -18,6 +18,7 @@ import { FiArrowRight } from "react-icons/fi";
 import { TeamMember } from "@types";
 import { Skeleton } from "@chakra-ui/react";
 import { Error } from "@components";
+import NextLink from "next/link"
 
 // get featured team members
 const getFeatured = async () => {
@@ -35,19 +36,19 @@ const Home = () => {
 
   const stats = [
     {
-      icon: UserFriendsIcon,
-      title: "100+ Members",
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    },
-    {
       icon: CommentsIcon,
       title: "A growing community",
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+      body: "Connect, play, and grow with fellow tennis lovers.",
+    },
+    {
+      icon: UserFriendsIcon,
+      title: "100+ Members",
+      body: "Join a thriving community of tennis enthusiasts at every skill level.",
     },
     {
       icon: TennisBallIcon,
-      title: "15+ courts",
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+      title: "Weekly sessions",
+      body: "Sharpen your skills with regular, fun-filled practices.",
     },
   ];
 
@@ -69,12 +70,10 @@ const Home = () => {
           >
             <Heading as="h1">Welcome to the UBC Tennis Circle!</Heading>
             <Text maxW="lg">
-              Lorem ipsum dolor sit amet, officia excepteur ex fugiat
-              reprehenderit enim labore culpa sint ad nisi Lorem pariatur mollit
-              ex esse exercitation amet.
+              Whether you're a seasoned player or just picking up a racket for the first time, our club offers a dynamic and inclusive community for tennis enthusiasts of all skill levels.
             </Text>
             <Box mt="2">
-              <Button colorScheme="brand" rightIcon={<FiArrowRight />}>
+              <Button colorScheme="brand" rightIcon={<FiArrowRight />} as={NextLink} href="https://www.showpass.com/o/ams-tennis-circle-ubc/">
                 Join the Circle
               </Button>
             </Box>
@@ -83,7 +82,7 @@ const Home = () => {
               position="absolute"
               bottom={{ base: "-10", lg: "24" }}
               right={{ base: "0", lg: "24" }}
-              src="static/images/illustrations/tennis-ball-yellow-lg.svg"
+              src="static/images/illustrations/tennis-ball-yellow-sm.svg"
               w="16"
               alt="Tennis ball"
             />
@@ -123,15 +122,11 @@ const Home = () => {
             <Heading as="h1">
               Find events and connect with other tennis players!
             </Heading>
-            <Text>
-              Lorem ipsum dolor sit amet, officia excepteur ex fugiat
-              reprehenderit enim labore culpa sint ad nisi Lorem pariatur mollit
-              ex esse exercitation amet. Nisi anim cupidatat excepteur officia.
-              Reprehenderit nostrud nostrud ipsum Lorem est aliquip amet
-              voluptate voluptate dolor minim nulla est proident.
+            <Text mb="4">
+              Whether you’re competing in friendly matches, joining social round-robins, or participating in club tournaments, UBC Tennis Circle offers something for everyone. Our events bring players together, helping you meet new people, form teams, and grow your tennis network. No matter your skill level, you'll find a welcoming and active community ready to rally with you both on and off the court!
             </Text>
             <Box>
-              <Button colorScheme="brand" rightIcon={<FiArrowRight />}>
+              <Button colorScheme="brand" rightIcon={<FiArrowRight />} as={NextLink} href="https://www.showpass.com/o/ams-tennis-circle-ubc/">
                 Browse Events
               </Button>
             </Box>
@@ -157,9 +152,8 @@ const Home = () => {
           <Heading as="h3" textAlign="center">
             Meet the Team
           </Heading>
-          <Text maxW="xl" textAlign="center">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a leo
-            tempus, euismod purus vitae, blandit lectus.
+          <Text maxW="lg" textAlign="center" >
+            Get to know the passionate leaders who drive the UBC Tennis Circle forward!
           </Text>
           <Flex mt="8" flexDirection={{ base: "column", md: "row" }} w="100%">
             <Box>
@@ -214,7 +208,7 @@ const Home = () => {
               </SimpleGrid>
             )}
           </Flex>
-          <Button mt="8" colorScheme="brand" rightIcon={<FiArrowRight />}>
+          <Button mt="8" colorScheme="brand" rightIcon={<FiArrowRight />} as={NextLink} href="/about">
             View full team
           </Button>
         </Flex>

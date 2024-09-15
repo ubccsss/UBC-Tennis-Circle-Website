@@ -40,9 +40,8 @@ const Gallery = () => {
             <Heading as="h1" textAlign="center">
               View our recent posts
             </Heading>
-            <Text maxW="xl" textAlign="center">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi a
-              leo tempus, euismod purus vitae, blandit lectus.
+            <Text maxW="lg" textAlign="center">
+              Check out our latest updates and stay connected with the UBC Tennis Circle!
             </Text>
           </VStack>
         </Center>

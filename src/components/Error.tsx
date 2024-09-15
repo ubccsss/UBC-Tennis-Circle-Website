@@ -1,5 +1,5 @@
-import {Flex, Icon, Text, FlexProps} from '@chakra-ui/react';
-import {FiAlertCircle} from 'react-icons/fi';
+import { Flex, Icon, Text, FlexProps } from '@chakra-ui/react';
+import { FiAlertCircle } from 'react-icons/fi';
 
 export const Error = (props: FlexProps) => (
   <Flex
@@ -14,3 +14,4 @@ export const Error = (props: FlexProps) => (
     <Text maxW="64">An unexpected error has occurred</Text>
   </Flex>
 );
+
