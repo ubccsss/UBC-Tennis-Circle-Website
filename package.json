@@ -26,6 +26,8 @@
     "@hookform/resolvers": "^3.3.4",
     "@lucia-auth/adapter-mongoose": "^3.0.1",
     "@lucia-auth/oauth": "^3.5.2",
+    "@netlify/next": "^1.4.9",
+    "@netlify/plugin-nextjs": "^5.7.1",
     "@react-email/components": "0.0.12",
     "@react-email/render": "^0.0.7",
     "@stripe/stripe-js": "^3.0.10",
