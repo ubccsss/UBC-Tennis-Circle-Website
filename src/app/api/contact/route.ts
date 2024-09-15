@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { connectToDatabase } from "@lib";
 import { logger, sendMail } from "@lib";
 import { ServerResponse } from "@helpers";
 import ContactEmail from "@emails/ContactEmail";
@@ -14,8 +13,6 @@ const ContactEmailSchema = z.object({
 });
 
 export const POST = async (request: NextRequest) => {
-  await connectToDatabase();
-
   const body = await request.json();
 
   const { name, email_address, message } = structuredClone(body);
@@ -41,7 +38,7 @@ export const POST = async (request: NextRequest) => {
       return ServerResponse.success("Successfully sent message.");
     } catch (e) {
       logger.error(e);
-
+      console.log(e)
       return ServerResponse.serverError();
     }
   } else {
