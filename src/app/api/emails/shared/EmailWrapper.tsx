@@ -10,7 +10,6 @@ import {
   Text,
   Img,
 } from "@react-email/components";
-import { User } from "@models";
 import * as React from "react";
 
 interface EmailWrapperProps {
@@ -23,7 +22,6 @@ interface EmailWrapperProps {
     last_name: string;
     [key: string]: unknown;
   }
-  | User;
 }
 
 export const EmailWrapper = ({

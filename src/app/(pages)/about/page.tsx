@@ -62,7 +62,7 @@ const About = () => {
               Find events and connect with other tennis players!
             </Heading>
             <Text>
-              At the UBC Tennis Circle, we offer a variety of events throughout the year, from casual meetups to competitive tournaments. Whether you're looking to improve your game or just meet new people, our events provide the perfect opportunity to bond with fellow tennis enthusiasts. No matter your experience level, you'll find players who share your passion and a welcoming community to grow with.
+              At the UBC Tennis Circle, we offer a variety of events throughout the year, from casual meetups to competitive tournaments. Whether you&apos;re looking to improve your game or just meet new people, our events provide the perfect opportunity to bond with fellow tennis enthusiasts. No matter your experience level, you&apos;ll find players who share your passion and a welcoming community to grow with.
             </Text>
           </Flex>
           <Image
@@ -84,7 +84,7 @@ const About = () => {
               Our Mission
             </Heading>
             <Text>
-              Our mission is to create an inclusive, vibrant space where tennis lovers of all skill levels can connect, play, and grow. At UBC Tennis Circle, we’re committed to fostering a supportive community that encourages both personal improvement and teamwork, all while promoting a love for the game. Whether you're here to compete or just have fun, we aim to provide a platform where everyone feels welcome on and off the court.
+              Our mission is to create an inclusive, vibrant space where tennis lovers of all skill levels can connect, play, and grow. At UBC Tennis Circle, we’re committed to fostering a supportive community that encourages both personal improvement and teamwork, all while promoting a love for the game. Whether you&apos;re here to compete or just have fun, we aim to provide a platform where everyone feels welcome on and off the court.
             </Text>
           </Flex>
           <Image

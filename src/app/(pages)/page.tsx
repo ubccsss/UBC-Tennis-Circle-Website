@@ -70,7 +70,7 @@ const Home = () => {
           >
             <Heading as="h1">Welcome to the UBC Tennis Circle!</Heading>
             <Text maxW="lg">
-              Whether you're a seasoned player or just picking up a racket for the first time, our club offers a dynamic and inclusive community for tennis enthusiasts of all skill levels.
+              Whether you&apos;re a seasoned player or just picking up a racket for the first time, our club offers a dynamic and inclusive community for tennis enthusiasts of all skill levels.
             </Text>
             <Box mt="2">
               <Button colorScheme="brand" rightIcon={<FiArrowRight />} as={NextLink} href="https://www.showpass.com/o/ams-tennis-circle-ubc/">
@@ -123,7 +123,7 @@ const Home = () => {
               Find events and connect with other tennis players!
             </Heading>
             <Text mb="4">
-              Whether you’re competing in friendly matches, joining social round-robins, or participating in club tournaments, UBC Tennis Circle offers something for everyone. Our events bring players together, helping you meet new people, form teams, and grow your tennis network. No matter your skill level, you'll find a welcoming and active community ready to rally with you both on and off the court!
+              Whether you’re competing in friendly matches, joining social round-robins, or participating in club tournaments, UBC Tennis Circle offers something for everyone. Our events bring players together, helping you meet new people, form teams, and grow your tennis network. No matter your skill level, you&apos;ll find a welcoming and active community ready to rally with you both on and off the court!
             </Text>
             <Box>
               <Button colorScheme="brand" rightIcon={<FiArrowRight />} as={NextLink} href="https://www.showpass.com/o/ams-tennis-circle-ubc/">
