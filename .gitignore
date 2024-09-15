@@ -49,3 +49,6 @@ next-env.d.ts
 .flaskenv*
 !.env.project
 !.env.vault
+
+# Local Netlify folder
+.netlify

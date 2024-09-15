@@ -182,7 +182,7 @@ const Home = () => {
                   ))}
               </SimpleGrid>
             )}
-            {data && (
+            {data && Array.isArray(data) && (
               <SimpleGrid spacing="4" columns={{ base: 1, sm: 2, md: 4 }}>
                 {data.map((i, idx) => (
                   <Box position="relative" key={idx}>
