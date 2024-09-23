@@ -20,12 +20,13 @@ import NextLink from "next/link";
 interface Link {
   name: string;
   href: string;
+  mobileHref?: string;
 }
 
 const links: Array<Link> = [
   { name: "Home", href: "/" },
   { name: "About us", href: "/about" },
-  { name: "Gallery", href: "/gallery" },
+  { name: "Gallery", href: "/gallery", mobileHref: "https://www.instagram.com/ubctenniscircle/" },
   { name: "Contact", href: "/contact" },
 ];
 
@@ -146,8 +147,8 @@ const MobileNav = () => {
           {links.map((i) => (
             <Link
               as={NextLink}
-              href={i.href}
-              key={i.href}
+              href={i.mobileHref ? i.mobileHref : i.href}
+              key={i.mobileHref ? i.mobileHref : i.href}
               onClick={onToggle}
               fontWeight="medium"
               color="gray.500"
